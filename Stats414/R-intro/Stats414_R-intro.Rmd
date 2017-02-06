@@ -1,0 +1,515 @@
+---
+title: "A gentle introduction to R"
+author: "GAO Zheng"
+date: "Dec 25, 2016"
+output:
+  html_document: default
+  html_notebook: default
+  pdf_document: default
+---
+
+I am roughly following the **TutorialsPoint.com**'s R tutorial: <http://www.tutorialspoint.com/r/>
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+## Getting started
+
+Start by installing R and Rstudio on your computer.
+
+## Wroking directory
+
+```{r include=FALSE}
+options(digits = 8)
+rm(list = ls())
+```
+
+An R session keeps track of your working directory. All reads/writes/changes/etc. to files living on your computer (hard drive) happens under this directory, unless otherwise specified.
+
+```{r}
+# get working directory
+getwd()
+# set appropriate working directory (YOUR OWN DIRECTORY)
+setwd("/home/gaozheng/Teaching/Stats414/R-intro/")
+# Looking around, list all files under this directory
+list.files()
+# alternatively
+dir()
+```
+
+## Look for variables in environment 
+
+Within an R session, objects exist in an environment (living in your computer's memory). The one you will be working with most of the time is called the global environment. To 
+
+```{r}
+# list variables in the environment
+ls()
+# create a number in the global environment
+a.number <- 12
+# look at the environment again
+ls()
+# remove a variable from the environment
+rm(list='a.number')
+# Now 'a.number' is gone
+ls()
+```
+
+## Data types
+
+There are 6 types of basic data types in R:
+Logical, Numeric, Integer, Complex, Character, Raw
+
+```{r}
+v <- TRUE 
+print(class(v))
+v <- 23.5
+print(class(v))
+v <- 2L
+print(class(v))
+v <- 2+5i
+print(class(v))
+v <- "TRUE"
+print(class(v))
+v <- charToRaw("Hello")
+print(class(v))
+```
+
+## Vectors and Lists
+
+Vectors contains objects of the *same* type. List doesn't require members to be of the same type.
+
+### Vectors
+
+```{r}
+# initialize a vector (concatenation)
+vector1 <- c(1,'A',T,2.3)
+# print a vector (works inside functions)
+print(vector1)
+# another way to display a variable (doesn't work inside functions)
+vector1
+# another way to initialize a vector
+x <- 1:10
+# yet another way to initialize a vector
+x <- seq(from = 1, to = 10, by = 1);x
+# you can leave out the paramenter names as long as the orders are correct
+x <- seq(1,10,1);x
+# initialize a variable using existing ones
+y <- x^2
+# Notice that you don't have to write a loop to define y
+# R is 'vector-friendly'
+# In fact you should AVOID writting loops in R unless necessary
+print(y)
+```
+
+### Lists
+
+```{r}
+# Create a list.
+list1 <- list(c(2,5,3),21.3,sin)
+# Now things inside list1 do NOT get converted to the same type!
+print(list1)
+```
+
+### Subsetting a vector / list
+
+```{r}
+# You can ``access'' any elements of a vector / list by providing its index inside the [ ]
+vector1[1]
+# Or by providing a vector of indices
+vector1[1:3]
+# Or by providing a vector of Logicals
+index <- c(T,F,F,T)
+vector1[index]
+```
+
+#### Q: What happens if the length of the Logical index and the vector disagrees?
+
+R recycles the vector with shorter length
+
+```{r}
+vector1[c(T,F,F)]
+```
+
+Subsetting a list is a little tricky.
+
+```{r}
+# Subsetting a list with [ ], and you still get a list
+list1[1]
+class(list1[1])
+# To extract the vector, use double [[ ]]
+list1[[1]]
+class(list1[[1]])
+```
+Pictorial illustration tweeted by [Hadley Wickham](https://twitter.com/hadleywickham/status/643381054758363136):
+
+![Subsetting a list in R](https://pbs.twimg.com/media/CO2_qPVWsAAErbv.png)
+
+
+## Matrices
+
+Think of them as ``2-D vectors''. It, too, only allows data of the same type.
+
+### Creating a matrix
+
+```{r}
+M <- matrix( c(4,2,6,3,7,1), nrow = 2, ncol = 3, byrow = TRUE)
+print(M)
+# Matrix transpose
+t(M)
+```
+
+### Naming the columns and rows (always good to have meaningful names)
+
+```{r}
+colnames(M) <- c('col1','col2','col3')
+rownames(M) <- c('row1','row2')
+M
+```
+
+#### Q: what happens if the length of the content and the matrix size disagrees?
+
+```{r,results='hide'}
+# M <- matrix(1:5, nrow = 2, ncol = 3)
+# print(M)
+```
+
+Subsetting of a matrix is siimlar to that of a vector, except you need to provide two indices for the two dimensions:
+
+```{r}
+M[2,c(1,3)]
+```
+
+### Matrix mutiplication
+
+Dimensions must agree! Vectors are treated by default as column vectors.
+
+```{r}
+# with a vector
+M%*%c(1,2,3)
+# with another matrix
+M%*%t(M)
+```
+
+#### Q: what happens if the orientation is misaligned for the vector?
+
+```{r,results='hide'}
+# M%*%t(c(1,2,3))
+# What about this?
+# t(c(1,2))%*%M
+```
+
+## Factors
+
+are roughly speaking, storage-wise, an integer vector with labels. 
+
+Factors are treated differently from intergers when being operated on. More on this later in the course.
+
+```{r}
+# NA does not count as a factor
+factor1 <- factor(c('apple','orange','apple','apple','orange','pear',NA,'orange'))
+# coercion to numerical values produces integer values
+as.numeric(factor1)
+# read the factor levels
+levels(factor1)
+# relabel the levels
+levels(factor1) <- c("cup","bowl","plate")
+# look at the factor again
+factor1
+```
+
+
+## Dataframes
+
+Think of dataframes as generalization of matrices, allowing columns to assume different data types.
+
+```{r}
+col1 <- (1:5)/10; col2 <- letters[1:5]; col3 <- round(sin(1:5),3);
+```
+
+Numerical objects are converted to characters when concatenating A1 to A3, same as when you create a vector of mixed data types.
+
+```{r}
+A <- cbind(col1 , col2 , col3) # cbind for 'column bind'
+print(A)
+```
+
+Data frames keep numerical variables numerical, and convert characters to factors.
+
+```{r}
+dataframe1 <- data.frame(col1 , col2 , col3)
+print(dataframe1)
+```
+
+Viewing dataframe summaries
+
+```{r}
+summary(dataframe1)
+```
+
+### Subsetting a dataframe
+
+You can subset a dataframe in one of two ways: by name of row/column, or by index.
+
+```{r}
+dataframe1$col1
+dataframe1[,1]
+```
+
+
+## Functions
+ 
+Functions are a great way of reuse and reduce the code you have to write. It wraps a closely-tied chunck of code into a resuable operation with a name. A function is signatured by its name and input. Functions are avaible as a bundle in pre-existing packages, or can be defined as you wish in an R session environment.
+
+### How to use an existing function from package
+
+```{r}
+# look for manual for a function if you know the function name
+?rm
+# fuzzy search
+??remove
+```
+
+Sometimes Google (or your favorarite engine) search is more helpful than ``??''.
+
+### How to define a new function
+
+Use `function()` function
+
+```{r}
+f <- function(x){
+  x^2-2*x+1
+}
+```
+
+The last line is returned, you can also use 'return' for clarity
+
+```{r}
+f <- function(x){
+  return(x^2-2*x+1)
+}
+```
+
+Now we can apply it
+
+```{r}
+f(x) # works on numericals
+# It contains incompatible operation for strings
+# f('test') # won't run
+```
+
+## Basic plotting
+
+```{r}
+# plot a series against another
+plot(x, f(x))
+# connecting the dots, add colors, plotting ranges
+plot(x, f(x) ,type = 'l', col = 'red', xlim = c(0,11))
+```
+
+# Data wrangling
+
+In real life, most of our time is spent wrangling with datasets; figuring out how things are recorded, dealing with missing data, extract the useful bits of information from a menagerie of variables.
+Much less time is spent on actual discovery and trying to draw insights from the datasets.
+
+Datasets in classes are mostly curated, clearly annotated. The real world is a lot messier.
+
+The following is an example of real world dataset, still quite well-behaved, but it is closer to what datasets look like out there.
+
+The dataset is adapted from:
+
+[Allison, T. and Chichetti, D. (1976) Sleep in mammals: ecological and constitutional correlates. Science 194 (4266), 732–734.](http://science.sciencemag.org/content/194/4266/732)
+
+- The dataset consists of animal sleep data with 62 observations on 10 variables.
+
+- Some of the variables are missing.
+
+- The dataset is splitted into two (deliberately): 
+First contains the observation ID plus the first 6 variables. Second contains the observation ID plus the last 4 variables.
+
+We are going to read the datasets, combine them according to their ID, calculate some simple statistics, and visulaize the results.
+
+## Read the dataset into R
+
+Download the datasets [sleep1.csv](./data/sleep1.csv), [sleep2.csv](./data/sleep2.csv) here by following the links or download from Canvas.
+
+Inspect the datasets. Read both files into R.
+
+You should be getting the following header names and data types
+
+```{r}
+sleepdata1 <- read.csv(file = "./data/sleep1.csv", header = T,na.strings = "NULL")
+sleepdata2 <- read.csv(file = "./data/sleep2.csv", header = T,na.strings = "NULL")
+
+sapply(sleepdata1,class)
+sapply(sleepdata2,class)
+```
+
+## Combine the datasets according to observation ID
+
+We shoud be merging the two datasets where their ID's match.
+
+The combined headers and data types look like this:
+
+```{r}
+sleepdata <- merge(sleepdata1, sleepdata2, by = "ID")
+sapply(sleepdata, class)
+```
+
+*Q*: Does `cbind` work? Why? What about `merge`?
+
+## Calculate the proportion of dream time in sleep
+
+Notice there is a numeric column "Dream" and a numerical column "Sleep". We want to calculate the ratio of the two, where neither of them are `NA`'s.
+
+Then append the new column to the dataframe. Call the new Column "Ratio". The first 10 rows look like this:
+
+```{r}
+sleepdata <- cbind(sleepdata,"Ratio" = sleepdata$Dream/sleepdata$Sleep)
+head(sleepdata[2:12],10)
+```
+
+## Stripchart
+
+```{r}
+stripchart(sleepdata$Ratio,
+           main =  "Proportion of dream time in sleep")
+```
+
+It is a little more pleasing to the eye to see a jittered stripchart.
+
+```{r}
+stripchart(sleepdata$Ratio, method = 'jitter',
+           main =  "Proportion of dream time in sleep")
+```
+
+## Histogram
+
+```{r}
+hist(sleepdata$Ratio)
+```
+
+You can also overlay a stripchart over the histogram.
+
+```{r}
+hist(sleepdata$Ratio)
+stripchart(sleepdata$Ratio, method = 'jitter', add=TRUE, at = 5)
+```
+
+## Boxplot
+
+```{r}
+boxplot(sleepdata$Ratio)
+```
+
+
+## Boxplot of a variable against another
+
+Now we want to viualize the relationship between the variables "Ratio" and "Danger" using a boxplot.
+
+```{r}
+with(sleepdata,boxplot(Ratio~Danger,
+                       xlab='Danger',
+                       ylab = 'Ratio',
+                       main='Ratio by Danger Category'))
+```
+
+*Tip*: The function `with` can shorten the code significantly for expressions involving dataframes.
+
+`with` creates an environment from the dataframe and places it in the search path, so that when you refer to the variables in the dataset, you no longer have refer to the dataset by name.
+
+For example instead of writing 
+
+```{}
+plot(really_long_dataframe_name$really_long_variable_name_1,
+     really_long_dataframe_name$really_long_variable_name_2)
+```
+you can write
+```{}
+with(really_long_dataframe_name, 
+     plot(really_long_variable_name_1,really_long_variable_name_2))
+```
+
+See more on `?with`.
+
+## Order the dataset by a variable
+
+What if we want to reorder the dataframe accoring to the variable "Ratio", in increasing order?
+
+```{r}
+sleepdata <- sleepdata[order(sleepdata$Ratio),]
+print(head(sleepdata[,2:12],10))
+```
+
+Q: Does `sort` do? What about `order`?
+
+#More on plotting
+
+There are many ways you can make your plots for 
+
+This example contains a few frequently used plotting parameters:
+
+- Line/Point styles: `type`, `lty`, `pch`, `col`, ...
+
+    - `type`: consult `?plot`, it refers to the type of the line. ‘b’ for showing both the points and the line, ‘o’ for both but over-positioning each other, ‘l’ for line-only and ‘p’ for points-only.
+
+    - `lty`: line type, take integer values.
+
+    - `pch`: the point marker used, take integer or character values.
+    
+    - `col`: color, take integer or character values.
+
+- Plot range: `xlim`, `ylim`. Here we expanded the plot ranges to have more comfortable margins.
+
+- Texts: `main`, `sub`, `xlab`, `ylab`, ...
+
+    - `main`: main title of the plot.
+
+    - `sub`: subtitle.
+
+    - `xlim`, `ylim`: ranges of axes.
+
+- Font sizes: `cex` (default), `cex.main`, `cex.sub`, `cex.lab`, `cex.axis`, ... 
+
+- Axes: `axes` ...
+
+- Margin: `par(mar = )` ...
+
+- Layout: `layout`, `par(mfrow = )` ...
+
+```{r,fig.width=8,fig.height=4}
+simulated.X <- rnorm(n=10000);
+dens <- density(simulated.X);
+plot(
+  dens, col = 'blue', lty = 2, xlim = c(-4,4), ylim = c(0,0.4),
+  main = "A comparison of true and estimated normal density"
+)
+par(new = T)
+lines(
+  dens$x, dnorm(dens$x),lty = 1, col = 'red'
+)
+legend(
+  x = 'topleft',legend = c('Estimated density','True density'),
+  col = c('blue','red'), lty = c(2,1)
+)
+```
+
+It is possible to come up with pretty plots using only base packages. Plotting needs a little practice (and some Googling).
+
+
+## Extras
+- It is always good to keep in mind that computers are finite machines.
+- They are only approxiamtely accurate.
+- Your algorithm matters.
+
+E.g.
+```{r}
+options(digits = 22)
+sum(1/1:500000)
+sum(1/500000:1)
+options(digits = 8)
+```
+
+Results are close (for all practical purposes), but bot identical.
+
+## Advanced
+
+[Advanced R](http://adv-r.had.co.nz/) is a good reference if you are into more details of R.

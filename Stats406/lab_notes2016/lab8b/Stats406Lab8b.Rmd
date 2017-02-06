@@ -1,0 +1,115 @@
+---
+title: "Lab 8b"
+author: "GAO Zheng"
+date: "November 2, 2016"
+output:
+  html_notebook: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Now you can download the RMarkdown file by clicking the button in the rupper right corner of this html page.
+
+
+## Rejection sampling
+
+Idea: Simulate random variables (pair of coordinates) distributed uniformly over the region under the density curve ($F$). However doing so directly may be difficult.
+
+Simulate a random variables uniformly in a region that encapsulates the target density.
+
+i.e. simulate from $Y \sim g$, $U \sim \mathrm{U}(0, Mg(Y))$, where $Mg(t) \ge f(t)$ everywhere.
+
+Algorithm (Rejection Sampling)
+
+1. Generate $Y \sim g$ and generate $U \sim \mathrm{U}(0, Mg(Y))$.
+
+2. If $U \le f(Y)$, Stop and return $Y$.
+
+3. Otherwise, reject $Y$ and go back to Step 1.
+
+Here is an equivalent version:
+
+Algorithm (Rejection Sampling)
+
+1. Generate $Y ~ g$ and generate $U \sim \mathrm{U}(0, 1)$.
+
+2. If $UMg(Y) \le f(Y)$, Stop and return $Y$.
+
+3. Otherwise, reject $Y$ and go back to Step 1.
+
+Overall efficiency of the algorithm is $1/M$. Therefore we would like the constant $M$ to be as small as possible (M cannot be less than 1; why?).
+
+#### Example
+
+simulate circular distribution on $[-1,1]$ using standard normal as the proposal distribution.
+
+```{r}
+xseq <- seq(-2,2,0.01)
+f <- function(x){
+  2/pi*sqrt(pmax(1-x^2,rep(0,length(x))))
+}
+plot(xseq,f(xseq),'l',ylim=c(0,1),ylab = "f(x)",xlab="x",main = "density of target and proposals")
+lines(xseq,dnorm(xseq),'l',col=4,lty=2)
+lines(xseq,2*dnorm(xseq),'l',col=2)
+legend("topright",
+       legend=c('f(x)',
+                expression(paste(phi,'(x)')),
+                expression(paste('2',phi,'(x)'))),
+       col=c(1,4,2),lty = c(1,2,1))
+```
+
+```{r}
+rejection_sampling <- function(n)
+{
+  ## constant M
+  M <- 2
+  
+  ## Initialize the output
+  x <- rep(0, n)
+  
+  k <- 0 ## Number of accepted samples
+  ## While loop until there are n accepted samples
+  while (k <= n)
+  {
+    y <- rnorm(1)
+    u <- runif(1)
+    if (u*M*dnorm(y) <= f(y))
+    {
+      k <- k + 1
+      x[k] <- y
+    }
+  }
+  return(x)
+}
+
+x <- rejection_sampling(10000)
+hist(x, breaks=20,prob = TRUE)
+lines(xseq,f(xseq),'l')
+```
+
+
+
+**Remarks**
+
+ - We only need to know f up to a constant factor (why?). This is helpful when the normalizing constant for f(x) is expensive to compute.
+ 
+ $$
+ \begin{aligned}
+ \mathrm{P}[X_i\in [a,b]~\big|~X_i~\mathrm{accepted}] 
+ &= \frac{\mathrm{P}[X_i\in [a,b], X_i~\mathrm{accepted}]}{\mathrm{P}[X_i~\mathrm{accepted}]}\\
+ &= \frac{\mathrm{E}\big[\mathrm{P}[X_i\in [a,b], X_i~\mathrm{accepted}~\big|~Y_i]\big]} {\mathrm{P}[X_i~\mathrm{accepted}]}\\
+ &= \frac{\int_a^b\mathrm{P}[X_i~\mathrm{accepted}~\big|~Y_i=y]g(y)\mathrm{d}y} {\int_{-\infty}^{\infty}\mathrm{P}[X_i~\mathrm{accepted}~\big|~Y_i=y]g(y)\mathrm{d}y}\\
+ &= \frac{\int_a^b \frac{f(y)}{Mg(y)} g(y)\mathrm{d}y} {\int_{-\infty}^{\infty}\frac{f(y)}{Mg(y)}g(y)\mathrm{d}y}\\
+ &= \frac{\int_a^b {f(y)}\mathrm{d}y}{\int_{-\infty}^{\infty}f(y)\mathrm{d}y}
+ \end{aligned}
+ $$
+ 
+ - Best rejection sampling can do: choose a proper M such that $f(x) \le Mg(x)$ but f(x) and M g(x) as close as possible. i.e. M as small as possible; best choice of M is
+ 
+ $$ M^* = \mathrm{sup}_x \frac{f(x)}{g(x)} $$
+

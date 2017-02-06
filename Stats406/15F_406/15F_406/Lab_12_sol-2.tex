@@ -1,0 +1,427 @@
+% \let\Oriitem\item
+\documentclass[9pt]{beamer}
+\usepackage[latin1]{inputenc}
+\usepackage{amsmath, amsfonts, amssymb}
+% \usepackage{paralist}
+\usepackage{bbm}
+\usepackage{cases}
+\usepackage{graphicx, float, pdfpages}
+\usepackage{verbatim}
+
+
+\usepackage{color}
+\newcommand{\pr}{\mathbb{P}}
+\newcommand{\ep}{\mathbb{E}}
+\newcommand{\var}{\textrm{Var}}
+
+\renewcommand{\thefootnote}{\fnsymbol{footnote}}
+\newcommand{\x}{\bm{x}}
+\newcommand{\X}{\bm{X}}
+\newcommand{\td}{\textrm{d}}
+
+\newcommand{\tblue}[1]{\textcolor{blue}{#1}}
+\newcommand{\tred}[1]{\textcolor{red}{#1}}
+\newcommand{\tplum}[1]{\textcolor{Plum}{#1}}
+\newcommand{\tcyan}[1]{\textcolor{Cyan}{#1}}
+\newcommand{\taqua}[1]{\textcolor{Aquamarine}{#1}}
+
+\usetheme{Antibes}
+\usecolortheme{beaver}
+
+\title{STATS 406 Fall 2015 \\Final Review}
+%\author{Yuan Zhang}
+
+\begin{document}
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Random number generation}
+	\begin{itemize}
+		\item \tblue{Inversion method:} If CDF $F(x)$ is known, we can sample $X\stackrel{\textrm{CDF}}{\sim}F$ by $F^{-1}(U)$, where $U\sim~$Uniform$(0, 1)$.
+		\only<1>{
+			\item {\bf Question 1.(a):} Sample standard Cauchy: $F(x) = \frac{1}{\pi}\arctan(x)+\frac{1}{2}$.
+			\item {\bf Answer:} First figure out the inverse function $F^{-1}$:
+			$$y=\frac{1}{\pi}\arctan(x)+\frac{1}{2}$$
+			which gives $x = \tan\left( \pi\left( y-\frac{1}{2} \right) \right)$, that is $F^{-1}(t)=\tan\left( \pi\left( t-\frac{1}{2} \right) \right)$.
+			
+			We can sample $X$ by $X:=\tan\left( \pi\left( U-\frac{1}{2`} \right) \right)$.
+		}
+		\only<2>{
+			\item {\bf Question 1.(b):} Sample Geometric($p$):
+			$$
+			\ep(X=k) = p(1-p)^{k-1}
+			$$
+			\item {\bf Answer:} The \tblue{discrete version} of the inversion method is a \tblue{stick breaking algorithm}:
+			\begin{enumerate}
+				\item Sample $U\sim$~Uniform$(0, 1)$. Set $k=1$, $v=p$.
+				\item while(U$>$v)\{\\
+					k = k + 1;\\
+					v = v + p*(1-p)\^{}(k-1);\\
+				\}
+				\item Return $k$.
+			\end{enumerate}
+		}
+	\end{itemize}
+\end{frame}
+
+
+
+
+\begin{frame}
+	\frametitle{Random number generation}
+	\begin{itemize}
+		\item \tblue{Rejection sampling:} Want to sample from PDF $f(x)$, know: 1. how to sample from PDF $g(x)$; 2. for a constant $M$, $f(x)\leq Mg(x)$ for \tred{all} $x$.
+		\begin{itemize}
+			\item $M$ doesn't have to be its optimal choice.
+			\item The domination of $Mg$ over $f$ must hold for \tred{all} $x$.
+		\end{itemize}
+		\item {\bf Question 1.(c):} Given CDF $F(x)=\sin(\pi x)$ on $\left[0, \frac{1}{2}\right]$, sample from $F$.
+		\item {\bf Answer:} First derive the corresponding PDF: $f(x)=F'(x)=\pi\cos(\pi x)$. $f(x)$ ranges from $\pi$ to $0$ on $\left[0, \frac{1}{2}\right]$. So we can use the uniform distribution on $\left[0, \frac{1}{2}\right]$ to dominate $f(x)$ with the choice of $M=\frac{\pi}{2}$.\\\bigskip
+		\underline{Algorithm:}
+		\begin{enumerate}
+			\item Sample $U\sim$~Uniform($0, \frac{1}{2}$).
+			\item Accept $U$ with probability $\dfrac{\pi\cos(\pi U)}{\frac{\pi}{2}\cdot 2}=\cos(\pi U)$.
+		\end{enumerate}
+	\end{itemize}
+\end{frame}
+
+
+
+
+\begin{frame}
+	\frametitle{Monte-Carlo integration}
+	\begin{itemize}
+		\only<1>{
+			\item All Monte-Carlo integration techniques start with the common insight:
+			$$
+			I = \int f(x)\td x = \int \frac{f(x)}{\pi(x)} \pi(x)\td x  =\ep\left[\frac{f(X)}{\pi(X)}\right]
+			$$
+			where $X\stackrel{\textrm{PDF}}{\sim}\pi(x)$.\\\bigskip
+			They only differ in choices of $\pi(x)$ and/or ways to compute $\ep\left[\frac{f(X)}{\pi(X)}\right]$.
+		}
+		\only<2>{
+			\item \tblue{Plain Monte-Carlo:} Use a uniform distribution as $\pi(x)$.
+			\item {\bf Question 2.(a):} Use Uniform$(1,3)$.\\\bigskip
+			\underline{Algorithm:}
+			\begin{enumerate}
+				\item Sample $X_1,\ldots,X_n\sim$~Uniform$(1,3)$.
+				\item Estimate $I$ by 
+				$$\hat{I}=\frac{\tred{2}}{n}\sum_{i=1}^n \frac{1}{X_i^2}$$
+			\end{enumerate}
+			Where does the factor $2$ come from?
+		}
+		\only<3>{
+			\item \tblue{Importance sampling:} To improve efficiency, choose $\pi(x)$ that mimics the shape of $f(x)$.
+			\item {\bf Question 2.(b):} Compute $\ep[Y]$, where $Y=X^3\mathbbm{1}[X>0]$, $X\sim N(0,1)$.
+			\item {\bf Answer:} First write the expectation in integration form:
+			$$
+				I = \int_0^{+\infty} x^3\cdot \frac{1}{\sqrt{2\pi}}e^{-\frac{x^2}{2}}\td x = \int_0^{+\infty} \dfrac{x^3\cdot \frac{1}{\sqrt{2\pi}}e^{-\frac{x^2}{2}}}{\pi(x)}\pi(x)\td x = \ep\left[ \dfrac{X^3\cdot \frac{1}{\sqrt{2\pi}}e^{-\frac{X^2}{2}}}{\pi(X)} \right]
+			$$
+			for $X\stackrel{\textrm{PDF}}{\sim}\pi(x)$. As required by the question, choose $\pi(x)$ to be the PDF of the standard exponential distribution, that is, $\pi(x)=e^{-x}$ for $x>0$.\\\bigskip
+			\underline{Algorithm:}
+			\begin{enumerate}
+				\item Sample $X_1,\ldots,X_n$ from standard exponential distribution.
+				\item Estimate $I$ by
+				$$
+				\hat{I}=\dfrac{1}{n}\sum_{i=1}^n\left\{ \dfrac{X_i^3\cdot \frac{1}{\sqrt{2\pi}}e^{-\frac{X_i^2}{2}}}{e^{-X_i}} \right\}
+				$$
+			\end{enumerate}
+		}
+		\only<4>{
+			\item \tblue{Importance sampling (self-normalized):} Ordinary importance sampling requires knowing $f(x)$ exactly. When $f(x)$ is only known up to a constant, the self-normalized version of importance sampling should be used.
+			\item {\bf Question 2.(c):} Compute $\ep[X]$, where $X\stackrel{\textrm{PDF}}{\sim}f(x)\propto e^{-x^{3/2}}$.
+			\item {\bf Answer:} Recall the derivation of the self-normalized importance sampling:
+			$$I=\ep[X]=\int x f(x) \td x = \int \frac{xf(x)}{\pi(x)}\pi(x)\td x = \ep\left[\frac{Xf(X)}{\pi(X)}\right] = \frac{\ep\left[\dfrac{Xf(X)}{\pi(X)}\right]}{\tred{\ep\left[ \dfrac{f(X)}{\pi(X)} \right]}}$$
+			where $X\stackrel{\textrm{PDF}}{\sim}\pi(x)$. With $X_1, \ldots, X_n$ generated from PDF $\pi(x)$, we use the self-normalized importance sampling:
+			$$
+			\hat{I} = \dfrac{\tblue{\dfrac{1}{n}\sum_{i=1}^n \dfrac{X_if(X_i)\pi(X_i)}{\pi(X_i)}}}{\dfrac{1}{n}\sum_{i=1}^n\dfrac{f(X_i)}{\pi(X_i)}} = \dfrac{\sum_{i=1}^n \dfrac{X_if_0(X_i)\pi(X_i)}{\pi(X_i)}}{\sum_{i=1}^n\dfrac{f_0(X_i)}{\pi(X_i)}}
+			$$
+			where $f_0(x):=e^{-x^{3/2}}\propto f(x)$ with unknown constant. \tblue{Blue part:} the ordinary importance sampling estimator if $f(x)$ is fully known.
+		}
+	\end{itemize}
+	
+\end{frame}
+
+
+
+
+\begin{frame}
+	\frametitle{Monte-Carlo performance evaluation and bootstrap}
+	\begin{itemize}
+		\only<1>{
+			\item Definition of mean-squared error(MSE).
+			\item {\bf Question 3.(a) answer:} MSE$(\widehat{\mu^2}) = \ep\left[ \left(\widehat{\mu^2} - \mu^2\right)^2 \right]$.
+		}
+		\only<2>{
+			\item \tblue{Monte-Carlo performance evaluation:} if we know the true values of the parameter, we can generate simulated data from the population. Draw many samples to evaluate the accuracy of an estimator.
+			\item {\bf Question 3.(b):} Consider $N(\mu, 1)$ and the estimator $\widehat{\mu^2} = \left(\bar{X}\right)^2$. If $\mu$ is known how to compute MSE$(\widehat{\mu^2})$?
+			\item {\bf Answer:} Very straightforward:
+			\begin{enumerate}
+				\item Generate many samples $X^{(1)}, \ldots, X^{(m)}$, each of size $n$.
+				\item Compute the square of each sample mean: $\widehat{\mu^2}^{(i)}=\left(\textrm{mean}(X^{(i)})\right)^2$.
+				\item Estimate the MSE: $\widehat{\textrm{MSE}}(\widehat{\mu^2}) = \frac{1}{m}\sum_{i=1}^m\left( \left(\bar{X}^{(i)}\right)^2 - \mu^2 \right)^2$
+			\end{enumerate}
+			\item {\bf Remark:} Rigorously speaking, the MSE here depends on the sample size. We should have stated that $\widehat{\mu^2}$ is estimating the MSE at sample size $n$.
+		}
+		\only<3>{
+			\item \tblue{Bootstrap:} When the true parameter value is unknown, the population distribution becomes unknown, too. We carry out the evaluation procedures referring to the replacement chart as follows:
+			\begin{center}
+			\begin{tabular}{cc}\\\hline
+				Monte-Carlo evaluation & Bootstrap\\\hline
+				population distribution & sample distribution\\
+				true parameter value & estimated parameter value\\
+				generated samples & resamples\\
+				sample statistic & sample statistics of resamples\\\hline
+			\end{tabular}
+			\end{center}
+		}
+		\only<4>{
+			\item \tblue{Bootstrap:}
+			\item {\bf Question 3.(c):} Consider $N(\mu, 1)$ and the estimator $\widehat{\mu^2} = \left(\bar{X}\right)^2$. If $\mu$ is unknown how to estimate MSE$(\widehat{\mu^2})$?
+			\item {\bf Answer:} Following the replacement chart to derive the algorithm:
+			\begin{enumerate}
+				\item Use the estimated parameter in place of the true parameter: $\widehat{\mu^2} = \left(\bar{X}\right)^2$
+				\item Draw resamples $X^{*(1)}, \ldots, X^{*(m)}$, each of size $n$.
+				\item Compute the square of each sample mean: $\widehat{\mu^2}^{*(i)}=\left(\textrm{mean}(X^{*(i)})\right)^2$.
+				\item Estimate the MSE: $\widehat{\textrm{MSE}}^*(\widehat{\mu^2}) = \frac{1}{m}\sum_{i=1}^m\left( \left(\bar{X}^{*(i)}\right)^2 - \widehat{\mu^2} \right)^2$.
+			\end{enumerate}
+		}
+	\end{itemize}
+\end{frame}
+
+
+
+
+\begin{frame}
+	\frametitle{SQL}
+	\begin{itemize}
+		\only<1>{
+			\item Recall the order in which we read an SQL script. This is also the order in which we write an SQL script.
+			\begin{enumerate}
+				\item FROM (including INNER JOIN)
+				\item WHERE
+				\item GROUP BY
+				\item HAVING
+				\item SELECT
+				\item ORDER BY
+			\end{enumerate}
+		}
+		\only<2>{
+			\item {\bf Question 4.(a):} Query all \emph{pianists} from \emph{Soviet}. Only report \emph{pianist} and \emph{country}.
+			\item {\bf Answer:}\\
+			SELECT Pianist, Country\\
+			FROM Pianists\\
+			WHERE Country="Soviet"
+		}
+		\only<3>{
+			\item {\bf Question 4.(b):} Query the table \emph{Works} and summarize the number of \emph{works} performed by \emph{pianist}. Only report \emph{pianist} and the number of works performed.
+			\item {\bf Answer:}\\
+			SELECT Pianists, Count(Title) as NumberOfWorksPerformed\\
+			FROM Works\\
+			GROUP BY Pianists
+		}
+		\only<4>{
+			\item {\bf Question 4.(c):} Combine tables \emph{Works} and \emph{Pianists} and query works played by \emph{European(including Soviet) pianists}. Only report \emph{title}, \emph{composer} and \emph{pianist}.
+			\item {\bf Answer:}\\
+			SELECT Title, Composer, Pianists.Pianist AS Pianist\\
+			FROM\\
+			Works INNER JOIN Pianists\\
+			ON Works.Pianist = Pianists.Pianist\\
+			WHERE Pianists.Pianist = "Soviet" OR Pianists.Pianist = "Germany" OR Pianists.Pianist = "Austria"\\
+%			\item {\bf Remark:} (Not taught in class) the WHERE sentence can be succinctly written as WHERE Pianists.Pianist IN ("Soviet", "Germany", "Austria")
+		}
+		\onslide<5->{
+			\item {\bf Question 4.(d):} Combine all three tables and query works composed by \emph{Germany composers} and performed by \emph{Soviet pianists}. Only report \emph{title}, \emph{composer} and \emph{pianist}.
+			\item {\bf Answer:}\\
+			\only<5>{
+				First combine the first two tables:\\\bigskip
+				SELECT Composers.Composer AS Composer, Era, Works.Pianist AS Pianist\\
+				FROM Composers INNER JOIN Works\\
+				ON Composers.Composer = Works.Composer\\
+				WHERE Composers.Country = "Germany"
+			}
+			\only<6>{
+				Then combine this table (\tblue{in blue}) with the third table:\\\bigskip
+				SELECT Title, T1.Composer AS Composer, T1.Pianist AS Pianist\\
+				FROM\\
+				(\\
+				\tblue{SELECT Composers.Composer AS Composer, Era, Works.Pianist AS Pianist\\
+				FROM Composers INNER JOIN Works\\
+				ON Composers.Composer = Works.Composer\\
+				WHERE Composers.Country = "Germany"\\}
+				) AS T1\\
+				INNER JOIN\\
+				Pianists\\
+				ON T1.Pianist = Pianists.Pianist\\
+				WHERE Pianists.Country = "Soviet"\\
+			}
+		}
+	\end{itemize}
+\end{frame}
+
+
+
+
+\begin{frame}[fragile]
+	\frametitle{XML}
+	\begin{itemize}
+		\item {\bf Question 5:} Rewrite the following entry, transforming the attributes into children:
+		\begin{verbatim}
+		<book Title="The Return of The Native" 
+		Author="Thomas Hardy" PublishedYear="1878" />
+		\end{verbatim}
+		Consider the rewritten version: write an R command (assume the package ``XML'' is loaded and \emph{root} points to the \emph{book} tag) to query the content of the \emph{PublishedYear} tag. The returned value must be numeric.
+		\item {\bf Answer:} Rewrite the entry:
+		\begin{verbatim}
+		<book>
+			<Title>The Return of The Native</Title>
+			<Author>Thomas Hardy</Author>
+			<PublishedYear>1878</PublishedYear>
+		</book>
+		\end{verbatim}
+		Notice: 1. no quote marks needed; 2. remember to close each tag; 3. XML is case-sensitive.\\\bigskip
+		Query the \emph{Author} tag:
+		\begin{verbatim}
+		as.numeric(xmlValue(root[["PublishedYear"]]))
+		\end{verbatim}
+	\end{itemize}
+\end{frame}
+
+
+
+
+\begin{frame}
+	\frametitle{Optimization}
+	\begin{itemize}
+		\only<1>{
+			\item Use the illustration in Lab\_11.pdf to help you memorize the formulations of gradient methods and Newton's method.
+			\item Those illustrations are univariate, but once you have the formulation, it's easy to extend it to the multivariate case.
+		}
+		\only<2>{
+			\item {\bf Question 6.(a):} Optimize $f(x,y)=x^2+4(y-1)^2$, starting at $(x_0,y_0)=(2,3)$. Use gradient method and Newton's method.
+			\item {\bf Answer:} First compute the gradient: $\nabla f(x, y) = \left(2x, 8(y-1)\right)^T$.\\\bigskip
+			\tblue{Gradient method:} minimization $\Rightarrow$ gradient descend.
+			\begin{align*}
+			(x_1, y_1) 	&= (x_0, y_0) - \textrm{StepSize}\cdot\nabla f(x_0, y_0)\\
+						&= (2,3) - 0.1\cdot(4,16) = (1.6,1.4)\\
+			(x_2, y_2)  &= (x_1, y_1) - \textrm{StepSize}\cdot\nabla f(x_1, y_1) \\
+						&= (1.6,1.4) - 0.1\cdot(3.2,3.2) = (1.28,1.08)
+			\end{align*}
+			\tblue{Newton's method:} calculate Hessian: $\frac{\partial^2 f}{\partial x^2}=2$, $\frac{\partial^2 f}{\partial x \partial y}=0$ and $\frac{\partial^2 f}{\partial y^2}=8$, so
+			\begin{align*}
+			\begin{pmatrix}
+			x_{t+1}\\y_{t+1}
+			\end{pmatrix} &= \begin{pmatrix}
+			x_t\\y_t
+			\end{pmatrix} - H^{-1}(x_t, y_t)\cdot \nabla f(x_t, y_t) = \begin{pmatrix}
+			x_t\\y_t
+			\end{pmatrix} - \begin{pmatrix}
+			\frac{1}{2} & 0\\
+			0 & \frac{1}{8}
+			\end{pmatrix} \begin{pmatrix}
+			2x_t\\8(y_t-1)
+			\end{pmatrix}\\
+			&= \begin{pmatrix}
+			x_t\\y_t
+			\end{pmatrix} - \begin{pmatrix}
+			x_t\\y_t-1
+			\end{pmatrix} = \begin{pmatrix}
+			0\\1
+			\end{pmatrix}
+			\end{align*}
+			Newton's method converges to the optimum after only one iteration, and will stay there forever.
+		}
+		\only<3>{
+			\item {\bf Question 6.(b):} Poisson mixture: 3 Poisson distributions with $\lambda_k$ and mixing probabilities $\pi_k$, $k=1,2,3$. Observe $X_1,\ldots,X_n$. Write down and maximize the incomplete log-likelihood.
+			\item {\bf Answer:} By total probability theorem, we have the likelihood:
+			$$
+			\pr\left(X_i=k\right) = \sum_{j=1}^3 \pr\left(X_i=k|Z_i=j\right)\pr\left(Z_i=j\right) = \sum_{j=1}^3\frac{\lambda_j^k}{k!}e^{-\lambda_j}\pi_j
+			$$
+			Therefore, the log-likelihood function is:
+			$$
+			l(\Theta|X) = \sum_{i=1}^n \log\left(\sum_{j=1}^3\frac{\lambda_j^k}{k!}e^{-\lambda_j}\pi_j\right)
+			$$
+			The gradient method we should use here is a gradient ascend as follows:
+			$$
+			\Theta_{t+1} = \Theta_t + \textrm{StepSize}\cdot \nabla l(\Theta_t|X)
+			$$
+		}
+	\end{itemize}
+	
+\end{frame}
+
+
+
+
+\begin{frame}
+	\frametitle{EM algorithm}
+	\begin{itemize}
+		\only<1>{
+			\item {\bf Question 7:} Poisson mixture: 3 Poisson distributions with $\lambda_k$ and mixing probabilities $\pi_k$, $k=1,2,3$. Observe $X_1,\ldots,X_n$. Write down and maximize the incomplete log-likelihood.
+			\item {\bf Answer:} \tred{The question is not yet completely ready to apply EM algorithm upon. We need to first finish modeling by introducing latent random variables.}\\
+			
+			Set $Z_i\in\{1,2,3\}$ to be a categorical random variable that indicates which Poisson distribution generates $X_i$. The $i$th term in the complete likelihood function is:
+			$$
+			\pr\left(X_i=k, Z_i=j\right) = \frac{\lambda_j^k}{k!}e^{-\lambda_j}\cdot\pi_j
+			$$
+			\tred{Employing the indicator function $\mathbbm{1}[Z_i=j]$,} the log-likelihood function is:
+			\begin{align*}
+			l_c(\Theta; X, Z) &= \sum_{i=1}^n\left\{ \sum_{j=1}^3 \mathbbm{1}[Z_i=j] \log\left( \frac{\lambda_j^{X_i}}{X_i!}e^{-\lambda_j}\cdot\pi_j \right) \right\}\\
+			&= \sum_{i=1}^n\left\{ \sum_{j=1}^3 \mathbbm{1}[Z_i=j]\left( X_i\log\lambda_j - \lambda_j + \log\pi_j \right) \right\} + \textrm{constant}
+			\end{align*}
+		}
+		\only<2>{
+			\item {\bf Answer(continued):} The complete log-likelihood:
+			$$
+			l_c(\Theta; X, Z)= \sum_{i=1}^n\left\{ \sum_{j=1}^3 \mathbbm{1}[Z_i=j]\left( X_i\log\lambda_j - \lambda_j + \log\pi_j \right) \right\} + \textrm{constant}
+			$$
+			\item E-step: calculate $\ep\left[ l_c(\Theta; X, Z) | \Theta_t, X \right]$.\\\bigskip
+			Notice that here $l$ is linear in $\mathbbm{1}[Z_i=j]$, which only depends on $X_i$, it suffices to evaluate $\ep\left[ \mathbbm{1}[Z_i=j] | \Theta_t, X_i \right]$. By Bayes formula:
+			\begin{align*}
+			\langle\mathbbm{1}[Z_i=j]\rangle&:=\ep\left[ \mathbbm{1}[Z_i=j] | \Theta_t, X_i \right] = \pr\left( Z_i=j | \Theta_t, X_i \right)\\
+			&= \dfrac{ \pr\left( X=X_i | Z_i=j, \Theta_t \right) \pr\left( Z_i=j | \Theta_t \right)   }{ \sum_{\tilde{j}=1}^3 \pr\left( X=X_i | Z_i=\tilde{j}, \Theta_t \right) \pr\left( Z_i=\tilde{j} | \Theta_t \right) }\\
+			&= \dfrac{\dfrac{\left(\lambda_j^{(t)}\right)^{X_i}e^{-\lambda_j^{(t)}}}{X_i!}\cdot\pi_j^{(t)}}{\sum_{\tilde{j}=1}^3\left\{ \dfrac{\left(\lambda_{\tilde{j}}^{(t)}\right)^{X_i}e^{-\lambda_{\tilde{j}}^{(t)}}}{X_i!}\cdot\pi_{\tilde{j}}^{(t)}\right\}}
+			\end{align*}
+		}
+		\only<3>{
+			\item {\bf Answer(continued):}
+			\item M-step: replacing all $\mathbbm{1}[Z_i=j]$ in the complete log-likelihood by $\langle\mathbbm{1}[Z_i=j]\rangle$, we have
+			$$
+			\ep\left[ l_c(\Theta; X, Z) | \Theta_t, X \right] = \sum_{i=1}^n\left\{ \sum_{j=1}^3 \langle\mathbbm{1}[Z_i=j]\rangle\left( X_i\log\lambda_j - \lambda_j + \log\pi_j \right) \right\} + \textrm{constant}
+			$$
+			By taking the derivative of $\ep\left[ l_c(\Theta; X, Z) | \Theta_t, X \right]$ over each $\lambda_j$ respectively and setting it to zero, we immediately have:
+			$$
+			\lambda_j^{(t+1)} = \dfrac{\sum_{i=1}^n \langle\mathbbm{1}[Z_i=j]\rangle X_i }{ \sum_{i=1}^n \langle\mathbbm{1}[Z_i=j]\rangle }
+			$$
+			for $j=1,2,3$.
+		}
+		\only<4>{
+				\item {\bf Answer(continued):}
+				\item M-step(continued): recall that
+				$$
+				\ep\left[ l_c(\Theta; X, Z) | \Theta_t, X \right] = \sum_{i=1}^n\left\{ \sum_{j=1}^3 \langle\mathbbm{1}[Z_i=j]\rangle\left( X_i\log\lambda_j - \lambda_j + \log\pi_j \right) \right\} + \textrm{constant}
+				$$
+				Obtaining the update for $\pi_i$'s is slightly harder due to the constraint $\sum_{j=1}^3\pi_j=$. We consider the corresponding terms plus the Langrangian multiplier:
+				$$
+				\sum_{i=1}^n\left\{ \sum_{j=1}^3 \left( \mathbbm{1}[Z_i=j] \log\pi_j \right)  \right\} - \alpha\left(\pi_1+\pi_2+\pi_3-1\right)
+				$$
+				and set its derivative to zero. We have
+				$$
+				\alpha = \dfrac{\sum_{i=1}^n \mathbbm{1}[Z_i=1]}{\pi_1} = \dfrac{\sum_{i=1}^n \mathbbm{1}[Z_i=2]}{\pi_2} = \dfrac{\sum_{i=1}^n \mathbbm{1}[Z_i=3]}{\pi_3}
+				$$
+				Therefore
+				$$
+				\pi_j^{(t+1)} = \dfrac{\sum_{i=1}^n \mathbbm{1}[Z_i=j]}{n}
+				$$
+		}
+	\end{itemize}
+\end{frame}
+
+
+
+
+\end{document}

@@ -1,0 +1,319 @@
+---
+title: "Stats 406 Lab 1"
+author: "GAO Zheng"
+date: "September 12, 2016"
+output: html_document
+---
+## Lab info
+
+* Lab section: Thursday, 11:30 am - 1:00 am (Gao, Zheng)
+
+* Office hours: (Science Learning Center, Chemistry building, attend any)
+
+    - Tuesday: 10:00a.m. – 11:30a.m. (Gao, Zheng)
+  
+    - Wednesday 4:00p.m.-5:30p.m. (Liu, Boang)
+
+Face to face conversation is prefered to email conversations.
+
+I am roughly following the **TutorialsPoint.com**'s R tutorial: <http://www.tutorialspoint.com/r/>
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+## Getting started
+
+```{r}
+# get working directory
+getwd()
+# set appropriate working directory (YOUR OWN DIRECTORY)
+setwd("/home/gaozheng/Teaching/Stats406/R_scripts")
+# Looking around, list all files under this directory
+list.files()
+```
+
+## Data types
+
+There are 6 types of basic data types in R:
+Logical, Numeric, Integer, Complex, Character, Raw
+
+```{r}
+v <- TRUE 
+print(class(v))
+v <- 23.5
+print(class(v))
+v <- 2L
+print(class(v))
+v <- 2+5i
+print(class(v))
+v <- "TRUE"
+print(class(v))
+v <- charToRaw("Hello")
+print(class(v))
+```
+
+## Vectors and Lists
+
+Vectors contains objects of the *same* type. List doesn't require members to be of the same type.
+
+### Vectors
+```{r}
+# initialize a vector (concatenation)
+vector1 <- c(1,'A',T,2.3)
+# print a vector (works inside functions)
+print(vector1)
+# another way to display a variable (doesn't work inside functions)
+vector1
+# another way to initialize a vector
+x <- 1:10
+# yet another way to initialize a vector
+x <- seq(from = 1, to = 10, by = 1);x
+# you can leave out the paramenter names as long as the orders are correct
+x <- seq(1,10,1);x
+# initialize a variable using existing ones
+y <- x^2
+# Notice that you don't have to write a loop to define y
+# R is 'vector-friendly'
+# In fact you should AVOID writting loops in R unless necessary
+print(y)
+```
+
+### Lists
+```{r}
+# Create a list.
+list1 <- list(c(2,5,3),21.3,sin)
+# Now things inside list1 do NOT get converted to the same type!
+print(list1)
+```
+
+### Subsetting a vector / list
+
+```{r}
+# You can ``access'' any elements of a vector / list by providing its index inside the [ ]
+vector1[1]
+# Or by providing a vector of indices
+vector1[1:3]
+# Or by providing a vector of Logicals
+index <- c(T,F,F,T)
+vector1[index]
+```
+
+#### Quiz: what happens if the length of the Logical index and the vector disagrees?
+```{r,results='hide'}
+# vector1[c(T,F,F)]
+```
+
+
+Subsetting a list is **tricky**!
+
+```{r}
+# Subsetting a list with [ ], and you still get a list!
+list1[1]
+class(list1[1])
+# To extract the vector, use double [[ ]]
+list1[[1]]
+class(list1[[1]])
+```
+Provocative imagery by [Hadley Wickham](https://twitter.com/hadleywickham/status/643381054758363136):
+
+![Rlist](https://pbs.twimg.com/media/CO2_qPVWsAAErbv.png)
+
+
+## Matrices
+
+Think of them as ``2-D vectors''.
+
+### Creating a matrix
+```{r}
+M <- matrix( c(4,2,6,3,7,1), nrow = 2, ncol = 3, byrow = TRUE)
+print(M)
+# Matrix transpose
+t(M)
+```
+
+### Naming the columns and rows (always good to have meaningful names)
+```{r}
+colnames(M) <- c('col1','col2','col3')
+rownames(M) <- c('row1','row2')
+M
+```
+
+#### Quiz: what happens if the length of the content and the matrix size disagrees?
+```{r,results='hide'}
+# M <- matrix(1:5, nrow = 2, ncol = 3)
+# print(M)
+```
+
+Subsetting of a matrix is siimlar to that of a vector, except you need to provide two indices for the two dimensions:
+```{r}
+M[2,c(1,3)]
+```
+
+### Matrix mutiplication
+Dimensions must agree! Vectors are treated by default as column vectors.
+```{r}
+# with a vector
+M%*%c(1,2,3)
+# with another matrix
+M%*%t(M)
+```
+
+#### Quiz: what happens if the orientation is misaligned for the vector?
+```{r,results='hide'}
+# M%*%t(c(1,2,3))
+# What about this?
+# t(c(1,2))%*%M
+```
+
+## factors
+Roughly speaking, storage-wise, an integer array with labels. 
+
+Factors are treated differently from intergers when being operated on. More on this later in the course.
+```{r}
+# NA does not count as a factor
+factor1 <- factor(c('apple','orange','apple','apple','orange','pear',NA,'orange'))
+# coercion to numerical values produces integer values
+as.numeric(factor1)
+# read the factor levels
+levels(factor1)
+# relabel the levels
+levels(factor1) <- c("cup","bowl","plate")
+# look at the factor again
+factor1
+```
+
+
+## Dataframes
+Data frame is an extension to matrices, allowing columns to take different types.
+```{r}
+col1 <- (1:5)/10; col2 <- letters[1:5]; col3 <- round(sin(1:5),3);
+```
+Numerical objects are converted to characters when concatenating A1 to A3, same as when you create a vector of mixed data types.
+```{r}
+A <- cbind(col1 , col2 , col3) # cbind for 'column bind'
+print(A)
+```
+Data frames keep numerical variables numerical, and convert characters to factors.
+```{r}
+dataframe1 = data.frame(col1 , col2 , col3)
+dataframe1
+```
+Viewing dataframe summaries
+```{r}
+summary(dataframe1)
+```
+
+## Basic plotting
+```{r}
+# plot a series against another
+plot(x,y)
+# connecting the dots, add colors, plotting ranges
+plot(x,y,type = 'l',col = 'red', xlim = c(0,11))
+```
+
+## Look for variables in environment 
+```{r}
+# list variables in the environment
+ls()
+# remove a variable from the environment
+rm(list='vector1')
+# Now 'vector1' is gone
+ls()
+## still remember what list.files() does?
+```
+
+## Functions
+
+### How to use an existing function from package
+```{r}
+# look for manual for a function
+?rm
+# fuzzy search
+??remove
+```
+I find Google search more helpful than ``??''.
+
+### How to define a new function
+```{r}
+# use 'function' function
+f <- function(x){
+  x^2-2*x+1
+}
+# last line is returned, you can also use 'return' for clarity
+f = function(x){
+  return (x^2-2*x+1)
+}
+# Now apply it
+f(x) # works on numericals
+# incompatible operation for strings
+# f('test') 
+```
+
+## Extras
+- It is always good to keep in mind that computers are finite machines.
+- They are only approxiamtely accurate.
+- Your algorithm matters.
+
+E.g.
+```{r}
+options(digits = 22)
+sum(1/1:500000)
+sum(1/500000:1)
+```
+
+Results are close (for all practical purposes), but bot identical.
+
+## Advanced
+
+[Advanced R](http://adv-r.had.co.nz/) is a good reference if you are into the inner workings of R.
+
+## Q&A
+My experience has been that study/research as a community is most effective.
+
+I will post questions here for the benefit of all.
+
+Hope we can learn together.
+
+Email me any suggestions.
+
+#### What's the differnce between <- and = ?
+
+```{r}
+x = 1:11
+mean(x = x)
+x
+mean(x = 2:12)
+x
+mean(x <- 2:12)
+x
+```
+
+Now what if there are valiables of the same name in further higher environments?
+
+```{r}
+x = 1:11
+
+f1 <- function(x){
+  mean(x = 2:12)
+}
+
+f2 <- function(x){
+  mean(x <- 2:12)
+}
+
+
+f3 <- function(x){
+  mean(x <<- 2:12)
+}
+
+
+f1(x)
+x
+
+f2(x)
+x
+
+f3(x)
+x
+```
+
+<- always creates a binding in the current environment; <<- rebinds an existing name in a parent of the current environment.

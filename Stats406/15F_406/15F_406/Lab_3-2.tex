@@ -1,0 +1,378 @@
+\documentclass[10pt]{article}
+\setlength{\oddsidemargin}{0.0in} \setlength{\evensidemargin}{0.0in}
+\setlength{\textwidth}{6.5in} \setlength{\topmargin}{-0.25in}
+\setlength{\textheight}{8.75in}
+\usepackage{amsmath, amssymb, amsfonts, amscd, xspace, pifont, natbib, fullpage}
+\usepackage{epsfig, amsfonts, verbatim, multirow, hyperref}
+\usepackage{epstopdf}
+\usepackage{listings}
+\lstset{
+  basicstyle=\ttfamily,
+  mathescape
+}
+%\usepackage{setspace}
+\newcommand{\mycite}[1]{{\citeNP{#1}}}
+
+\parindent=0pt
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Different font in captions
+\newcommand{\captionfonts}{\small}
+\makeatletter  % Allow the use of @ in command names
+\long\def\@makecaption#1#2{%
+  \vskip\abovecaptionskip
+  \sbox\@tempboxa{{\captionfonts #1: #2}}%
+  \ifdim \wd\@tempboxa >\hsize
+    {\captionfonts #1: #2\par}
+  \else
+    \hbox to\hsize{\hfil\box\@tempboxa\hfil}%
+  \fi
+  \vskip\belowcaptionskip}
+\makeatother   % Cancel the effect of \makeatletter
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Matrix, Vector
+\newcommand{\V}[1]{\ensuremath{\boldsymbol{#1}}\xspace}
+\newcommand{\M}[1]{\ensuremath{\boldsymbol{#1}}\xspace}
+%% Math Functions
+\newcommand{\F}[1]{\ensuremath{\mathrm{#1}}\xspace}
+\newcommand{\sgn}{\F{sgn}}
+\newcommand{\tr}{\F{trace}}
+\newcommand{\diag}{\F{diag}}
+\newcommand{\dett}{\F{det}}
+%% Transpose
+\newcommand{\T}[1]{\ensuremath{{#1}^{\mbox{\sf\tiny T}}}}
+
+%%
+\def  \R  {\boldsymbol R}
+\def\bX{\boldsymbol X}
+\def\bY{\boldsymbol Y}
+\def\bbeta{\boldsymbol \beta}
+\def\blambda{\boldsymbol \lambda}
+\def\bepsilon{\boldsymbol \epsilon}
+\def\bone{\boldsymbol{1}}
+\def\bzero{\boldsymbol 0}
+\def\E{\mbox{E}}
+\def\var{\mbox{var}}
+\def\gauss{\mbox{N}}
+\def\lap{\mbox{L}}
+\def\G{\mbox{G}}
+\def\go{  $\R$  ightarrow}
+\def\invG{\mbox{G}^{-1}}
+\def\argmin{\arg\min}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}{Proposition}
+\newtheorem{lemma}{Lemma}
+\newtheorem{corollary}{Corollary}
+\newtheorem{algorithm}{Algorithm}
+\newtheorem{definition}{Definition}
+\newtheorem{remark}{Remark}
+
+\usepackage{color}
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+\lstdefinestyle{displaycode}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    columns=flexible,
+    numbers=none,
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=true,
+    showtabs=false,                  
+    tabsize=2%,
+    %xleftmargin=2em,
+    %xrightmargin=2em,
+} 
+
+\lstset{style=displaycode}
+%\newcommand{\displaycodefile}[1]{\lstinputlisting[language=R]{./codeblocks/#1.txt}}
+
+\begin{document}
+
+\title{\Large \bf STATS 406 F15: Lab 03}
+\date{}
+
+\maketitle
+
+
+1. Plotting: making your plots prefessional
+1.1 Brief recap of basic examples: plot, boxplot, hist
+1.2 Screen management:
+* par(mfrow=c(n1, n2)) or mfcol
+* layout(matrix): can control the order of plot, can split into different sizes
+* (will not elaborate)screen.split
+1.3 Contour plots
+* contour(x, y, z)
+* lattice::levelplot
+* image(x, y, z)
+1.4 Frequently used plotting parameters
+* line/point styles: type, lty, col, pch: scalar or vector
+* plot range: xlim, ylim
+* texts: main, sub, xlab, ylab -- can use paste/sprintf to include variables
+* font size: cex(default), cex.main/sub/lab/axis
+texts can be stand alone using title command or placed within plot
+1.5 Low-level plots: adding something to existing plot
+* point
+* abline
+* floating text
+* legend
+**  Including legend is a basic courtsey in many formal write-ups
+**  legend(location, legendnames, style)
+**  Principle: if set style parameters for the plot command, use consistent configuration for legend
+* Remark: the usage of expression in texts
+
+2. Simplest asymptotics: LLNo's and CLT
+1.1 Illustration of SLLNo's and WLLNo's
+1.2 Conceptual clarification of CLT: what is converging to a standard normal distribution?
+* To illustrate CLT, we need many samples
+
+
+\section{Plotting: making your plots prefessional}
+
+\subsection{Recap: basic plot commands}
+\begin{itemize}
+	\item {\bf plot()}. Here we only recap list plots. In practice you rarely work with function plots in R.
+\begin{lstlisting}[style=displaycode, language=R]
+	# Recap: plot()
+	a_vec = seq(from=0, to=3, by=0.1);
+	b_vec = a_vec + rnorm(length(a_vec));
+	plot(b_vec~a_vec);
+\end{lstlisting}
+	Looks awkward. Today's lab is dedicated to improve it.
+	\item {\bf hist()}.
+\begin{lstlisting}[style=displaycode, language=R]
+	# Recap: hist()
+	# continued from the previous example...
+	hist(b_vec);
+\end{lstlisting}
+	\item {\bf boxplot()}.
+\begin{lstlisting}[style=displaycode, language=R]
+	# Recap: boxplot();
+	# 3 groups of data, each group contains 20 random numbers
+	groupsize = 20; ngroup = 3;
+	a_vec = rnorm(ngroup*groupsize); a_vec = a_vec + seq(from=0, to=5, length.out=length(a_vec));
+	b_vec = as.factor( rep(letters[1:ngroup], rep(groupsize, ngroup)) );
+	# side-by-side group-wise boxplots
+	test_data_frame = data.frame(a_vec, b_vec);
+	boxplot( with(test_data_frame, a_vec ~ b_vec) );
+\end{lstlisting}
+\end{itemize}
+
+
+
+\subsection{Manage screen layout}
+\begin{itemize}
+	\item Method 1: {\bf par(mfrow=c(n1, n2))}(by row) or {\bf par(mfcol=c(n1, n2))}(by column).
+\begin{lstlisting}[style=displaycode, language=R]
+	# par(mfrow=...)
+	# Open a new screen.
+	x11(); # Not applicable under commandline
+	# Split screen
+	par(mfrow = c(2, 1)); 
+	# Plots
+	set.seed(2015);
+	plot(rnorm(1000));
+	qqnorm(runif(1000));
+	#
+	# When we're done:
+	dev.off(); # or click to close the window
+\end{lstlisting}
+	Drawback: always evenly split the screen, cannot control screen block sizes.
+	\item Method 2: {\bf layout(splitmatrix)}. More flexible.\\
+	\underline{Example:} If we want a big square plot at the top-left corner and split the rest accordingly, first set the split matrix that looks like:
+	\begin{equation*}
+		\textrm{split matrix} = 
+		\begin{pmatrix}
+		1&1&1&2&2\\
+		1&1&1&2&2\\
+		1&1&1&2&2\\
+		3&3&3&4&4\\
+		3&3&3&4&4
+		\end{pmatrix}
+	\end{equation*}
+\begin{lstlisting}[style=displaycode, language=R]
+	# layout(splitmatrix)
+	x11();
+	# Prepare the split matrix
+	SplitMat = array(0, c(5, 5));
+	SplitMat[1:3, 1:3] = 1;
+	SplitMat[4:5, 1:3] = 2; SplitMat[1:3, 4:5] = 3;
+	SplitMat[4:5, 4:5] = 4;
+\end{lstlisting}
+	and then split the screen accordingly and plot:
+\begin{lstlisting}[style=displaycode, language=R]
+	# Split the screen
+	layout(SplitMat, 2, 2);
+	layout.show(4); # just to confirm, not required
+	# Plots
+	set.seed(2015);
+	plot(rnorm(1000));
+	qqnorm(runif(1000));
+	qqnorm(rt(1000, df=3));
+	hist(rnorm(1000));
+	#
+	# When we're done:
+	dev.off(); # or click to close the window
+\end{lstlisting}
+	\item Method 3: {\bf split.screen()}. Will not elaborate. Check documentation if interested.
+\end{itemize}
+
+
+\subsection{More plotting commands: contour plots}
+Apart from line plots, another important family of plots in R are contour plots.
+\begin{itemize}
+	\item {\bf contour()}. Shows only contour lines.
+\begin{lstlisting}[style=displaycode, language=R]
+	# A naive contour plot
+	# Prepare an integer multiply chart within 100
+	x_mat = (1:10) %*% t(rep(1, 10));
+	y_mat = t(x_mat);
+	z_mat = x_mat*y_mat;
+	# Contour plot
+	contour(z_mat);
+\end{lstlisting}
+	\item {\bf levelplot(). Requires package ``lattice''}. If we want to use colors to indicate entry values...
+\begin{lstlisting}[style=displaycode, language=R]
+	# Continuing the last example
+	require(lattice);
+	print(levelplot(z_mat)); # Always use print with levelplot.
+\end{lstlisting}
+	\item {\bf image()}. Similar to {\bf levelplot()}.
+\begin{lstlisting}[style=displaycode, language=R]
+# Continuing the last example
+	image(z_mat);
+\end{lstlisting}	
+\end{itemize}
+
+
+
+\subsection{Adjusting plot parameters}
+Plots almost never appear ``raw''(or ``naked'') in formal write-ups. Now we learn how to tune the appearance of our plots. To embed our discussion in a specific context, let's recall the light bulb example we went through last week:
+
+\noindent\fbox{%
+	\parbox{\textwidth}{%
+		Example: a simple on-off Markov chain\\
+		Each light bulb has two status: 1=lighted up or 0=burnt out.  In each round, a light bulb goes from status 1 to 0 with probability $q=0.05$ or from status 0 to 1 with probability $p=0.10$.
+	}%
+}
+This time we focus the update track of a light bulb. First, prepare data for plotting:
+\begin{lstlisting}[style=displaycode, language=R]
+# Illustrate the update track of one light bulb
+# Prepare data
+set.seed(2015);
+p = 0.10; q = 0.05;
+nround = 2000;
+UpdateTrack = integer(nround);
+UpdateTrack[1] = 1;
+for(i in 2:nround){
+	if(UpdateTrack[i-1]==0){
+		UpdateTrack[i] = rbinom(1, 1, p);
+	} else{
+		UpdateTrack[i] = rbinom(1, 1, 1-q);
+	}
+}
+\end{lstlisting}
+
+Then we plot it:
+\begin{lstlisting}[style=displaycode, language=R]
+	# Plot
+	plot(UpdateTrack,
+		type='b', lty=3, pch=25, col='blue',
+		xlim=c(-1, 52), ylim=c(-0.2, 1.2),
+		main=paste('Light bulb status update within ', nround, ' rounds', sep=''), sub='An on-off process illustration', xlab='Index', ylab='Status',
+		cex.lab=1.5, cex.main=1.25, cex.sub=1.25, # col.lab='darkblue',
+		axes=FALSE, # to be specified later
+	)
+	axis(1, at=c(1, 25, 50), cex.axis=1.5);
+	axis(2, at=c(0, 1), cex.axis=1.5);
+	box();
+\end{lstlisting}
+This example contains a few frequently used plotting parameters:
+	\begin{itemize}
+		\item Line/Point styles: {\bf type}, {\bf lty}, {\bf pch}, {\bf col}, ...
+		\begin{itemize}
+			\item {\bf type}: consult {\bf ?plot}, it refers to the type of the line. `b' for showing both the points and the line, `o' for both but over-positioning each other, `l' for line-only and `p' for points-only.
+			\item {\bf lty}: line type, take integer values.
+			\item {\bf pch}: the point marker used, take integer or character values.
+			\item {\bf col}: color, take integer or character values.
+		\end{itemize}
+		\item Plot range: {\bf xlim}, {\bf ylim}. Here we expanded the plot ranges to have more comfortable margins.
+		\item Texts: {\bf main}, {\bf sub}, {\bf xlab}, {\bf ylab}, ...
+		\begin{itemize}
+			\item {\bf main}: main title of the plot.
+			\item {\bf sub}: subtitle.
+			\item {\bf xlim}, {\bf ylim}: ranges of axes.
+		\end{itemize}
+		\item Font sizes: {\bf cex}(default), {\bf cex.main}, {\bf cex.sub}, {\bf cex.lab}, {\bf cex.axis}, ...
+	\end{itemize}
+	{\bf Quiz:} How to assign different colors to different points?
+
+
+
+\subsection{Low-level plots}
+We can add additional plotting objects like points or lines, as well as texts to an existing plot. Such additions are called low-level plots.
+\begin{itemize}
+	\item Adding points: {\bf points(x, y)}.
+\begin{lstlisting}[style=displaycode, language=R]
+	# Continuing the last example
+	Points_x = c(13,15,17,30,31,39);
+	Points_y = c(0.3, 0.4, 0.5, 0.6, 0.7, 0.8);
+	points(x, y);
+\end{lstlisting}
+	\item Adding lines: {\bf lines(x, y)}, similar to {\bf points}, omitted here. Check documentation.
+	\item Adding a reference line: {\bf abline(a=intercept, b=slope)}.
+\begin{lstlisting}[style=displaycode, language=R]
+	# Continuing the last example
+	abline(0.2, 0.5/nround, type=3, col='lightblue');
+\end{lstlisting}
+	\item Adding a legend: {\bf legend()}
+	\begin{itemize}
+		\item Usage: {\bf legend(location, legendnames, optimalstyle)}.
+		\item The style options should be consistent with curves.
+	\end{itemize}
+\begin{lstlisting}[style=displaycode, language=R]
+	# Continuing the last example
+	legend('topright', c('LightBulb 1'), lty=3, pch=25, col=c('blue'));
+\end{lstlisting}
+\end{itemize}
+
+
+\subsection{Exercises}
+See Lab\_3.R.
+
+
+\section{Law of large numbers and central limit theorem}
+
+\subsection{Illustrations of strong- and weak- laws of large numbers}
+\begin{lstlisting}[style=displaycode, language=R]
+	### Illustrations of SLLNo's and WLLNo's
+	nsamples = 1000; samplesize = 1000;
+	BigRVMatrix = matrix(runif(nsamples*samplesize), c(nsamples, samplesize));
+\end{lstlisting}
+
+\subsection{Central limit theorem}
+In a random sample $S = \{ X_1, X_2,\ldots, X_n \}$, ...
+\begin{itemize}
+	\item {\bf Whose distribution is asymptotically normal?}
+	\item {\bf Does the sample distribution go to normal?}
+	\item {\bf Compare CLT under different parent population distributions}
+\begin{lstlisting}[style=displaycode, language=R]
+	# See Lab_3.R
+\end{lstlisting}
+\end{itemize}
+
+
+
+\end{document}

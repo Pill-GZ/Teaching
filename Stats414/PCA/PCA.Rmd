@@ -1,0 +1,278 @@
+---
+title: "A Tutorial on Pincipal Component Analysis"
+output:
+  html_document: default
+  html_notebook: default
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+```{r, include = F}
+if (!require("rgl")){
+  install.packages("rgl")
+  library(rgl)
+}
+if (!require("car")){
+  install.packages("car")
+  library(car)
+}
+if (!require("plotly")){
+  install.packages("plotly")
+  library(plotly)
+}
+if (!require("printr")){
+  install.packages(
+    'printr',
+    type = 'source',
+    repos = c('http://yihui.name/xran', 'http://cran.rstudio.com')
+  )
+  library(printr)
+}
+
+```
+
+
+## A motivating example for data reduction
+
+`mtcars` is a data frame with 32 observations on 11 variables. The data was extracted from the 1974 Motor Trend US magazine, and comprises fuel consumption and 10 aspects of automobile design and performance for 32 automobiles (1973–74 models). ^[Henderson and Velleman (1981), Building multiple regression models interactively. *Biometrics*, **37**, 391–411.]
+
+Its columns are
+
+- `mpg`:	 Miles/(US) gallon
+- `cyl`:	 Number of cylinders
+- `disp`:	 Displacement (cu.in.)
+- `hp`:	 Gross horsepower
+- `drat`:	 Rear axle ratio
+- `wt`:	 Weight (1000 lbs)
+- `qsec`:	 1/4 mile time
+- `vs`:	 V/S
+- `am`:	 Transmission (0 = automatic, 1 = manual)
+- `gear`:	 Number of forward gears
+- `carb`:	 Number of carburetors
+
+We will be working with only three of the columns: cylinder displacement, gross horsepower, and vihecle weight.
+
+```{r}
+mtcars3col <- mtcars[,c("disp","hp","wt")]
+library(printr)
+```
+
+```{r}
+summary(mtcars3col)
+```
+
+
+```{r}
+mtcars$am[which(mtcars$am == 0)] <- 'Automatic'
+mtcars$am[which(mtcars$am == 1)] <- 'Manual'
+mtcars$am <- as.factor(mtcars$am)
+
+p <- plot_ly(mtcars, x = ~hp, y = ~wt, z = ~disp, color = ~am, colors = c('#BF382A', '#0C4B8E')) %>%
+  add_markers() %>%
+  layout(scene = list(xaxis = list(title = 'Gross horsepower'),
+                     yaxis = list(title = 'Weight'),
+                     zaxis = list(title = 'Displacement')))
+p
+```
+
+
+It seems that most of the vairation is along a single direction (or two, depending on how sharp your eyes are). This phenomenon happens in many situations: in datasets with many vairiables (large p), the data points resides almost in a linear subspace of a much smaller dimension.
+
+It is natural to ask:
+
+1. Is there a way to represent the dataset is a way that is consistent with this observation? i.e., most of the variation happens in one (or a few) of the variables.
+
+2. Is there a way, using linear combinations of the variables to represent the data without losing much information, so that we can work with only a fewer variables?
+
+
+## Population principal components
+
+We have to be precise about what we mean by "not losing much information". 
+
+Suppose we have a p-dimensional random vector $\mathbf{X}' = (X_1, X_2, \dots , X_p)$, we represent each data point as a collection o flinear combinations $Y$'s of its original data $X$'s.
+
+$$
+Y_1 = a_1'X = a_{11}X_1 + \dots + a_{1p}X_p\\
+Y_2 = a_2'X = a_{21}X_1 + \dots + a_{2p}X_p\\
+\dots\\
+Y_p = a_p'X = a_{p1}X_1 + \dots + a_{pp}X_p\\
+$$
+
+In compact form, 
+
+$$
+Y = AX
+$$
+
+where $A$ is a $p$ by $p$ matrix.
+
+We want most of the variation in the data $X$ to be summarized into as few components of $Y$'s as possible. Intuitively, we want variance of $Y_1$ to be as large as possible, and the variances of the rest of the $Y$'s in decreasing order.
+
+A moments thought reveals that this cannont be done without contraints on $A$:
+
+1. Scaling $a_1$ by a constant factor increase the variance of $Y_1$, leading to indeterminancy. We require that $a_i'a_i = 1$, i.e., $a_i$'s are unit vectors.
+
+2. We also require that whatever has been explained in earlier $Y$'s does not re-enter later $Y$'s. We require $a_i'a_j = 0$, i.e., $a_i$ is orthogonal to $a_j$ whenever $i\ne j$. (It is infac equivalent to require that the components $Y$'s are independent; left as an exercise).
+
+The coefficients of the linear combinations therefore has the interpretation of a `direction'; each is direction orthogonal to the rest.
+
+In two dimensions this is illustrated with the folloing plot. The two directions of linear combinations should be perpendicular to each other, with the first maximizing the variance of data along its direction.
+
+```{r, echo=FALSE, message=FALSE}
+Sigma <- 0.5*matrix(c(2,1,1,1),2,2)
+V <- -eigen(Sigma)$vectors
+
+library(MASS)
+X <- mvrnorm(300, c(0,0), Sigma)
+X <- data.frame(X)
+names(X) <- c("x1", "x2")
+X %>% 
+  plot_ly(x = ~x1, y = ~x2,
+          name = "sample",
+          type = 'scatter',
+          color = I("lightgreen"),
+          mode = "markers") %>%
+  add_lines(x = c(0,V[1,1]), y = c(0,V[2,1]),
+            name = "PC 1",
+            line = list(color = 'rgb(22, 96, 167)', width = 4, dash = 'dash')) %>%
+  add_lines(x = c(0,V[1,2]), y = c(0,V[2,2]),
+            name = "PC 2",
+            line = list(color = 'rgb(22, 96, 167)', width = 4, dash = 'dot')) %>%
+#  add_annotations(x = V[1,], y = V[2,],
+#                  text = "", xref = "x", yref = "y",
+#                   showarrow = TRUE, arrowcolor = I("red"),
+#                   arrowhead = 7, arrowsize = .5,
+#                   axref = "x", ax = 0, ayref = "y", ay = 0, 
+#                   color = I("red") )%>%
+  layout(showlegend = TRUE,
+         xaxis = list(range = c(-3, 3)),
+         yaxis = list(range = c(-2.5, 2.5))
+  )
+```
+
+Formally, we can write the problem as a constrained optimization problem:
+
+$a_1$ is the solution to
+
+$$
+\begin{equation*}
+\begin{aligned}
+& \underset{a}{\text{max}}
+& & \mathrm{Var}(a'X) \\
+& \text{subject to}
+& & a'a = 1
+\end{aligned}
+\end{equation*}
+$$
+
+$a_2$ is the solution to
+
+$$
+\begin{equation*}
+\begin{aligned}
+& \underset{a}{\text{max}}
+& & \mathrm{Var}(a'X) \\
+& \text{subject to}
+& & a'a_1 = 0\\
+& & & a'a = 1
+\end{aligned}
+\end{equation*}
+$$
+
+In general the $j^{th}$ principal component is the solution to 
+
+$$
+\begin{equation*}
+\begin{aligned}
+& \underset{a}{\text{max}}
+& & \mathrm{Var}(a'X) \\
+& \text{subject to}
+& & a'a_i = 0 & \mathrm{for} \; i = 1,\dots,j-1\\
+& & & a'a = 1
+\end{aligned}
+\end{equation*}
+$$
+
+It is exercise to show that the problem is equivalent to 
+
+$$
+\begin{equation*}
+\begin{aligned}
+& \underset{a}{\text{max}}
+& & \frac{\mathrm{Var}(a'X)}{a'a} \\
+& \text{subject to}
+& & a'a_i = 0 & \mathrm{for} \; i = 1,\dots,j-1
+\end{aligned}
+\end{equation*}
+$$
+
+Looks daunting, but luckily we can derive the solutions to the problem with some simple linear algebra.
+
+$$
+\mathrm{Var}(a'X) = a'\mathrm{Var}(X)a = a'\Sigma_X a
+$$
+
+where $\Sigma_X$ is the covariance matrix of $X$. Because $\Sigma_X$ is a [positive definite matrix](https://en.wikipedia.org/wiki/Positive-definite_matrix), it admits a [spectral decomposition](https://en.wikipedia.org/wiki/Eigendecomposition_of_a_matrix). we can write 
+
+$$\Sigma_X = P\Lambda P'$$
+where $P = [v_1, \dots,v_p]$ is an [orthogonal matrix](https://en.wikipedia.org/wiki/Orthogonal_matrix), and $\Lambda$ a diagonal matrix with eigenvalues of $\Sigma_X$, $\lambda_1,\dots,\lambda_p$, in descending order as its diagonal entries. 
+
+If we write $b = P'a$, then
+
+$$
+\begin{equation*}
+\begin{aligned}
+\frac{a'\Sigma_X a}{a'a} & = \frac{a' P\Lambda P'a}{a'PP'a} = \frac{b'\Lambda b}{b'b}
+= \frac{\sum_{i=1}^{p}\lambda_i b_i^2}{\sum_{i=1}^{p} b_i^2}\\
+& \le \lambda_1 \frac{\sum_{i=1}^{p} b_i^2}{\sum_{i=1}^{p} b_i^2}\\
+& = \lambda_1
+\end{aligned}
+\end{equation*}
+$$
+
+
+where equality can be attained when $a$ is a constant multiple of $v_1$. Say $a = v_1$ so $b = P'a = (1,0,\dots,0)'$ since by orthogonality of $P$,
+
+$$
+b = P'a = \begin{bmatrix}v_1'\\v_2'\\\vdots\\v_p'\end{bmatrix} v_1 = \begin{bmatrix}1\\0\\\vdots\\0\end{bmatrix} 
+$$
+
+We have solved the optimization problem for the first principal component.
+
+Similar arguments work for the rest of the problems.
+
+For the $j^{th}$ problem we require that $a\perp a_i \; \mathrm{for}\; i = {1,\dots,j-1}$, so the optimizing $a$ must be in the span of $v_j,\dots,v_p$, i.e., $a = b_j v_j + \dots + b_p v_p$, for some $b_j,\dots,b_p$.
+
+(Note that we have not abused notations here since $b_k = (P'a)_k = (P')_{k*}a = (P)_{*k}'a = v_k'a = v_k'(b_j v_j + \dots + b_p v_p) = b_k$.)
+
+The objective function simplifies to 
+
+$$
+\begin{equation*}
+\begin{aligned}
+\frac{a'\Sigma_X a}{a'a} & = \frac{a' P\Lambda P'a}{a'PP'a} = \frac{b'\Lambda b}{b'b}
+= \frac{\sum_{i=j}^{p}\lambda_i b_i^2}{\sum_{i=j}^{p} b_i^2}\\
+& \le \lambda_j \frac{\sum_{i=j}^{p} b_i^2}{\sum_{i=j}^{p} b_i^2}\\
+& = \lambda_j
+\end{aligned}
+\end{equation*}
+$$
+
+Setting $a = v_j$ and $b = P'a = \underbrace{(0,\dots,0,1,0,\dots,0)}_{\mathrm{j^{th} unit vector}}$ attains the maximum.
+
+An interesting consequence of the decomposition is that the sum of variances are preserved (exercise).
+
+$$
+\sum_{i=1}^{p}\mathrm{Var}(Y_i) = \sum_{i=1}^{p}\mathrm{Var}(X_i)
+$$
+
+## Estimation of principal components
+
+
+
+## Application: quality montoring using PCA
+
+```{r}
+
+```
+

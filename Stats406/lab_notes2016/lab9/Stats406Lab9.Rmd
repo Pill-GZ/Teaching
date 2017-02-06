@@ -1,0 +1,222 @@
+---
+title: "Lab 9"
+author: "GAO Zheng"
+date: "November 10, 2016"
+output:
+  html_notebook: default
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Now you can download the RMarkdown file by clicking the button in the rupper right corner of this html page.
+
+## Monte Carlo integration
+
+- Goal: Approximate $I :=\int_\Omega f(x)\mathrm{d}x$, by Monte Carlo.
+- Why Monte Carlo integration?
+    - algebraic solution not available
+    - high dimensional integration
+  
+How does it work?
+
+### Simple case: integration over region of finite volume.
+
+If $V(\Omega)<\infty$, we can simulate a random variable uniformly over the region $\Omega$, with density $\frac{1}{V(\Omega)}$.
+
+$$
+\begin{aligned}
+I = \int_\Omega f(x)\mathrm{d}x &= \int_\Omega \frac{1}{V(\Omega)}f(x)V(\Omega)\mathrm{d}x \\
+&= V(\Omega)\int_\Omega \frac{1}{V(\Omega)}f(x)\mathrm{d}x \\
+&= V(\Omega) \mathrm{E}[f(X)] \quad \mathrm{where} \quad X \sim \mathrm{Uniform}(\Omega)
+\end{aligned}
+$$
+Where we know (by Law of Large Numbers) that $\mathrm{E}[f(X)]$ can be approximated by
+
+$$
+\frac{1}{N}\sum_{i=1}^N f(X_i) \quad \mathrm{where} \quad X_i \stackrel{iid}{\sim} \mathrm{Uniform}(\Omega)
+$$
+
+So our estimator of the integral is
+
+$$
+\hat{I} = \frac{V(\Omega)}{N}\sum_{i=1}^N f(X_i) \quad \mathrm{where} \quad X_i \stackrel{iid}{\sim} \mathrm{Uniform}(\Omega)
+$$
+
+### More generally: when the region has infinite volume
+
+When $V(\Omega)$ is $+\infty$, we can no longer simulate a uniform random variable over $\Omega$.
+
+We can, however, simulate a random variable over the region $\Omega$ with density $\pi$, such that $\int_\Omega\pi(x)\mathrm{d}x = 1$.
+
+$$
+\begin{aligned}
+I = \int_\Omega f(x)\mathrm{d}x &= \int_\Omega \frac{f(x)}{\pi(x)}\pi(x)\mathrm{d}x \\
+&= \mathrm{E}\frac{f(X)}{\pi(X)} \quad \mathrm{where} \quad X \sim \pi
+\end{aligned}
+$$
+
+By the same token as in the simple case, $\mathrm{E}\frac{f(X)}{\pi(X)}$ can be approximated by
+
+$$
+\hat{I} = \frac{1}{N}\sum_{i=1}^N \frac{f(X_i)}{\pi(X_i)} \quad \mathrm{where} \quad X_i \stackrel{iid}{\sim} \pi
+$$
+
+
+### How good are the estimates?
+
+Let's look at the variance of the estimator
+
+$$
+\begin{aligned}
+\mathrm{Var}(\hat{I}) &= \mathrm{Var}\Big(\frac{1}{N}\sum_{i=1}^N \frac{f(X_i)}{\pi(X_i)}\Big)\\
+&= \frac{1}{N^2}\mathrm{Var}\Big(\sum_{i=1}^N \frac{f(X_i)}{\pi(X_i)}\Big)\\
+&= \frac{1}{N^2}\sum_{i=1}^N\mathrm{Var}\Big(\frac{f(X_i)}{\pi(X_i)}\Big)\\
+&= \frac{1}{N}\mathrm{Var}\Big(\frac{f(X)}{\pi(X)}\Big)
+\end{aligned}
+$$
+Now,
+
+$$
+\begin{aligned}
+\mathrm{Var}\Big(\frac{f(X)}{\pi(X)}\Big) &= \mathrm{E}\Big[\Big(\frac{f(X)}{\pi(X)}\Big)^2\Big] - \Big(\mathrm{E}\Big[\frac{f(X)}{\pi(X)}\Big]\Big)^2\\
+&= \int_\Omega \Big(\frac{f(x)}{\pi(x)}\Big)^2\pi(x)\mathrm{d}x - I^2\\
+&= \int_\Omega \frac{f(x)^2}{\pi(x)}\mathrm{d}x - I^2
+\end{aligned}
+$$
+If the first integral is finite, variance of $\frac{f(X)}{\pi(X)}$ is bounded, and the variance of the average goes to 0 as N increases.
+
+## Algorithm
+
+To approximate $I = \int_\Omega f(x)\mathrm{d}x$. 
+
+1. Simulate $X_i \sim \pi$
+2. Calculate $\hat{I} = \frac{1}{N}\sum_{i=1}^N \frac{f(X_i)}{\pi(X_i)}$
+
+## Example
+
+Let
+$$f(x) = \sin\Big(\frac{\cos(x)}{x^3}\Big)$$
+We wish to approximate the following integral
+$$
+I = \int_{-\infty}^{\infty} f(x)\mathrm{d}x = \int_{-\infty}^{\infty} \sin\Big(\frac{\cos(x)}{x^3}\Big)\mathrm{d}x
+$$
+
+- $\sin(\cos(x)/x^3)$ is integrable.
+
+$$
+\begin{aligned}
+\int_{-\infty}^{\infty} \sin\Big(\frac{\cos(x)}{x^3}\Big)\mathrm{d}x
+&\le \int_{-\infty}^{\infty} \Big|\sin\Big(\frac{\cos(x)}{x^3}\Big)\Big|\mathrm{d}x \\
+&\le \int_{-2}^{2} 1 \mathrm{d}x + 2\int_{2}^{\infty} \Big|\sin\Big(\frac{\cos(x)}{x^3}\Big)\Big|\mathrm{d}x \\
+&\le \int_{-2}^{2} 1 \mathrm{d}x + 2\int_{2}^{\infty} \sin(1/x^3)\mathrm{d}x 
+\quad \Big(\mathrm{since} \quad \frac{\cos(x)}{x^3}<\frac{1}{x^3}<\frac{\pi}{2} \quad \forall x>2\Big) \\
+&\le 4 + 2\int_{2}^{\infty} \frac{1}{x^3}-\frac{1}{6x^9} \mathrm{d}x 
+\quad \Big(\mathrm{since} \quad \sin(1/x^3)< \frac{1}{x^3}-\frac{1}{6x^9}\Big) \\
+&< \infty
+\end{aligned}
+$$
+In practice we usually are not able to figure integrability of the target function.
+
+- $f$ is an odd function (why?), so the integral is 0.
+
+But imagine we do not know the value of the integral, and we want to approxiamte via Monte Carlo methods. (That's the purpose of Monte Carlo integration. We mention the true value of the integral here for the purpose of illustrating the choice of $\pi$; more on this later.)
+
+- choice of $\pi$.
+
+The region to integrate over is infinite volume, so we resort to Monte Carlo integration in the general setting.
+
+Here we have the freedom to choose $\pi$. Consider two choices of $\pi(x)$:
+
+#### 1. Cauchy: $\pi(x) = \frac{1}{\pi(1+x^2)}$
+
+Here $\lim_{x\to\infty} f(x)/\pi(x) = 0$. The estimator $\hat{I}$ is "stable" in the sense that $\mathrm{Var}(\hat{I}) = \frac{1}{N}\mathrm{Var}\Big(\frac{f(X)}{\pi(X)}\Big) \to 0$ as $N\to\infty$, because.
+
+$$
+\begin{aligned}
+\mathrm{Var}\Big(\frac{f(X)}{\pi(X)}\Big) &= \int_{-\infty}^{\infty} \frac{f(x)^2}{\pi(x)}\mathrm{d}x\\
+&= \int_{-\infty}^{\infty} \sin^2\Big(\frac{\cos(x)}{x^3}\Big)\pi(1+x^2)\mathrm{d}x\\
+&\le 2\pi\int_{2}^{\infty} \Big|\sin^2\Big(\frac{\cos(x)}{x^3}\Big)\Big|(1+x^2)\mathrm{d}x + \pi\int_{-2}^{2} (1+x^2)\mathrm{d}x\\
+&\le 2\pi\int_{2}^{\infty} O\Big(\frac{1}{x^6}\Big)(1+x^2)\mathrm{d}x + 20\pi\\
+&< +\infty
+\end{aligned}
+$$
+
+#### 2. Gaussian: $\pi(x) = \frac{1}{\sqrt{2\pi}}\exp\{-\frac{x^2}{2}\}$
+
+Things are not so pretty if you choose $\pi$ to be a Gaussian density.
+
+$$
+\begin{aligned}
+\mathrm{Var}\Big(\frac{f(X)}{\pi(X)}\Big) &= \int_{-\infty}^{\infty} \frac{f(x)^2}{\pi(x)}\mathrm{d}x\\
+&= \int_{-\infty}^{\infty} \sin^2\Big(\frac{\cos(x)}{x^3}\Big)\sqrt{2\pi}\exp\{x^2/2\}\mathrm{d}x\\
+&\sim \sqrt{2\pi}\int_{-\infty}^{\infty} \frac{\cos^2(x)}{x^6}e^{x^2/2}\mathrm{d}x  = \infty
+\end{aligned}
+$$
+
+The estimator $\hat{I}$ is not stable.
+
+## Numerical results
+
+```{r}
+### Monte Carlo integration
+
+rm(list=ls())
+
+# define the integrand
+f <- function(x){
+  return(sin(cos(x)/x^3))
+}
+
+x <- seq(-5.0005,5.0005,0.001)
+plot(x,f(x),'l')
+
+# start Monte Carlo integration
+set.seed(2016)
+n <- 1e7 # INCREASE n by adding 0's
+
+## Approach 1(good): using pi(x) = PDF(Cauchy; x)
+
+sample.cauchy <- rcauchy(n)
+sample.integrand.cauchy <- f(sample.cauchy) / dcauchy(sample.cauchy)
+I.cauchy <- mean(sample.integrand.cauchy)
+var.I.cauchy <- var(sample.integrand.cauchy)
+
+cat(paste('mean=', round(I.cauchy, 3), ',  var=', round(var.I.cauchy, 3), '\n', sep=''))
+
+
+## Approach 2(bad): using pi(x) = PDF(Normal x)
+sample.norm <- rnorm(n)
+sample.integrand.norm <- f(sample.norm) / dnorm(sample.norm)
+I.norm <- mean(sample.integrand.norm)
+var.I.norm <- var(sample.integrand.norm)
+
+cat(paste('mean=', round(I.norm, 3), ',  var=', round(var.I.norm, 3), '\n', sep=''))
+
+```
+
+NOTE: usually we report standard error of Monte Carlo estimate, i.e., `sd(sample.integrand)/sqrt(n)`, instead of sd of the samples. Here we report the latter to emphasize the point that using a normal sample has infinite variance.
+
+```{r}
+# results:
+# n = 1e7:
+# (cauchy): mean=0.001,  var=5.177
+# (normal): mean=-0.004,  var=99.268
+```
+
+# Q&A
+
+#### Why is the Cauchy better?
+
+Let's try to understand instead why Normal density is bad in this case:
+
+Normal distribution has a tails that decays faster than $f$, ($e^{-x^2/2}$ vs $1/x^3$). What this means is that if your sample $x$ comes from the tail, the ratio $f(x)/g(x)$ is going to be large. Intuitively, you will have a small probability of getting something large (of non-negligible contribution), and the estimates become unstable.
+
+Because Cauchy has a heavier tail than the integrand $f$, ($1/x^2$ vs $1/x^3$), this does not happen when you take samples from Cauchy distribution.
+
+In general, if the function $f$ is integrable, the tail part has to go to zero, you can always find a distribution that decays slower than your integrand in the tail. In this case yoru Monte Carlo estimates are "stable".

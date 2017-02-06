@@ -1,0 +1,59 @@
+---
+title: 'Data wrangling: Exercise 3'
+output:
+  html_notebook: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Download the college board data from
+
+https://collegescorecard.ed.gov/data/
+
+We will work with the 2009 dataset (MERGED2009_10_PP.csv) and 2014 dataset (MERGED2014_15_PP.csv), and the following variables:
+the school's identifier (UNITID), its name (INSTNM), the control of the institution (variable CONTROL); that is whether the institution is public (coded as 1), private not-for-profit (coded as 2), or private for-profit (coded as 3), and the average annual cost of attending that school (variable COSTT4 A).
+
+Explore the dataset. Answer the following questions:
+
+(a) For each school compute the rate of change in the average annual cost of attendance between 2009 to 2014. Work only with the
+schools for which the variable COSTT4 A is not missing in neither of the years.
+
+(b) Make boxplots that present the distributions of the rate of change for public schools, private not-for-profit schools, and private for-profit schools. Put the three boxplots on the same figure.
+
+```{r include=FALSE, eval=FALSE}
+dt_2012 =read.csv('MERGED2009_10_PP.csv',na.strings=c('NULL'), stringsAsFactors = F)
+dt_2013 =read.csv('MERGED2014_15_PP.csv',na.strings=c('NULL'), stringsAsFactors = F)
+selected= (complete.cases(dt_2012$COSTT4_A));
+dt_12 = dt_2012[selected, c('UNITID','OPEID','INSTNM', 'CITY', 'STABBR', 'CONTROL', 'UGDS','COSTT4_A')]
+selected= (complete.cases(dt_2013$COSTT4_A));
+dt_13 = dt_2013[selected, c('UNITID','OPEID','INSTNM', 'CITY', 'STABBR', 'CONTROL', 'UGDS','COSTT4_A')]
+
+college = unique(dt_12$UNITID);
+L=length(college)
+dataset = data.frame(matrix(NA,nrow=1,ncol=7))
+names(dataset) = c('UNITID','INSTNM','CONTROL','STABBR','UGDS','COSTT4_A','rate_cost')
+
+ind=1;
+for (ii in 1:L){
+  dt_find_12 = dt_12[dt_12$UNITID==college[ii],]
+  dt_find_13 = dt_13[dt_13$UNITID==college[ii],]
+  if (nrow(dt_find_13) != 0){
+    dataset[ind,1:6] =c(dt_find_12[,c('UNITID','INSTNM','CONTROL','STABBR','UGDS','COSTT4_A')])
+    rate = (dt_find_13$COSTT4_A-dt_find_12$COSTT4_A)/dt_find_12$COSTT4_A;
+    dataset[ind,7] = rate
+  	ind = ind+1;
+  }
+  print(ii)
+}
+dataset=dataset[abs(dataset$rate_cost)<2,]
+dt1 = dataset$rate_cost[dataset$CONTROL==1]
+dt2 = dataset$rate_cost[dataset$CONTROL==2]
+dt3 = dataset$rate_cost[dataset$CONTROL==3]
+par(mfrow=c(1,3))
+boxplot(dt1,col='blue',ylim=c(-0.5,2)); 
+boxplot(dt2,col='blue',ylim=c(-0.5,2)); 
+boxplot(dt3,col='blue',ylim=c(-0.5,2)); 
+```

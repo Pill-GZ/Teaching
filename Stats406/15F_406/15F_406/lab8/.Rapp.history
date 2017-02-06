@@ -1,0 +1,4016 @@
+Stable = as.data.frame(table(Xrand))[1:6,]# this is a vector of frequencies of generated integers
+Stable
+Stable[,3] = trfx
+Stable
+Stable$truepmf = trfx
+Stable
+Stable = as.data.frame(table(Xrand))[1:6,]# table(Xrand) is a vector of frequencies of generated integers#
+estfx = count[,2] / n#
+Stable$true.pmf = trfx#
+Stable$est.pmf = estfx
+Stable = as.data.frame(table(Xrand))[1:6,]# table(Xrand) is a vector of frequencies of generated integers#
+estfx = Stable[,2] / n#
+Stable$true.pmf = trfx#
+Stable$est.pmf = estfx
+Stable
+print(Stable[,3:4])
+pi
+rC = function(n){#
+	u = runif(n)#
+	return(tan(pi * u / 2))#
+}#
+#
+n = 1000#
+C1 = rC(n)#
+approxintg = mean(C1 <= 2)
+C1
+approxintg
+arctan(1)
+tan(1)
+invtan(1)
+?tan
+atan(2)*pi/2
+atan(2)*2/pi
+Rejrnd0 = function(n){#
+	Vy = numeric(n)#
+	j=1; cpt = 0;#
+	while(j <=n ){#
+		u = runif(1); y = runif(1); cpt = cpt+1;#
+		if(u <= y*exp(-y^2)){#
+			Vy[j] = y;#
+			j=j+1;#
+		}#
+	}#
+	return(list(Vy,cpt))#
+}#
+#
+rndsample0 = Rejrnd0(10)#
+#
+Rejrnd1 = function(n) {#
+	Vy = numeric(n)#
+	j=1; cpt = 0;#
+	while(j <=n ){#
+		u = runif(1); y = runif(1); cpt = cpt+1;#
+		if(u <= sqrt(2)*y*exp(0.5-y^2)){#
+			Vy[j] = y;#
+			j=j+1;#
+		}#
+	}#
+	return(list(Vy,cpt))#
+}#
+#
+rndsample1 = Rejrnd1(10)
+rndsample0
+rndsample1
+Rejrnd0 = function(n){#
+	Vy = numeric(n)#
+	Vcpt = integer(n)#
+	j=1; cpt = 0;#
+	while(j <=n ){#
+		u = runif(1); y = runif(1); cpt = cpt+1;#
+		if(u <= y*exp(-y^2)){#
+			Vy[j] = y; Vcpt[j] = cpt#
+			j=j+1; cpt = 0#
+		}#
+	}#
+	return(list(Vy,Vcpt))#
+}#
+#
+rndsample0 = Rejrnd0(10)#
+#
+Rejrnd1 = function(n) {#
+	Vy = numeric(n)#
+	Vcpt = integer(n)#
+	j=1; cpt = 0;#
+	while(j <=n ){#
+		u = runif(1); y = runif(1); cpt = cpt+1;#
+		if(u <= sqrt(2)*y*exp(0.5-y^2)){#
+			Vy[j] = y; Vcpt[j] = cpt#
+			j=j+1; cpt = 0;#
+		}#
+	}#
+	return(list(Vy,Vcpt))#
+}#
+#
+rndsample1 = Rejrnd1(10)
+rndsample0
+rndsample1
+rndsample0 = Rejrnd0(100)#
+rndsample1 = Rejrnd1(100)
+rndsample1
+rndsample0
+Rejrnd0 = function(n){#
+	Vy = numeric(n)#
+	j=1; cpt = 0;#
+	while(j <=n ){#
+		u = runif(1); y = runif(1); cpt = cpt+1;#
+		if(u <= y*exp(-y^2)){#
+			Vy[j] = y;#
+			j=j+1;#
+		}#
+	}#
+	return(list(Vy,cpt))#
+}#
+Rejrnd1 = function(n) {#
+	Vy = numeric(n)#
+	j=1; cpt = 0;#
+	while(j <=n ){#
+		u = runif(1); y = runif(1); cpt = cpt+1;#
+		if(u <= sqrt(2)*y*exp(0.5-y^2)){#
+			Vy[j] = y; #
+			j=j+1;#
+		}#
+	}#
+	return(list(Vy,cpt))#
+}#
+#
+n = 1000#
+rndsample0 = Rejrnd0(n)#
+rndsample1 = Rejrnd1(n)#
+print(paste("total number of samples needed in first algorithm =",rndsample0[[2]]))#
+print(paste("total number of samples needed in second algorithm =",rndsample1[[2]]))#
+#
+intgz = mean(rndsample1[[1]] >= 0.5)
+print(paste("total number of samples needed to generate" n "samples in first algorithm =",rndsample0[[2]]))#
+print(paste("total number of samples needed to generate" n "samples in second algorithm =",rndsample1[[2]]))
+print(paste("total number of samples needed to generate", n, "samples in first algorithm =",rndsample0[[2]]))#
+print(paste("total number of samples needed to generate", n, "samples in second algorithm =",rndsample1[[2]]))
+intgz
+"The approximated integer value is"#
+print(intgx)
+setwd("/Users/guojun/Google Drive/15Summer/Simulation/SPGA-R/SPGA-logistic/Boyd")#
+#setwd("C:/Users/TEMP/Downloads")#
+library(MASS)#
+#library(mvtnorm)#
+#library(MCMCpack)#
+#library(BayesLogit)#
+#
+##Simulate data#
+#
+mylogit = function(x) 1/(1+exp(-x)) # compare with exp(x)/(1+exp(x))#
+vnorm = function(x) sqrt(sum(x^2))#
+#
+N=200; p=50;#
+X = as.matrix(read.table('Xdta'))#
+colnames(X) = NULL#
+y = as.matrix(read.table('Ydta'))#
+b = drop(y)#
+b[which(b==0)] = -1;#
+#
+A = diag(b) %*% X;#
+#
+beta_star = drop(as.matrix(read.table('trBdta')))#
+beta_0 = 1.5;#
+beta_star = c(beta_0, beta_star);
+update_x = function(A, b, u, z, rho){#
+	Alpha = 0.1; # this Alpha is for backtracking, not the relaxing parameter.#
+	BETA = 0.5;#
+	TOLERANCE = 1e-5;#
+	MAX_ITER = 5;#
+	m = dim(A)[1]; n = dim(A)[2];#
+	I = diag(n+1);#
+	#if (exists('x0')) { #
+	#	x = x0;#
+	#	}#
+	x = numeric(n+1);#
+	C = cbind(-b, -A);#
+	f = function(argx) (sum(log(1 + exp(C %*% argx))) + (rho/2) * sum((argx - z + u)^2));#
+	for (iter in 1:MAX_ITER){#
+		fx = f(x);#
+		g = t(C) %*% mylogit(C %*% x) + rho * (x - z + u);#
+		#H = t(C) %*% diag(as.vector( exp(C %*% x) / (1 + exp(C %*% x))^2 )) %*% C + rho * I;#
+		# dx = -solve(H , g);#
+		dx = -g#
+		dfx = t(g) %*% dx;#
+		#if(abs(dfx) < TOLERANCE) break;#
+		# backtracking #
+		t = 1;#
+		while(f(x + t * dx) > fx + Alpha * t * dfx){#
+			t = BETA * t;#
+		}#
+		x = x + t * dx;#
+	} #
+	return(x)#
+}#
+#
+shrinkage = function(a, kappa){#
+	z = pmax(0, a - kappa) - pmax(0, -a-kappa); # max() return max for all values, pmax() return parallel max.#
+	return(z)#
+}#
+#
+logreg_Boyd = function(A, b, mu, rho, alpha, N_ITER){#
+	#N_ITER = 2;#
+	#ABSTOL = 1e-4; RELTOL = 1e-2;#
+	m = dim(A)[1]; n = dim(A)[2];#
+	x = numeric(n+1);#
+	z = numeric(n+1);#
+	u = numeric(n+1);#
+	#history = as.data.frame(matrix(NA, nrow = N_ITER, ncol = 5));#
+	#names(history) = c('objval','r_norm','s_norm','eps_pri','eps_dual');#
+	for( k in 1:N_ITER ){#
+		# x update#
+		x = update_x(A, b, u, z, rho);#
+		# z update#
+		#zold = z;#
+		#x_hat = alpha * x + (1-alpha) * zold;#
+		#x_hat = x;#
+		z = x + u;#
+		z[-1] = shrinkage(z[-1], m*mu/rho);#
+		# multiplier update#
+		u = u + ( x - z ); # x_hat originally#
+		# diagnostics, reporting, termination checks#
+		# history$objval[k] = objective(A, b, mu, x, z);#
+		#history$r_norm[k] = norm( x - z );#
+		#history$s_norm[k] = norm( rho*(z - zold) );#
+		#history$eps_pri[k] = sqrt(n) * ABSTOL + RELTOL * max(vnorm(x), vnorm(z));#
+		#history$eps_dual[k] = sqrt(n) * ABSTOL + RELTOL * vnorm(rho*u);#
+		#if (history$r_norm[k] < history$eps_pri[k] & history$s_norm[k] < history$eps_dual[k]) {#
+		#	history = history[1:k,]#
+		#	break;#
+		#}#
+	}#
+	return(z)#
+}#
+#
+mu = 0.05 * sqrt(log(p)/N)#
+ADMMBOY = logreg_Boyd(A, b, mu, rho = 1.0, alpha = 1.0, 3)#
+print(drop(ADMMBOY))
+N1=200; p1=50;#
+X1 = as.matrix(read.table('Xdta'))#
+colnames(X1) = NULL#
+y1 = as.matrix(read.table('Ydta'))#
+b1 = drop(y1)#
+b1[which(b1==0)] = -1;#
+#
+#A1 = diag(b1) %*% X1;#
+#
+beta_star1 = drop(as.matrix(read.table('trBdta')))#
+beta_01 = 1.5;#
+beta_star1 = c(beta_01, beta_star1);
+set.seed(2015)#
+#
+##	ADMM with Newton Ralphson update for beta;#
+#
+myxupdate = function(x, z, u, bD, rho){#
+	MAXITER = 5;#
+	alpha = 0.1; beta = 0.5;#
+	fx = function(argx) (sum( log(1 + exp(drop(-bD %*% argx)))) + (rho / 2) * sum((argx - z + u)^2))#
+	for(iter in 1:MAXITER){#
+		gradx = - t(bD) %*% mylogit(drop(-bD %*% x)) + rho * (x - z + u)#
+		t = 1;#
+		fx0 = fx(x);#
+		while(fx0 < fx(x - t * gradx) + alpha * t * sum(gradx^2)){#
+			t = beta * t#
+		}#
+		x = x - t * gradx;#
+	}#
+	return(list(x,t))#
+}#
+#
+softshrink = function(a, kappa){#
+	z = pmax(a - kappa, 0) - pmax(-a - kappa, 0)#
+	return(z)#
+}#
+#
+myADMM = function(b, X, rho, lambda0, Niter){#
+	n = dim(X)[1]; p = dim(X)[2];#
+	data = cbind(rep(1, n), X);#
+	lambda = lambda0 * sqrt(n*log(p));#
+	bD = diag(b) %*% data;#
+	x = numeric(p+1);#
+	z = numeric(p+1);#
+	u = numeric(p+1);#
+	step = 1;#
+	for (k in 1:Niter){#
+		xupdate = myxupdate(x, z, u, bD, rho);#
+		x = xupdate[[1]]#
+		step = c(step, xupdate[[2]])#
+		z = x + u#
+		z[-1] = softshrink(z[-1], lambda/rho);#
+		u = u + x - z;#
+	}#
+	return(list(drop(z), step))#
+}#
+#
+ADMM1 = myADMM(b1, X1, 1, 0.05, 3)#
+print(ADMM1)
+rm(list=ls())
+x = numeric(n+1);#
+	z = numeric(n+1);#
+	u = numeric(n+1);
+N=200; p=50;#
+X = as.matrix(read.table('Xdta'))#
+colnames(X) = NULL#
+y = as.matrix(read.table('Ydta'))#
+b = drop(y)#
+b[which(b==0)] = -1;#
+#
+A = diag(b) %*% X;#
+#
+beta_star = drop(as.matrix(read.table('trBdta')))#
+beta_0 = 1.5;#
+beta_star = c(beta_0, beta_star);
+mu = 0.05 * sqrt(log(p)/N)
+mu
+m = dim(A)[1]; n = dim(A)[2];
+m
+n
+x = numeric(n+1);#
+	z = numeric(n+1);#
+	u = numeric(n+1);
+rho = 1.0
+Alpha = 0.1; # this Alpha is for backtracking, not the relaxing parameter.
+BETA = 0.5;
+MAX_ITER = 5;
+m = dim(A)[1]; n = dim(A)[2];
+n
+m
+I = diag(n+1);
+update_x = function(A, b, u, z, x, rho){#
+	Alpha = 0.1; # this Alpha is for backtracking, not the relaxing parameter.#
+	BETA = 0.5;#
+	#TOLERANCE = 1e-5;#
+	MAX_ITER = 5;#
+	m = dim(A)[1]; n = dim(A)[2];#
+	I = diag(n+1);#
+	#if (exists('x0')) { #
+	#	x = x0;#
+	#	}#
+	#x = numeric(n+1);#
+	C = cbind(-b, -A);#
+	f = function(argx) (sum(log(1 + exp(C %*% argx))) + (rho/2) * sum((argx - z + u)^2));#
+	for (iter in 1:MAX_ITER){#
+		fx = f(x);#
+		g = t(C) %*% mylogit(C %*% x) + rho * (x - z + u);#
+		#H = t(C) %*% diag(as.vector( exp(C %*% x) / (1 + exp(C %*% x))^2 )) %*% C + rho * I;#
+		# dx = -solve(H , g);#
+		dx = -g#
+		dfx = t(g) %*% dx;#
+		#if(abs(dfx) < TOLERANCE) break;#
+		# backtracking #
+		t = 1;#
+		while(f(x + t * dx) > fx + Alpha * t * dfx){#
+			t = BETA * t;#
+		}#
+		x = x + t * dx;#
+	} #
+	return(x)#
+}#
+#
+shrinkage = function(a, kappa){#
+	z = pmax(0, a - kappa) - pmax(0, -a-kappa); # max() return max for all values, pmax() return parallel max.#
+	return(z)#
+}#
+#
+logreg_Boyd = function(A, b, mu, rho, alpha, N_ITER){#
+	#N_ITER = 2;#
+	#ABSTOL = 1e-4; RELTOL = 1e-2;#
+	m = dim(A)[1]; n = dim(A)[2];#
+	x = numeric(n+1);#
+	z = numeric(n+1);#
+	u = numeric(n+1);#
+	#history = as.data.frame(matrix(NA, nrow = N_ITER, ncol = 5));#
+	#names(history) = c('objval','r_norm','s_norm','eps_pri','eps_dual');#
+	for( k in 1:N_ITER ){#
+		# x update#
+		x = update_x(A, b, u, z, rho);#
+		# z update#
+		#zold = z;#
+		#x_hat = alpha * x + (1-alpha) * zold;#
+		#x_hat = x;#
+		z = x + u;#
+		z[-1] = shrinkage(z[-1], m*mu/rho);#
+		# multiplier update#
+		u = u + ( x - z ); # x_hat originally#
+		# diagnostics, reporting, termination checks#
+		# history$objval[k] = objective(A, b, mu, x, z);#
+		#history$r_norm[k] = norm( x - z );#
+		#history$s_norm[k] = norm( rho*(z - zold) );#
+		#history$eps_pri[k] = sqrt(n) * ABSTOL + RELTOL * max(vnorm(x), vnorm(z));#
+		#history$eps_dual[k] = sqrt(n) * ABSTOL + RELTOL * vnorm(rho*u);#
+		#if (history$r_norm[k] < history$eps_pri[k] & history$s_norm[k] < history$eps_dual[k]) {#
+		#	history = history[1:k,]#
+		#	break;#
+		#}#
+	}#
+	return(z)#
+}#
+#
+mu = 0.05 * sqrt(log(p)/N)#
+ADMMBOY = logreg_Boyd(A, b, mu, rho = 1.0, alpha = 1.0, 3)
+logreg_Boyd = function(A, b, mu, rho, alpha, N_ITER){#
+	#N_ITER = 2;#
+	#ABSTOL = 1e-4; RELTOL = 1e-2;#
+	m = dim(A)[1]; n = dim(A)[2];#
+	x = numeric(n+1);#
+	z = numeric(n+1);#
+	u = numeric(n+1);#
+	#history = as.data.frame(matrix(NA, nrow = N_ITER, ncol = 5));#
+	#names(history) = c('objval','r_norm','s_norm','eps_pri','eps_dual');#
+	for( k in 1:N_ITER ){#
+		# x update#
+		x = update_x(A, b, u, z, x, rho);#
+		# z update#
+		#zold = z;#
+		#x_hat = alpha * x + (1-alpha) * zold;#
+		#x_hat = x;#
+		z = x + u;#
+		z[-1] = shrinkage(z[-1], m*mu/rho);#
+		# multiplier update#
+		u = u + ( x - z ); # x_hat originally#
+		# diagnostics, reporting, termination checks#
+		# history$objval[k] = objective(A, b, mu, x, z);#
+		#history$r_norm[k] = norm( x - z );#
+		#history$s_norm[k] = norm( rho*(z - zold) );#
+		#history$eps_pri[k] = sqrt(n) * ABSTOL + RELTOL * max(vnorm(x), vnorm(z));#
+		#history$eps_dual[k] = sqrt(n) * ABSTOL + RELTOL * vnorm(rho*u);#
+		#if (history$r_norm[k] < history$eps_pri[k] & history$s_norm[k] < history$eps_dual[k]) {#
+		#	history = history[1:k,]#
+		#	break;#
+		#}#
+	}#
+	return(z)#
+}#
+#
+mu = 0.05 * sqrt(log(p)/N)#
+ADMMBOY = logreg_Boyd(A, b, mu, rho = 1.0, alpha = 1.0, 3)#
+print(drop(ADMMBOY))
+mylogit = function(x) 1/(1+exp(-x)) # compare with exp(x)/(1+exp(x))#
+vnorm = function(x) sqrt(sum(x^2))
+ADMMBOY = logreg_Boyd(A, b, mu, rho = 1.0, alpha = 1.0, 3)#
+print(drop(ADMMBOY))
+N1=200; p1=50;#
+X1 = as.matrix(read.table('Xdta'))#
+colnames(X1) = NULL#
+y1 = as.matrix(read.table('Ydta'))#
+b1 = drop(y1)#
+b1[which(b1==0)] = -1;#
+#
+#A1 = diag(b1) %*% X1;#
+#
+beta_star1 = drop(as.matrix(read.table('trBdta')))#
+beta_01 = 1.5;#
+beta_star1 = c(beta_01, beta_star1);#
+#
+#ratio1 = sum(b1 == 1) / N1;#
+#mu1 = 0.7 * 1/N1 * max( (1 - ratio1) * apply(A1[(y1==1),], 2, sum) + ratio1 * apply(A1[(y1==-1),], 2, sum) );#
+#
+set.seed(2015)#
+#
+##	ADMM with Newton Ralphson update for beta;#
+#
+myxupdate = function(x, z, u, bD, rho){#
+	MAXITER = 5;#
+	alpha = 0.1; beta = 0.5;#
+	fx = function(argx) (sum( log(1 + exp(drop(-bD %*% argx)))) + (rho / 2) * sum((argx - z + u)^2))#
+	for(iter in 1:MAXITER){#
+		gradx = - t(bD) %*% mylogit(drop(-bD %*% x)) + rho * (x - z + u)#
+		t = 1;#
+		fx0 = fx(x);#
+		while(fx0 < fx(x - t * gradx) + alpha * t * sum(gradx^2)){#
+			t = beta * t#
+		}#
+		x = x - t * gradx;#
+	}#
+	return(list(x,t))#
+}#
+#
+softshrink = function(a, kappa){#
+	z = pmax(a - kappa, 0) - pmax(-a - kappa, 0)#
+	return(z)#
+}#
+#
+myADMM = function(b, X, rho, lambda0, Niter){#
+	n = dim(X)[1]; p = dim(X)[2];#
+	data = cbind(rep(1, n), X);#
+	lambda = lambda0 * sqrt(n*log(p));#
+	bD = diag(b) %*% data;#
+	x = numeric(p+1);#
+	z = numeric(p+1);#
+	u = numeric(p+1);#
+	step = 1;#
+	for (k in 1:Niter){#
+		xupdate = myxupdate(x, z, u, bD, rho);#
+		x = xupdate[[1]]#
+		step = c(step, xupdate[[2]])#
+		z = x + u#
+		z[-1] = softshrink(z[-1], lambda/rho);#
+		u = u + x - z;#
+	}#
+	return(list(drop(z), step))#
+}#
+#
+ADMM1 = myADMM(b1, X1, 1, 0.05, 3)#
+print(ADMM1)
+drop(ADMMBOY - ADMM1[[1]])
+ADMMBOY = logreg_Boyd(A, b, mu, rho = 1.0, alpha = 1.0, 10)#
+print(drop(ADMMBOY))
+ADMM1 = myADMM(b1, X1, 1, 0.05, 10)#
+print(ADMM1)
+drop(ADMMBOY - ADMM1[[1]])
+vnorm(drop(ADMMBOY - ADMM1[[1]]))
+ADMM1 = myADMM(b1, X1, 1, 0.05, 50)#
+print(ADMM1)
+ADMMBOY = logreg_Boyd(A, b, mu, rho = 1.0, alpha = 1.0, 50)#
+print(drop(ADMMBOY))
+vnorm(ADMMBOY - ADMM1[[1]])
+ADMM1 = myADMM(b1, X1, 1, 0.05, 100)#
+print(ADMM1)
+mu = 0.05 * sqrt(log(p)/N)#
+ADMMBOY = logreg_Boyd(A, b, mu, rho = 1.0, alpha = 1.0, 100)#
+print(drop(ADMMBOY))
+vnorm(ADMMBOY - ADMM1[[1]])
+softshrink = function(a, kappa){#
+	z = pmax(a - kappa, 0) + pmin(a + kappa, 0)#
+	return(z)#
+}
+ADMM1 = myADMM(b1, X1, 1, 0.05, 100)#
+print(ADMM1)
+vnorm(ADMMBOY - ADMM1[[1]])
+abs(-5)
+setwd("/Users/guojun/Google Drive/15Summer/Simulation/SPGA-R/SPGA-logistic/Boyd")#
+#setwd("C:/Users/TEMP/Downloads")#
+library(MASS)#
+#library(mvtnorm)#
+#library(MCMCpack)#
+#library(BayesLogit)#
+#
+##Simulate data#
+#
+mylogit = function(x) 1/(1+exp(-x)) # compare with exp(x)/(1+exp(x))#
+vnorm = function(x) sqrt(sum(x^2))#
+#
+N1=200; p1=50;#
+X1 = as.matrix(read.table('Xdta'))#
+colnames(X1) = NULL#
+y1 = as.matrix(read.table('Ydta'))#
+b1 = drop(y1)#
+b1[which(b1==0)] = -1;#
+#
+#A1 = diag(b1) %*% X1;#
+#
+beta_star1 = drop(as.matrix(read.table('trBdta')))#
+beta_01 = 1.5;#
+beta_star1 = c(beta_01, beta_star1);#
+#
+set.seed(2015)#
+#
+##	ADMM with Newton Ralphson update for beta;#
+#
+myxupdate = function(x, z, u, bD, rho){#
+	MAXITER = 2;#
+	alpha = 0.1; beta = 0.5;#
+	fx = function(argx) (sum( log(1 + exp(-bD %*% argx)) + (rho / 2) * sum((argx - z + u)^2) ))#
+	for(iter in 1:MAXITER){#
+		gradx = - t(bD) %*% mylogit(-bD %*% x) + rho * (x - z + u)#
+		t = 1;#
+		fx0 = fx(x);#
+		while(fx0 < fx(x - t * gradx) + alpha * t * sum(gradx^2)){#
+			t = beta * t#
+			print(t)#
+		}#
+		x = x - t * gradx;#
+	}#
+	return(list(x,t))#
+}#
+#
+softshrink = function(a, kappa){#
+	z = pmax(a - kappa, 0) + pmin(a + kappa, 0)#
+	return(z)#
+}#
+#
+myADMM = function(b, X, rho, lambda0, Niter){#
+	n = dim(X)[1]; p = dim(X)[2];#
+	data = cbind(rep(1, n), X);#
+	lambda = lambda0 * sqrt(N*log(p));#
+	bD = diag(b) %*% data;#
+	x = numeric(p+1);#
+	z = numeric(p+1);#
+	u = numeric(p+1);#
+	step = 1;#
+	objfunc = function(argx, argz) (sum( log(1 + exp(-bD %*% argx)) + lambda * sum(abs(argz)) ))#
+	optpath = as.data.frame(matrix(NA, nrow = Niter, ncol = 5));#
+	names(optpath) = c('objval','r_norm','s_norm','eps_pri','eps_dual');#
+	for (k in 1:Niter){#
+		#update#
+		xupdate = myxupdate(x, z, u, bD, rho);#
+		x = xupdate[[1]]#
+		step = c(step, xupdate[[2]])#
+		zold = z#
+		z = x + u#
+		z = softshrink(z[-1], lambda/rho);#
+		u = u + x - z;#
+		#stopping#
+		optpath$objval[k] = objfunc(x, z);#
+		optpath$r_norm[k] = norm( x - z );#
+		optpath$s_norm[k] = norm( rho*(z - zold) );#
+		optpath$eps_pri[k] = sqrt(p) * ABSTOL + RELTOL * max(vnorm(x), vnorm(z));#
+		optpath$eps_dual[k] = sqrt(p) * ABSTOL + RELTOL * vnorm(rho*u);#
+		if (optpath$r_norm[k] < optpath$eps_pri[k] & optpath$s_norm[k] < optpath$eps_dual[k]) {#
+			optpath = optpath[1:k,]#
+			break;#
+		}	#
+	}#
+	return(list(drop(z), step, optpath))#
+}#
+#
+ADMM1 = myADMM(b1, X1, 1, 0.5, 2)#
+print(ADMM1)
+myADMM = function(b, X, rho, lambda0, Niter){#
+	n = dim(X)[1]; p = dim(X)[2];#
+	data = cbind(rep(1, n), X);#
+	lambda = lambda0 * sqrt(n*log(p));#
+	bD = diag(b) %*% data;#
+	x = numeric(p+1);#
+	z = numeric(p+1);#
+	u = numeric(p+1);#
+	step = 1;#
+	objfunc = function(argx, argz) (sum( log(1 + exp(-bD %*% argx)) + lambda * sum(abs(argz)) ))#
+	optpath = as.data.frame(matrix(NA, nrow = Niter, ncol = 5));#
+	names(optpath) = c('objval','r_norm','s_norm','eps_pri','eps_dual');#
+	for (k in 1:Niter){#
+		#update#
+		xupdate = myxupdate(x, z, u, bD, rho);#
+		x = xupdate[[1]]#
+		step = c(step, xupdate[[2]])#
+		zold = z#
+		z = x + u#
+		z = softshrink(z[-1], lambda/rho);#
+		u = u + x - z;#
+		#stopping#
+		optpath$objval[k] = objfunc(x, z);#
+		optpath$r_norm[k] = norm( x - z );#
+		optpath$s_norm[k] = norm( rho*(z - zold) );#
+		optpath$eps_pri[k] = sqrt(p) * ABSTOL + RELTOL * max(vnorm(x), vnorm(z));#
+		optpath$eps_dual[k] = sqrt(p) * ABSTOL + RELTOL * vnorm(rho*u);#
+		if (optpath$r_norm[k] < optpath$eps_pri[k] & optpath$s_norm[k] < optpath$eps_dual[k]) {#
+			optpath = optpath[1:k,]#
+			break;#
+		}	#
+	}#
+	return(list(drop(z), step, optpath))#
+}#
+#
+ADMM1 = myADMM(b1, X1, 1, 0.5, 2)#
+print(ADMM1)
+myxupdate = function(x, z, u, bD, rho){#
+	MAXITER = 2;#
+	alpha = 0.1; beta = 0.5;#
+	fx = function(argx) (sum( log(1 + exp(-bD %*% argx)) + (rho / 2) * sum((argx - z + u)^2) ))#
+	for(iter in 1:MAXITER){#
+		gradx = - t(bD) %*% mylogit(-bD %*% x) + rho * (x - z + u)#
+		t = 1;#
+		fx0 = fx(x);#
+		while(fx0 < fx(x - t * gradx) + alpha * t * sum(gradx^2)){#
+			t = beta * t#
+			print(t)#
+		}#
+		x = x - t * gradx;#
+	}#
+	return(list(x,t))#
+}#
+#
+softshrink = function(a, kappa){#
+	z = pmax(a - kappa, 0) + pmin(a + kappa, 0)#
+	return(z)#
+}#
+#
+myADMM = function(b, X, rho, lambda0, Niter){#
+	n = dim(X)[1]; p = dim(X)[2];#
+	ABSTOL = 1e-4; RELTOL = 1e-2;#
+	data = cbind(rep(1, n), X);#
+	lambda = lambda0 * sqrt(n*log(p));#
+	bD = diag(b) %*% data;#
+	x = numeric(p+1);#
+	z = numeric(p+1);#
+	u = numeric(p+1);#
+	step = 1;#
+	objfunc = function(argx, argz) (sum( log(1 + exp(-bD %*% argx)) + lambda * sum(abs(argz)) ))#
+	optpath = as.data.frame(matrix(NA, nrow = Niter, ncol = 5));#
+	names(optpath) = c('objval','r_norm','s_norm','eps_pri','eps_dual');#
+	for (k in 1:Niter){#
+		#update#
+		xupdate = myxupdate(x, z, u, bD, rho);#
+		x = xupdate[[1]]#
+		step = c(step, xupdate[[2]])#
+		zold = z#
+		z = x + u#
+		z[-1] = softshrink(z[-1], lambda/rho);#
+		u = u + x - z;#
+		#stopping#
+		optpath$objval[k] = objfunc(x, z);#
+		optpath$r_norm[k] = norm( x - z );#
+		optpath$s_norm[k] = norm( rho*(z - zold) );#
+		optpath$eps_pri[k] = sqrt(p) * ABSTOL + RELTOL * max(vnorm(x), vnorm(z));#
+		optpath$eps_dual[k] = sqrt(p) * ABSTOL + RELTOL * vnorm(rho*u);#
+		if (optpath$r_norm[k] < optpath$eps_pri[k] & optpath$s_norm[k] < optpath$eps_dual[k]) {#
+			optpath = optpath[1:k,]#
+			break;#
+		}	#
+	}#
+	return(list(drop(z), step, optpath))#
+}#
+#
+ADMM1 = myADMM(b1, X1, 1, 0.5, 2)#
+print(ADMM1)
+myxupdate = function(x, z, u, bD, rho){#
+	MAXITER = 50;#
+	alpha = 0.1; beta = 0.5;#
+	fx = function(argx) (sum( log(1 + exp(-bD %*% argx)) + (rho / 2) * sum((argx - z + u)^2) ))#
+	for(iter in 1:MAXITER){#
+		gradx = - t(bD) %*% mylogit(-bD %*% x) + rho * (x - z + u)#
+		t = 1;#
+		fx0 = fx(x);#
+		while(fx0 < fx(x - t * gradx) + alpha * t * sum(gradx^2)){#
+			t = beta * t#
+			print(t)#
+		}#
+		x = x - t * gradx;#
+	}#
+	return(list(x,t))#
+}#
+#
+softshrink = function(a, kappa){#
+	z = pmax(a - kappa, 0) + pmin(a + kappa, 0)#
+	return(z)#
+}#
+#
+myADMM = function(b, X, rho, lambda0, Niter){#
+	n = dim(X)[1]; p = dim(X)[2];#
+	ABSTOL = 1e-4; RELTOL = 1e-2;#
+	data = cbind(rep(1, n), X);#
+	lambda = lambda0 * sqrt(n*log(p));#
+	bD = diag(b) %*% data;#
+	x = numeric(p+1);#
+	z = numeric(p+1);#
+	u = numeric(p+1);#
+	step = 1;#
+	objfunc = function(argx, argz) (sum( log(1 + exp(-bD %*% argx)) + lambda * sum(abs(argz)) ))#
+	optpath = as.data.frame(matrix(NA, nrow = Niter, ncol = 5));#
+	names(optpath) = c('objval','r_norm','s_norm','eps_pri','eps_dual');#
+	for (k in 1:Niter){#
+		#update#
+		xupdate = myxupdate(x, z, u, bD, rho);#
+		x = xupdate[[1]]#
+		step = c(step, xupdate[[2]])#
+		zold = z#
+		z = x + u#
+		z[-1] = softshrink(z[-1], lambda/rho);#
+		u = u + x - z;#
+		#stopping#
+		optpath$objval[k] = objfunc(x, z);#
+		optpath$r_norm[k] = norm( x - z );#
+		optpath$s_norm[k] = norm( rho*(z - zold) );#
+		optpath$eps_pri[k] = sqrt(p) * ABSTOL + RELTOL * max(vnorm(x), vnorm(z));#
+		optpath$eps_dual[k] = sqrt(p) * ABSTOL + RELTOL * vnorm(rho*u);#
+		if (optpath$r_norm[k] < optpath$eps_pri[k] & optpath$s_norm[k] < optpath$eps_dual[k]) {#
+			optpath = optpath[1:k,]#
+			break;#
+		}	#
+	}#
+	return(list(drop(z), step, optpath))#
+}#
+#
+ADMM1 = myADMM(b1, X1, 1, 0.5, 2)#
+print(ADMM1)
+ADMM1 = myADMM(b1, X1, 1, 0.1, 2)#
+print(ADMM1)
+ADMM1 = myADMM(b1, X1, 1, 0, 2)#
+print(ADMM1)
+ADMM1 = myADMM(b1, X1, 1, 0.05, 2)#
+print(ADMM1)
+ADMM1 = myADMM(b1, X1, 1, 0.5, 10)#
+print(ADMM1)
+rm(list=ls())
+a
+rm(list=ls())
+setwd("/Users/guojun/Google Drive/15Summer/Simulation/SPGA-R/SPGA-logistic/Boyd/Current")#
+#setwd("C:/Users/TEMP/Downloads")#
+library(MASS)#
+#library(mvtnorm)#
+#library(MCMCpack)#
+#library(BayesLogit)#
+#
+##Simulate data#
+#
+mylogit = function(x) 1/(1+exp(-x)) # compare with exp(x)/(1+exp(x))#
+vnorm = function(x) sqrt(sum(x^2))#
+#
+N=200; p=50;#
+X = as.matrix(read.table('Xdta'))#
+colnames(X) = NULL#
+y = as.matrix(read.table('Ydta'))#
+b = drop(y)#
+b[which(b==0)] = -1;#
+#
+A = diag(b) %*% X;#
+#
+beta_star = drop(as.matrix(read.table('trBdta')))#
+beta_0 = 1.5;#
+beta_star = c(beta_0, beta_star);
+objective = function(A, b, mu, x, z){#
+	m = dim(A)[1];#
+	obj = sum(log(1 + exp(-A %*% x[-1] - b * x[1]))) + m * mu * sum(abs(z));#
+	return(obj)#
+}#
+#
+update_x = function(A, b, u, z, x, rho){#
+	Alpha = 0.1; # this Alpha is for backtracking, not the relaxing parameter.#
+	BETA = 0.5;#
+	TOLERANCE = 1e-5;#
+	MAX_ITER = 5;#
+	m = dim(A)[1]; n = dim(A)[2];#
+	I = diag(n+1);#
+	#if (exists('x0')) { #
+	#	x = x0;#
+	#	}#
+	#x = numeric(n+1);#
+	C = cbind(-b, -A);#
+	f = function(argx) (sum(log(1 + exp(C %*% argx))) + (rho/2) * sum((argx - z + u)^2));#
+	for (iter in 1:MAX_ITER){#
+		fx = f(x);#
+		g = t(C) %*% mylogit(C %*% x) + rho * (x - z + u);#
+		#H = t(C) %*% diag(as.vector( exp(C %*% x) / (1 + exp(C %*% x))^2 )) %*% C + rho * I;#
+		dx = -g;#
+		dfx = t(g) %*% dx;#
+		if(abs(dfx) < TOLERANCE) break;#
+		# backtracking #
+		t = 1;#
+		while(f(x + t * dx) > fx + Alpha * t * dfx){#
+			t = BETA * t;#
+		}#
+		x = x + t * dx;#
+	} #
+	return(x)#
+}#
+#
+shrinkage = function(a, kappa){#
+	z = pmax(0, a - kappa) - pmax(0, -a-kappa); # max() return max for all values, pmax() return parallel max.#
+	return(z)#
+}#
+#
+logreg_Boyd = function(A, b, mu, rho, alpha, N_ITER){#
+	#N_ITER = 2;#
+	#ABSTOL = 1e-4; RELTOL = 1e-2;#
+	m = dim(A)[1]; n = dim(A)[2];#
+	x = numeric(n+1);#
+	z = numeric(n+1);#
+	u = numeric(n+1);#
+	#history = as.data.frame(matrix(NA, nrow = N_ITER, ncol = 5));#
+	#names(history) = c('objval','r_norm','s_norm','eps_pri','eps_dual');#
+	for( k in 1:N_ITER ){#
+		# x update#
+		x = update_x(A, b, u, z, x, rho);#
+		# z update#
+		#zold = z;#
+		#x_hat = alpha * x + (1-alpha) * zold;#
+		#z = x_hat + u;#
+		z = x + u;#
+		z[-1] = shrinkage(z[-1], m*mu/rho);#
+		# multiplier update#
+		#u = u + ( x_hat - z );#
+		u = u + ( x - z );#
+		# diagnostics, reporting, termination checks#
+		#history$objval[k] = objective(A, b, mu, x, z);#
+		#history$r_norm[k] = norm( x - z );#
+		#history$s_norm[k] = norm( rho*(z - zold) );#
+		#history$eps_pri[k] = sqrt(n) * ABSTOL + RELTOL * max(vnorm(x), vnorm(z));#
+		#history$eps_dual[k] = sqrt(n) * ABSTOL + RELTOL * vnorm(rho*u);#
+		#if (history$r_norm[k] < history$eps_pri[k] & history$s_norm[k] < history$eps_dual[k]) {#
+		#	history = history[1:k,]#
+		#	break;#
+		#}#
+	}#
+	return(history)#
+}#
+#
+mu = 0.05 * sqrt(log(p)/N)#
+ADMMBOY = logreg_Boyd(A, b, mu, rho = 1.0, alpha = 1.0, 1)#
+print(drop(ADMMBOY))
+logreg_Boyd = function(A, b, mu, rho, alpha, N_ITER){#
+	#N_ITER = 2;#
+	#ABSTOL = 1e-4; RELTOL = 1e-2;#
+	m = dim(A)[1]; n = dim(A)[2];#
+	x = numeric(n+1);#
+	z = numeric(n+1);#
+	u = numeric(n+1);#
+	#history = as.data.frame(matrix(NA, nrow = N_ITER, ncol = 5));#
+	#names(history) = c('objval','r_norm','s_norm','eps_pri','eps_dual');#
+	for( k in 1:N_ITER ){#
+		# x update#
+		x = update_x(A, b, u, z, x, rho);#
+		# z update#
+		#zold = z;#
+		#x_hat = alpha * x + (1-alpha) * zold;#
+		#z = x_hat + u;#
+		z = x + u;#
+		z[-1] = shrinkage(z[-1], m*mu/rho);#
+		# multiplier update#
+		#u = u + ( x_hat - z );#
+		u = u + ( x - z );#
+		# diagnostics, reporting, termination checks#
+		#history$objval[k] = objective(A, b, mu, x, z);#
+		#history$r_norm[k] = norm( x - z );#
+		#history$s_norm[k] = norm( rho*(z - zold) );#
+		#history$eps_pri[k] = sqrt(n) * ABSTOL + RELTOL * max(vnorm(x), vnorm(z));#
+		#history$eps_dual[k] = sqrt(n) * ABSTOL + RELTOL * vnorm(rho*u);#
+		#if (history$r_norm[k] < history$eps_pri[k] & history$s_norm[k] < history$eps_dual[k]) {#
+		#	history = history[1:k,]#
+		#	break;#
+		#}#
+	}#
+	return(z)#
+}#
+#
+mu = 0.05 * sqrt(log(p)/N)#
+ADMMBOY = logreg_Boyd(A, b, mu, rho = 1.0, alpha = 1.0, 1)#
+print(drop(ADMMBOY))
+setwd("/Users/guojun/Google Drive/15Summer/Simulation/SPGA-R/SPGA-logistic/Boyd/Current")#
+#setwd("C:/Users/TEMP/Downloads")#
+library(MASS)#
+#library(mvtnorm)#
+#library(MCMCpack)#
+#library(BayesLogit)#
+#
+##Simulate data#
+#
+mylogit = function(x) 1/(1+exp(-x)) # compare with exp(x)/(1+exp(x))#
+vnorm = function(x) sqrt(sum(x^2))#
+#
+N1=200; p1=50;#
+X1 = as.matrix(read.table('Xdta'))#
+colnames(X1) = NULL#
+y1 = as.matrix(read.table('Ydta'))#
+b1 = drop(y1)#
+b1[which(b1==0)] = -1;#
+#
+#A1 = diag(b1) %*% X1;#
+#
+beta_star1 = drop(as.matrix(read.table('trBdta')))#
+beta_01 = 1.5;#
+beta_star1 = c(beta_01, beta_star1);#
+#
+set.seed(2015)#
+#
+##	ADMM with Newton Ralphson update for beta;#
+#
+myxupdate = function(x, z, u, bD, rho){#
+	MAXITER = 50;#
+	alpha = 0.1; beta = 0.5;#
+	fx = function(argx) sum(log(1 + exp(-bD %*% argx))) + (rho / 2) * sum((argx - z + u)^2)#
+	for(iter in 1:MAXITER){#
+		gradx = - t(bD) %*% mylogit(-bD %*% x) + rho * (x - z + u)#
+		t = 1;#
+		fx0 = fx(x);#
+		while(fx0 < fx(x - t * gradx) + alpha * t * sum(gradx^2)){#
+			t = beta * t#
+			print(t)#
+		}#
+		x = x - t * gradx;#
+	}#
+	return(list(x,t))#
+}#
+#
+softshrink = function(a, kappa){#
+	z = pmax(a - kappa, 0) + pmin(a + kappa, 0)#
+	return(z)#
+}#
+#
+myADMM = function(b, X, rho, lambda0, Niter){#
+	n = dim(X)[1]; p = dim(X)[2];#
+	#ABSTOL = 1e-4; RELTOL = 1e-2;#
+	data = cbind(rep(1, n), X);#
+	lambda = lambda0 * sqrt(n*log(p));#
+	bD = diag(b) %*% data;#
+	x = numeric(p+1);#
+	z = numeric(p+1);#
+	u = numeric(p+1);#
+	step = 1;#
+	#objfunc = function(argx, argz) sum(log(1 + exp(-bD %*% argx))) + lambda * sum(abs(argz))#
+	#optpath = as.data.frame(matrix(NA, nrow = Niter, ncol = 5));#
+	#names(optpath) = c('objval','r_norm','s_norm','eps_pri','eps_dual');#
+	for (k in 1:Niter){#
+		#update#
+		xupdate = myxupdate(x, z, u, bD, rho);#
+		x = xupdate[[1]]#
+		step = c(step, xupdate[[2]])#
+		#zold = z#
+		z = x + u#
+		z[-1] = softshrink(z[-1], lambda/rho);#
+		u = u + x - z;#
+		#stopping#
+		#optpath$objval[k] = objfunc(x, z);#
+		#optpath$r_norm[k] = norm( x - z );#
+		#optpath$s_norm[k] = norm( rho*(z - zold) );#
+		#optpath$eps_pri[k] = sqrt(p) * ABSTOL + RELTOL * max(vnorm(x), vnorm(z));#
+		#optpath$eps_dual[k] = sqrt(p) * ABSTOL + RELTOL * vnorm(rho*u);#
+		#if (optpath$r_norm[k] < optpath$eps_pri[k] & optpath$s_norm[k] < optpath$eps_dual[k]) {#
+		#	optpath = optpath[1:k,]#
+		#	break;#
+		#}	#
+	}#
+	#return(list(drop(z), step, optpath))#
+	return(drop(z))#
+}
+ADMM1 = myADMM(b1, X1, 1, 0.5, 1)#
+print(ADMM1)
+ADMM1 = myADMM(b1, X1, 1, 0.05, 1)#
+print(ADMM1)
+print(drop(ADMMBOY))
+myxupdate = function(x, z, u, bD, rho){#
+	MAXITER = 5;#
+	alpha = 0.1; beta = 0.5;#
+	fx = function(argx) sum(log(1 + exp(-bD %*% argx))) + (rho / 2) * sum((argx - z + u)^2)#
+	for(iter in 1:MAXITER){#
+		gradx = - t(bD) %*% mylogit(-bD %*% x) + rho * (x - z + u)#
+		t = 1;#
+		fx0 = fx(x);#
+		while(fx0 < fx(x - t * gradx) + alpha * t * sum(gradx^2)){#
+			t = beta * t#
+			print(t)#
+		}#
+		x = x - t * gradx;#
+	}#
+	return(list(x,t))#
+}
+ADMM1 = myADMM(b1, X1, 1, 0.05, 1)
+drop(ADMMBOY) - ADMM1
+myxupdate = function(x, z, u, bD, rho){#
+	MAXITER = 50;#
+	alpha = 0.1; beta = 0.5;#
+	fx = function(argx) sum(log(1 + exp(-bD %*% argx))) + (rho / 2) * sum((argx - z + u)^2)#
+	for(iter in 1:MAXITER){#
+		gradx = - t(bD) %*% mylogit(-bD %*% x) + rho * (x - z + u)#
+		t = 1;#
+		fx0 = fx(x);#
+		while(fx0 < fx(x - t * gradx) + alpha * t * sum(gradx^2)){#
+			t = beta * t#
+			print(t)#
+		}#
+		x = x - t * gradx;#
+	}#
+	return(list(x,t))#
+}
+update_x = function(A, b, u, z, x, rho){#
+	Alpha = 0.1; # this Alpha is for backtracking, not the relaxing parameter.#
+	BETA = 0.5;#
+	TOLERANCE = 1e-5;#
+	MAX_ITER = 50;#
+	m = dim(A)[1]; n = dim(A)[2];#
+	I = diag(n+1);#
+	#if (exists('x0')) { #
+	#	x = x0;#
+	#	}#
+	#x = numeric(n+1);#
+	C = cbind(-b, -A);#
+	f = function(argx) (sum(log(1 + exp(C %*% argx))) + (rho/2) * sum((argx - z + u)^2));#
+	for (iter in 1:MAX_ITER){#
+		fx = f(x);#
+		g = t(C) %*% mylogit(C %*% x) + rho * (x - z + u);#
+		#H = t(C) %*% diag(as.vector( exp(C %*% x) / (1 + exp(C %*% x))^2 )) %*% C + rho * I;#
+		dx = -g;#
+		dfx = t(g) %*% dx;#
+		if(abs(dfx) < TOLERANCE) break;#
+		# backtracking #
+		t = 1;#
+		while(f(x + t * dx) > fx + Alpha * t * dfx){#
+			t = BETA * t;#
+		}#
+		x = x + t * dx;#
+	} #
+	return(x)#
+}
+mu = 0.05 * sqrt(log(p)/N)#
+ADMMBOY = logreg_Boyd(A, b, mu, rho = 1.0, alpha = 1.0, 10)#
+print(drop(ADMMBOY))
+ADMM1 = myADMM(b1, X1, 1, 0.05, 10)#
+print(ADMM1)
+ADMM1 - drop(ADMMBOY)
+rm(list=ls())
+setwd("/Users/guojun/Google Drive/15Summer/Simulation/SPGA-R/SPGA-logistic/Boyd/Current")#
+#setwd("C:/Users/TEMP/Downloads")#
+library(MASS)#
+#library(mvtnorm)#
+#library(MCMCpack)#
+#library(BayesLogit)#
+#
+##Simulate data#
+#
+mylogit = function(x) 1/(1+exp(-x)) # compare with exp(x)/(1+exp(x))#
+vnorm = function(x) sqrt(sum(x^2))#
+#
+N=200; p=50;#
+X = as.matrix(read.table('Xdta'))#
+colnames(X) = NULL#
+y = as.matrix(read.table('Ydta'))#
+b = drop(y)#
+b[which(b==0)] = -1;#
+#
+A = diag(b) %*% X;#
+#
+beta_star = drop(as.matrix(read.table('trBdta')))#
+beta_0 = 1.5;#
+beta_star = c(beta_0, beta_star);
+set.seed(2015)#
+#
+## imitating the functions written in Boyds' implementation#
+#
+objective = function(A, b, mu, x, z){#
+	m = dim(A)[1];#
+	obj = sum(log(1 + exp(-A %*% x[-1] - b * x[1]))) + m * mu * sum(abs(z));#
+	return(obj)#
+}#
+#
+update_x = function(A, b, u, z, x, rho){#
+	Alpha = 0.1; # this Alpha is for backtracking, not the relaxing parameter.#
+	BETA = 0.5;#
+	#TOLERANCE = 1e-5;#
+	MAX_ITER = 50;#
+	m = dim(A)[1]; n = dim(A)[2];#
+	I = diag(n+1);#
+	#if (exists('x0')) { #
+	#	x = x0;#
+	#	}#
+	#x = numeric(n+1);#
+	C = cbind(-b, -A);#
+	f = function(argx) (sum(log(1 + exp(C %*% argx))) + (rho/2) * sum((argx - z + u)^2));#
+	for (iter in 1:MAX_ITER){#
+		fx = f(x);#
+		g = t(C) %*% mylogit(C %*% x) + rho * (x - z + u);#
+		#H = t(C) %*% diag(as.vector( exp(C %*% x) / (1 + exp(C %*% x))^2 )) %*% C + rho * I;#
+		dx = -g;#
+		dfx = t(g) %*% dx;#
+		#if(abs(dfx) < TOLERANCE) break;#
+		# backtracking #
+		t = 1;#
+		while(f(x + t * dx) > fx + Alpha * t * dfx){#
+			t = BETA * t;#
+		}#
+		x = x + t * dx;#
+	} #
+	return(x)#
+}#
+#
+shrinkage = function(a, kappa){#
+	z = pmax(0, a - kappa) - pmax(0, -a-kappa); # max() return max for all values, pmax() return parallel max.#
+	return(z)#
+}#
+#
+logreg_Boyd = function(A, b, mu, rho, alpha, N_ITER){#
+	#N_ITER = 2;#
+	#ABSTOL = 1e-4; RELTOL = 1e-2;#
+	m = dim(A)[1]; n = dim(A)[2];#
+	x = numeric(n+1);#
+	z = numeric(n+1);#
+	u = numeric(n+1);#
+	#history = as.data.frame(matrix(NA, nrow = N_ITER, ncol = 5));#
+	#names(history) = c('objval','r_norm','s_norm','eps_pri','eps_dual');#
+	for( k in 1:N_ITER ){#
+		# x update#
+		x = update_x(A, b, u, z, x, rho);#
+		# z update#
+		#zold = z;#
+		#x_hat = alpha * x + (1-alpha) * zold;#
+		#z = x_hat + u;#
+		z = x + u;#
+		z[-1] = shrinkage(z[-1], m*mu/rho);#
+		# multiplier update#
+		#u = u + ( x_hat - z );#
+		u = u + ( x - z );#
+		# diagnostics, reporting, termination checks#
+		#history$objval[k] = objective(A, b, mu, x, z);#
+		#history$r_norm[k] = norm( x - z );#
+		#history$s_norm[k] = norm( rho*(z - zold) );#
+		#history$eps_pri[k] = sqrt(n) * ABSTOL + RELTOL * max(vnorm(x), vnorm(z));#
+		#history$eps_dual[k] = sqrt(n) * ABSTOL + RELTOL * vnorm(rho*u);#
+		#if (history$r_norm[k] < history$eps_pri[k] & history$s_norm[k] < history$eps_dual[k]) {#
+		#	history = history[1:k,]#
+		#	break;#
+		#}#
+	}#
+	return(drop(z))#
+}#
+#
+mu = 0.05 * sqrt(log(p)/N)#
+ADMMBOY = logreg_Boyd(A, b, mu, rho = 1.0, alpha = 1.0, 10)#
+print(drop(ADMMBOY))
+setwd("/Users/guojun/Google Drive/15Summer/Simulation/SPGA-R/SPGA-logistic/Boyd/Current")#
+#setwd("C:/Users/TEMP/Downloads")#
+library(MASS)#
+#library(mvtnorm)#
+#library(MCMCpack)#
+#library(BayesLogit)#
+#
+##Simulate data#
+#
+mylogit = function(x) 1/(1+exp(-x)) # compare with exp(x)/(1+exp(x))#
+vnorm = function(x) sqrt(sum(x^2))#
+#
+N1=200; p1=50;#
+X1 = as.matrix(read.table('Xdta'))#
+colnames(X1) = NULL#
+y1 = as.matrix(read.table('Ydta'))#
+b1 = drop(y1)#
+b1[which(b1==0)] = -1;#
+#
+#A1 = diag(b1) %*% X1;#
+#
+beta_star1 = drop(as.matrix(read.table('trBdta')))#
+beta_01 = 1.5;#
+beta_star1 = c(beta_01, beta_star1);#
+#
+set.seed(2015)#
+#
+##	ADMM with Newton Ralphson update for beta;#
+#
+myxupdate = function(x, z, u, bD, rho){#
+	MAXITER = 50;#
+	alpha = 0.1; beta = 0.5;#
+	fx = function(argx) sum(log(1 + exp(-bD %*% argx))) + (rho / 2) * sum((argx - z + u)^2)#
+	for(iter in 1:MAXITER){#
+		gradx = - t(bD) %*% mylogit(-bD %*% x) + rho * (x - z + u)#
+		t = 1;#
+		fx0 = fx(x);#
+		while(fx0 < fx(x - t * gradx) + alpha * t * sum(gradx^2)){#
+			t = beta * t#
+			print(t)#
+		}#
+		x = x - t * gradx;#
+	}#
+	return(list(x,t))#
+}#
+#
+softshrink = function(a, kappa){#
+	z = pmax(a - kappa, 0) + pmin(a + kappa, 0)#
+	return(z)#
+}#
+#
+myADMM = function(b, X, rho, lambda0, Niter){#
+	n = dim(X)[1]; p = dim(X)[2];#
+	#ABSTOL = 1e-4; RELTOL = 1e-2;#
+	data = cbind(rep(1, n), X);#
+	lambda = lambda0 * sqrt(n*log(p));#
+	bD = diag(b) %*% data;#
+	x = numeric(p+1);#
+	z = numeric(p+1);#
+	u = numeric(p+1);#
+	step = 1;#
+	#objfunc = function(argx, argz) sum(log(1 + exp(-bD %*% argx))) + lambda * sum(abs(argz))#
+	#optpath = as.data.frame(matrix(NA, nrow = Niter, ncol = 5));#
+	#names(optpath) = c('objval','r_norm','s_norm','eps_pri','eps_dual');#
+	for (k in 1:Niter){#
+		#update#
+		xupdate = myxupdate(x, z, u, bD, rho);#
+		x = xupdate[[1]]#
+		step = c(step, xupdate[[2]])#
+		#zold = z#
+		z = x + u#
+		z[-1] = softshrink(z[-1], lambda/rho);#
+		u = u + x - z;#
+		#stopping#
+		#optpath$objval[k] = objfunc(x, z);#
+		#optpath$r_norm[k] = norm( x - z );#
+		#optpath$s_norm[k] = norm( rho*(z - zold) );#
+		#optpath$eps_pri[k] = sqrt(p) * ABSTOL + RELTOL * max(vnorm(x), vnorm(z));#
+		#optpath$eps_dual[k] = sqrt(p) * ABSTOL + RELTOL * vnorm(rho*u);#
+		#if (optpath$r_norm[k] < optpath$eps_pri[k] & optpath$s_norm[k] < optpath$eps_dual[k]) {#
+		#	optpath = optpath[1:k,]#
+		#	break;#
+		#}	#
+	}#
+	#return(list(drop(z), step, optpath))#
+	return(drop(z))#
+}#
+#
+ADMM1 = myADMM(b1, X1, 1, 0.05, 10)#
+print(ADMM1)
+ADMM1 - drop(ADMMBOY)
+which(ADMM1 - drop(ADMMBOY)!=0)
+which(ADMM1 !=0)
+which(drop(ADMMBOY) !=0)
+which(drop(ADMMBOY) !=0) - which(ADMM1 !=0)
+mu = 0.05 * sqrt(log(p)/N)#
+ADMMBOY = logreg_Boyd(A, b, mu, rho = 1.0, alpha = 1.0, 20)
+ADMM1 = myADMM(b1, X1, 1, 0.05, 20)#
+print(ADMM1)
+ADMM1 - drop(ADMMBOY)
+update_x = function(A, b, u, z, x, rho){#
+	Alpha = 0.1; # this Alpha is for backtracking, not the relaxing parameter.#
+	BETA = 0.5;#
+	#TOLERANCE = 1e-5;#
+	MAX_ITER = 15;#
+	m = dim(A)[1]; n = dim(A)[2];#
+	I = diag(n+1);#
+	#if (exists('x0')) { #
+	#	x = x0;#
+	#	}#
+	#x = numeric(n+1);#
+	C = cbind(-b, -A);#
+	f = function(argx) (sum(log(1 + exp(C %*% argx))) + (rho/2) * sum((argx - z + u)^2));#
+	for (iter in 1:MAX_ITER){#
+		fx = f(x);#
+		g = t(C) %*% mylogit(C %*% x) + rho * (x - z + u);#
+		#H = t(C) %*% diag(as.vector( exp(C %*% x) / (1 + exp(C %*% x))^2 )) %*% C + rho * I;#
+		dx = -g;#
+		dfx = t(g) %*% dx;#
+		#if(abs(dfx) < TOLERANCE) break;#
+		# backtracking #
+		t = 1;#
+		while(f(x + t * dx) > fx + Alpha * t * dfx){#
+			t = BETA * t;#
+		}#
+		x = x + t * dx;#
+	} #
+	return(x)#
+}
+myxupdate = function(x, z, u, bD, rho){#
+	MAXITER = 15;#
+	alpha = 0.1; beta = 0.5;#
+	fx = function(argx) sum(log(1 + exp(-bD %*% argx))) + (rho / 2) * sum((argx - z + u)^2)#
+	for(iter in 1:MAXITER){#
+		gradx = - t(bD) %*% mylogit(-bD %*% x) + rho * (x - z + u)#
+		t = 1;#
+		fx0 = fx(x);#
+		while(fx0 < fx(x - t * gradx) + alpha * t * sum(gradx^2)){#
+			t = beta * t#
+			print(t)#
+		}#
+		x = x - t * gradx;#
+	}#
+	return(list(x,t))#
+}
+ADMM1 = myADMM(b1, X1, 1, 0.05, 20)#
+print(ADMM1)
+mu = 0.05 * sqrt(log(p)/N)#
+ADMMBOY = logreg_Boyd(A, b, mu, rho = 1.0, alpha = 1.0, 20)
+ADMMBOY - ADMM1
+vnorm(ADMMBOY - ADMM1)
+mu = 0.05 * sqrt(log(p)/N)#
+ADMMBOY = logreg_Boyd(A, b, mu, rho = 2.0, alpha = 1.0, 20)
+ADMM1 = myADMM(b1, X1, 2, 0.05, 20)
+vnorm(ADMMBOY - ADMM1)
+rm(list=ls())
+setwd("/Users/guojun/Google Drive/15Summer/Simulation/SPGA-R/SPGA-logistic/Boyd")#
+#setwd("C:/Users/TEMP/Downloads")#
+library(MASS)#
+#library(mvtnorm)#
+#library(MCMCpack)#
+#library(BayesLogit)#
+#
+##Simulate data#
+#
+mylogit = function(x) 1/(1+exp(-x)) # compare with exp(x)/(1+exp(x))#
+vnorm = function(x) sqrt(sum(x^2))#
+#
+N=200; p=50;#
+X = as.matrix(read.table('Xdta'))#
+colnames(X) = NULL#
+y = as.matrix(read.table('Ydta'))#
+b = drop(y)#
+b[which(b==0)] = -1;#
+#
+A = diag(b) %*% X;#
+#
+beta_star = drop(as.matrix(read.table('trBdta')))#
+beta_0 = 1.5;#
+beta_star = c(beta_0, beta_star);
+update_x = function(A, b, u, z, x, rho){#
+	Alpha = 0.1; # this Alpha is for backtracking, not the relaxing parameter.#
+	BETA = 0.5;#
+	TOLERANCE = 1e-5;#
+	MAX_ITER = 5;#
+	m = dim(A)[1]; n = dim(A)[2];#
+	I = diag(n+1);#
+	#if (exists('x0')) { #
+	#	x = x0;#
+	#	}#
+	x = numeric(n+1);#
+	C = cbind(-b, -A);#
+	f = function(argx) (sum(log(1 + exp(C %*% argx))) + (rho/2) * sum((argx - z + u)^2));#
+	for (iter in 1:MAX_ITER){#
+		fx = f(x);#
+		g = t(C) %*% mylogit(C %*% x) + rho * (x - z + u);#
+		H = t(C) %*% diag(as.vector( exp(C %*% x) / (1 + exp(C %*% x))^2 )) %*% C + rho * I;#
+		dx = -solve(H , g);#
+		dfx = t(g) %*% dx;#
+		if(abs(dfx) < TOLERANCE) break;#
+		# backtracking #
+		t = 1;#
+		while(f(x + t * dx) > fx + Alpha * t * dfx){#
+			t = BETA * t;#
+		}#
+		x = x + t * dx;#
+	} #
+	return(x)#
+}
+rm(list=ls())
+setwd("/Users/guojun/Google Drive/15Summer/Simulation/SPGA-R/SPGA-logistic/Boyd/Current")#
+#setwd("C:/Users/TEMP/Downloads")#
+library(MASS)#
+#library(mvtnorm)#
+#library(MCMCpack)#
+#library(BayesLogit)#
+#
+##Simulate data#
+#
+mylogit = function(x) 1/(1+exp(-x)) # compare with exp(x)/(1+exp(x))#
+vnorm = function(x) sqrt(sum(x^2))#
+#
+N=200; p=50;#
+X = as.matrix(read.table('Xdta'))#
+colnames(X) = NULL#
+y = as.matrix(read.table('Ydta'))#
+b = drop(y)#
+b[which(b==0)] = -1;#
+#
+A = diag(b) %*% X;#
+#
+beta_star = drop(as.matrix(read.table('trBdta')))#
+beta_0 = 1.5;#
+beta_star = c(beta_0, beta_star);#
+#
+ratio = sum(b == 1) / N;#
+mu = 0.7 * 1/N * max( (1 - ratio) * apply(A[(y==1),], 2, sum) + ratio * apply(A[(y==-1),], 2, sum) );#
+#
+set.seed(2015)#
+#
+## imitating the functions written in Boyds' implementation#
+#
+objective = function(A, b, mu, x, z){#
+	m = dim(A)[1];#
+	obj = sum(log(1 + exp(-A %*% x[-1] - b * x[1]))) + m * mu * sum(abs(z));#
+	return(obj)#
+}#
+#
+update_x = function(A, b, u, z, rho){#
+	Alpha = 0.1; # this Alpha is for backtracking, not the relaxing parameter.#
+	BETA = 0.5;#
+	TOLERANCE = 1e-5;#
+	MAX_ITER = 50;#
+	m = dim(A)[1]; n = dim(A)[2];#
+	I = diag(n+1);#
+	#if (exists('x0')) { #
+	#	x = x0;#
+	#	}#
+	x = numeric(n+1);#
+	C = cbind(-b, -A);#
+	f = function(argx) (sum(log(1 + exp(C %*% argx))) + (rho/2) * sum((argx - z + u)^2));#
+	for (iter in 1:MAX_ITER){#
+		fx = f(x);#
+		g = t(C) %*% mylogit(C %*% x) + rho * (x - z + u);#
+		#H = t(C) %*% diag(as.vector( exp(C %*% x) / (1 + exp(C %*% x))^2 )) %*% C + rho * I;#
+		dx = -g;#
+		dfx = t(g) %*% dx;#
+		if(abs(dfx) < TOLERANCE) break;#
+		# backtracking #
+		t = 1;#
+		while(f(x + t * dx) > fx + Alpha * t * dfx){#
+			t = BETA * t;#
+		}#
+		x = x + t * dx;#
+	} #
+	return(x)#
+}#
+#
+shrinkage = function(a, kappa){#
+	z = pmax(0, a - kappa) - pmax(0, -a-kappa); # max() return max for all values, pmax() return parallel max.#
+	return(z)#
+}#
+#
+logreg_Boyd = function(A, b, mu, rho, alpha, N_ITER){#
+	#N_ITER = 2;#
+	ABSTOL = 1e-4; RELTOL = 1e-2;#
+	m = dim(A)[1]; n = dim(A)[2];#
+	x = numeric(n+1);#
+	z = numeric(n+1);#
+	u = numeric(n+1);#
+	history = as.data.frame(matrix(NA, nrow = N_ITER, ncol = 5));#
+	names(history) = c('objval','r_norm','s_norm','eps_pri','eps_dual');#
+	for( k in 1:N_ITER ){#
+		# x update#
+		x = update_x(A, b, u, z, rho);#
+		# z update#
+		zold = z;#
+		x_hat = alpha * x + (1-alpha) * zold;#
+		z = x_hat + u;#
+		#z = x + u;#
+		z[-1] = shrinkage(z[-1], m*mu/rho);#
+		# multiplier update#
+		u = u + ( x_hat - z );#
+		#u = u + ( x - z );#
+		# diagnostics, reporting, termination checks#
+		history$objval[k] = objective(A, b, mu, x, z);#
+		history$r_norm[k] = norm( x - z );#
+		history$s_norm[k] = norm( rho*(z - zold) );#
+		history$eps_pri[k] = sqrt(n) * ABSTOL + RELTOL * max(vnorm(x), vnorm(z));#
+		history$eps_dual[k] = sqrt(n) * ABSTOL + RELTOL * vnorm(rho*u);#
+		if (history$r_norm[k] < history$eps_pri[k] & history$s_norm[k] < history$eps_dual[k]) {#
+			history = history[1:k,]#
+			break;#
+		}#
+	}#
+	return(list(drop(z),history))#
+}#
+#
+mu = 0.05 * sqrt(log(p)/N)#
+ADMMBOY_gd = logreg_Boyd(A, b, mu, rho = 1.0, alpha = 1.0, 20)
+ADMMBOY_gd
+setwd("/Users/guojun/Google Drive/15Summer/Simulation/SPGA-R/SPGA-logistic/Boyd")#
+#setwd("C:/Users/TEMP/Downloads")#
+library(MASS)#
+#library(mvtnorm)#
+#library(MCMCpack)#
+#library(BayesLogit)#
+#
+##Simulate data#
+#
+mylogit = function(x) 1/(1+exp(-x)) # compare with exp(x)/(1+exp(x))#
+vnorm = function(x) sqrt(sum(x^2))#
+#
+N=200; p=50;#
+X = as.matrix(read.table('Xdta'))#
+colnames(X) = NULL#
+y = as.matrix(read.table('Ydta'))#
+b = drop(y)#
+b[which(b==0)] = -1;#
+#
+A = diag(b) %*% X;#
+#
+beta_star = drop(as.matrix(read.table('trBdta')))#
+beta_0 = 1.5;#
+beta_star = c(beta_0, beta_star);#
+#
+ratio = sum(b == 1) / N;#
+mu = 0.7 * 1/N * max( (1 - ratio) * apply(A[(y==1),], 2, sum) + ratio * apply(A[(y==-1),], 2, sum) );#
+#
+set.seed(2015)#
+#
+## imitating the functions written in Boyds' implementation#
+#
+objective = function(A, b, mu, x, z){#
+	m = dim(A)[1];#
+	obj = sum(log(1 + exp(-A %*% x[-1] - b * x[1]))) + m * mu * sum(abs(z));#
+	return(obj)#
+}#
+#
+update_x = function(A, b, u, z, rho){#
+	Alpha = 0.1; # this Alpha is for backtracking, not the relaxing parameter.#
+	BETA = 0.5;#
+	TOLERANCE = 1e-5;#
+	MAX_ITER = 50;#
+	m = dim(A)[1]; n = dim(A)[2];#
+	I = diag(n+1);#
+	#if (exists('x0')) { #
+	#	x = x0;#
+	#	}#
+	x = numeric(n+1);#
+	C = cbind(-b, -A);#
+	f = function(argx) (sum(log(1 + exp(C %*% argx))) + (rho/2) * sum((argx - z + u)^2));#
+	for (iter in 1:MAX_ITER){#
+		fx = f(x);#
+		g = t(C) %*% mylogit(C %*% x) + rho * (x - z + u);#
+		H = t(C) %*% diag(as.vector( exp(C %*% x) / (1 + exp(C %*% x))^2 )) %*% C + rho * I;#
+		dx = -solve(H , g);#
+		dfx = t(g) %*% dx;#
+		if(abs(dfx) < TOLERANCE) break;#
+		# backtracking #
+		t = 1;#
+		while(f(x + t * dx) > fx + Alpha * t * dfx){#
+			t = BETA * t;#
+		}#
+		x = x + t * dx;#
+	} #
+	return(x)#
+}#
+#
+shrinkage = function(a, kappa){#
+	z = pmax(0, a - kappa) - pmax(0, -a-kappa); # max() return max for all values, pmax() return parallel max.#
+	return(z)#
+}#
+#
+logreg_Boyd = function(A, b, mu, rho, alpha, N_ITER){#
+	#N_ITER = 2;#
+	ABSTOL = 1e-4; RELTOL = 1e-2;#
+	m = dim(A)[1]; n = dim(A)[2];#
+	x = numeric(n+1);#
+	z = numeric(n+1);#
+	u = numeric(n+1);#
+	history = as.data.frame(matrix(NA, nrow = N_ITER, ncol = 5));#
+	names(history) = c('objval','r_norm','s_norm','eps_pri','eps_dual');#
+	for( k in 1:N_ITER ){#
+		# x update#
+		x = update_x(A, b, u, z, rho);#
+		# z update#
+		zold = z;#
+		x_hat = alpha * x + (1-alpha) * zold;#
+		z = x_hat + u;#
+		z[-1] = shrinkage(z[-1], m*mu/rho);#
+		# multiplier update#
+		u = u + ( x_hat - z );#
+		# diagnostics, reporting, termination checks#
+		history$objval[k] = objective(A, b, mu, x, z);#
+		history$r_norm[k] = norm( x - z );#
+		history$s_norm[k] = norm( rho*(z - zold) );#
+		history$eps_pri[k] = sqrt(n) * ABSTOL + RELTOL * max(vnorm(x), vnorm(z));#
+		history$eps_dual[k] = sqrt(n) * ABSTOL + RELTOL * vnorm(rho*u);#
+		if (history$r_norm[k] < history$eps_pri[k] & history$s_norm[k] < history$eps_dual[k]) {#
+			history = history[1:k,]#
+			break;#
+		}#
+	}#
+	return(list(drop(z),history))#
+}#
+#
+mu = 0.05 * sqrt(log(p)/N)#
+ADMMBOY = logreg_Boyd(A, b, mu, rho = 1.0, alpha = 1.0, 20)
+ADMMBOY[[1]]
+ADMMBOY_gd[[1]]
+vnorm(ADMMBOY[[1]] - ADMMBOY_gd[[1]])
+ADMMBOY_gd[[2]]
+ADMMBOY[[2]]
+ADMMBOY[[2]] - ADMMBOY_gd[[2]]
+ADMMBOY_gd = logreg_Boyd(A, b, mu, rho = 1.0, alpha = 1.0, 100)
+ADMMBOY = logreg_Boyd(A, b, mu, rho = 1.0, alpha = 1.0, 100)
+vnorm(ADMMBOY_gd[[1]] - ADMMBOY[[1]])
+ADMMBOY_gd[[1]]
+ADMMBOY[[1]]
+ADMMBOY_gd[[2]] - ADMMBOY[[2]]
+rm(list=ls())
+setwd("/Users/guojun/Google Drive/15Summer/Simulation/SPGA-R/SPGA-logistic/Boyd/Current")#
+#setwd("C:/Users/TEMP/Downloads")#
+library(MASS)#
+#library(mvtnorm)#
+#library(MCMCpack)#
+#library(BayesLogit)#
+#
+##Simulate data#
+#
+mylogit = function(x) 1/(1+exp(-x)) # compare with exp(x)/(1+exp(x))#
+vnorm = function(x) sqrt(sum(x^2))#
+#
+N=200; p=50;#
+X = as.matrix(read.table('Xdta'))#
+colnames(X) = NULL#
+y = as.matrix(read.table('Ydta'))#
+b = drop(y)#
+b[which(b==0)] = -1;#
+#
+A = diag(b) %*% X;#
+#
+beta_star = drop(as.matrix(read.table('trBdta')))#
+beta_0 = 1.5;#
+beta_star = c(beta_0, beta_star);#
+#
+ratio = sum(b == 1) / N;#
+mu = 0.7 * 1/N * max( (1 - ratio) * apply(A[(y==1),], 2, sum) + ratio * apply(A[(y==-1),], 2, sum) );#
+#
+set.seed(2015)#
+#
+## imitating the functions written in Boyds' implementation#
+#
+objective = function(A, b, mu, x, z){#
+	m = dim(A)[1];#
+	obj = sum(log(1 + exp(-A %*% x[-1] - b * x[1]))) + m * mu * sum(abs(z));#
+	return(obj)#
+}#
+#
+update_x = function(A, b, u, z, x, rho){#
+	Alpha = 0.1; # this Alpha is for backtracking, not the relaxing parameter.#
+	BETA = 0.5;#
+	TOLERANCE = 1e-5;#
+	MAX_ITER = 50;#
+	m = dim(A)[1]; n = dim(A)[2];#
+	I = diag(n+1);#
+	#if (exists('x0')) { #
+	#	x = x0;#
+	#	}#
+	x = numeric(n+1);#
+	C = cbind(-b, -A);#
+	f = function(argx) (sum(log(1 + exp(C %*% argx))) + (rho/2) * sum((argx - z + u)^2));#
+	for (iter in 1:MAX_ITER){#
+		fx = f(x);#
+		g = t(C) %*% mylogit(C %*% x) + rho * (x - z + u);#
+		#H = t(C) %*% diag(as.vector( exp(C %*% x) / (1 + exp(C %*% x))^2 )) %*% C + rho * I;#
+		dx = -g;#
+		dfx = t(g) %*% dx;#
+		if(abs(dfx) < TOLERANCE) break;#
+		# backtracking #
+		t = 1;#
+		while(f(x + t * dx) > fx + Alpha * t * dfx){#
+			t = BETA * t;#
+		}#
+		x = x + t * dx;#
+	} #
+	return(x)#
+}#
+#
+shrinkage = function(a, kappa){#
+	z = pmax(0, a - kappa) - pmax(0, -a-kappa); # max() return max for all values, pmax() return parallel max.#
+	return(z)#
+}#
+#
+logreg_Boyd = function(A, b, mu, rho, alpha, N_ITER){#
+	#N_ITER = 2;#
+	#ABSTOL = 1e-4; RELTOL = 1e-2;#
+	m = dim(A)[1]; n = dim(A)[2];#
+	x = numeric(n+1);#
+	z = numeric(n+1);#
+	u = numeric(n+1);#
+	#history = as.data.frame(matrix(NA, nrow = N_ITER, ncol = 5));#
+	#names(history) = c('objval','r_norm','s_norm','eps_pri','eps_dual');#
+	for( k in 1:N_ITER ){#
+		# x update#
+		x = update_x(A, b, u, z, x, rho);#
+		# z update#
+		#zold = z;#
+		#x_hat = alpha * x + (1-alpha) * zold;#
+		#z = x_hat + u;#
+		z = x + u;#
+		z[-1] = shrinkage(z[-1], m*mu/rho);#
+		# multiplier update#
+		#u = u + ( x_hat - z );#
+		u = u + ( x - z );#
+		# diagnostics, reporting, termination checks#
+		#history$objval[k] = objective(A, b, mu, x, z);#
+		#history$r_norm[k] = norm( x - z );#
+		#history$s_norm[k] = norm( rho*(z - zold) );#
+		#history$eps_pri[k] = sqrt(n) * ABSTOL + RELTOL * max(vnorm(x), vnorm(z));#
+		#history$eps_dual[k] = sqrt(n) * ABSTOL + RELTOL * vnorm(rho*u);#
+		#if (history$r_norm[k] < history$eps_pri[k] & history$s_norm[k] < history$eps_dual[k]) {#
+		#	history = history[1:k,]#
+		#	break;#
+		#}#
+	}#
+	return(drop(z))#
+}#
+#
+mu = 0.05 * sqrt(log(p)/N)#
+ADMMBOY = logreg_Boyd(A, b, mu, rho = 2.0, alpha = 1.0, 20)
+setwd("/Users/guojun/Google Drive/15Summer/Simulation/SPGA-R/SPGA-logistic/Boyd/Current")#
+#setwd("C:/Users/TEMP/Downloads")#
+library(MASS)#
+#library(mvtnorm)#
+#library(MCMCpack)#
+#library(BayesLogit)#
+#
+##Simulate data#
+#
+mylogit = function(x) 1/(1+exp(-x)) # compare with exp(x)/(1+exp(x))#
+vnorm = function(x) sqrt(sum(x^2))#
+#
+N1=200; p1=50;#
+X1 = as.matrix(read.table('Xdta'))#
+colnames(X1) = NULL#
+y1 = as.matrix(read.table('Ydta'))#
+b1 = drop(y1)#
+b1[which(b1==0)] = -1;#
+#
+#A1 = diag(b1) %*% X1;#
+#
+beta_star1 = drop(as.matrix(read.table('trBdta')))#
+beta_01 = 1.5;#
+beta_star1 = c(beta_01, beta_star1);#
+#
+set.seed(2015)#
+#
+##	ADMM with Newton Ralphson update for beta;#
+#
+myxupdate = function(x, z, u, bD, rho){#
+	MAXITER = 50;#
+	TOL = 1e-5;#
+	alpha = 0.1; beta = 0.5;#
+	fx = function(argx) sum(log(1 + exp(-bD %*% argx))) + (rho / 2) * sum((argx - z + u)^2)#
+	for(iter in 1:MAXITER){#
+		gradx = - t(bD) %*% mylogit(-bD %*% x) + rho * (x - z + u)#
+		if(sum(gradx^2) < TOL) break;#
+		t = 1;#
+		fx0 = fx(x);#
+		while(fx0 < fx(x - t * gradx) + alpha * t * sum(gradx^2)){#
+			t = beta * t#
+			print(t)#
+		}#
+		x = x - t * gradx;#
+	}#
+	return(list(x,t))#
+}#
+#
+softshrink = function(a, kappa){#
+	z = pmax(a - kappa, 0) + pmin(a + kappa, 0)#
+	return(z)#
+}#
+#
+myADMM = function(b, X, rho, lambda0, Niter){#
+	n = dim(X)[1]; p = dim(X)[2];#
+	#ABSTOL = 1e-4; RELTOL = 1e-2;#
+	data = cbind(rep(1, n), X);#
+	lambda = lambda0 * sqrt(n*log(p));#
+	bD = diag(b) %*% data;#
+	x = numeric(p+1);#
+	z = numeric(p+1);#
+	u = numeric(p+1);#
+	step = 1;#
+	#objfunc = function(argx, argz) sum(log(1 + exp(-bD %*% argx))) + lambda * sum(abs(argz))#
+	#optpath = as.data.frame(matrix(NA, nrow = Niter, ncol = 5));#
+	#names(optpath) = c('objval','r_norm','s_norm','eps_pri','eps_dual');#
+	for (k in 1:Niter){#
+		#update#
+		xupdate = myxupdate(x, z, u, bD, rho);#
+		x = xupdate[[1]]#
+		step = c(step, xupdate[[2]])#
+		#zold = z#
+		z = x + u#
+		z[-1] = softshrink(z[-1], lambda/rho);#
+		u = u + x - z;#
+		#stopping#
+		#optpath$objval[k] = objfunc(x, z);#
+		#optpath$r_norm[k] = norm( x - z );#
+		#optpath$s_norm[k] = norm( rho*(z - zold) );#
+		#optpath$eps_pri[k] = sqrt(p) * ABSTOL + RELTOL * max(vnorm(x), vnorm(z));#
+		#optpath$eps_dual[k] = sqrt(p) * ABSTOL + RELTOL * vnorm(rho*u);#
+		#if (optpath$r_norm[k] < optpath$eps_pri[k] & optpath$s_norm[k] < optpath$eps_dual[k]) {#
+		#	optpath = optpath[1:k,]#
+		#	break;#
+		#}	#
+	}#
+	#return(list(drop(z), step, optpath))#
+	return(drop(z))#
+}#
+#
+ADMM1 = myADMM(b1, X1, 2, 0.05, 20)
+vnorm(ADMM1 - ADMMBOY)
+ADMM1
+ADMMBOY
+update_x = function(A, b, u, z, x, rho){#
+	Alpha = 0.1; # this Alpha is for backtracking, not the relaxing parameter.#
+	BETA = 0.5;#
+	#TOLERANCE = 1e-5;#
+	MAX_ITER = 50;#
+	m = dim(A)[1]; n = dim(A)[2];#
+	I = diag(n+1);#
+	#if (exists('x0')) { #
+	#	x = x0;#
+	#	}#
+	x = numeric(n+1);#
+	C = cbind(-b, -A);#
+	f = function(argx) (sum(log(1 + exp(C %*% argx))) + (rho/2) * sum((argx - z + u)^2));#
+	for (iter in 1:MAX_ITER){#
+		fx = f(x);#
+		g = t(C) %*% mylogit(C %*% x) + rho * (x - z + u);#
+		#H = t(C) %*% diag(as.vector( exp(C %*% x) / (1 + exp(C %*% x))^2 )) %*% C + rho * I;#
+		dx = -g;#
+		dfx = t(g) %*% dx;#
+		#if(abs(dfx) < TOLERANCE) break;#
+		# backtracking #
+		t = 1;#
+		while(f(x + t * dx) > fx + Alpha * t * dfx){#
+			t = BETA * t;#
+		}#
+		x = x + t * dx;#
+	} #
+	return(x)#
+}
+myxupdate = function(x, z, u, bD, rho){#
+	MAXITER = 50;#
+	#TOL = 1e-5;#
+	alpha = 0.1; beta = 0.5;#
+	fx = function(argx) sum(log(1 + exp(-bD %*% argx))) + (rho / 2) * sum((argx - z + u)^2)#
+	for(iter in 1:MAXITER){#
+		gradx = - t(bD) %*% mylogit(-bD %*% x) + rho * (x - z + u)#
+		#if(sum(gradx^2) < TOL) break;#
+		t = 1;#
+		fx0 = fx(x);#
+		while(fx0 < fx(x - t * gradx) + alpha * t * sum(gradx^2)){#
+			t = beta * t#
+			print(t)#
+		}#
+		x = x - t * gradx;#
+	}#
+	return(list(x,t))#
+}
+ADMM1 = myADMM(b1, X1, 1.0, 0.05, 20)
+mu = 0.05 * sqrt(log(p)/N)#
+ADMMBOY = logreg_Boyd(A, b, mu, rho = 1.0, alpha = 1.0, 20)
+ADMMBOY - ADMM1
+vnorm(ADMMBOY - ADMM1)
+rm(list=ls())
+setwd("/Users/guojun/Google Drive/15Summer/Simulation/SPGA-R/SPGA-logistic/Boyd/Current")#
+#setwd("C:/Users/TEMP/Downloads")#
+library(MASS)#
+#library(mvtnorm)#
+#library(MCMCpack)#
+#library(BayesLogit)#
+#
+##Simulate data#
+#
+mylogit = function(x) 1/(1+exp(-x)) # compare with exp(x)/(1+exp(x))#
+vnorm = function(x) sqrt(sum(x^2))#
+#
+N=200; p=50;#
+X = as.matrix(read.table('Xdta'))#
+colnames(X) = NULL#
+y = as.matrix(read.table('Ydta'))#
+b = drop(y)#
+b[which(b==0)] = -1;#
+#
+A = diag(b) %*% X;#
+#
+beta_star = drop(as.matrix(read.table('trBdta')))#
+beta_0 = 1.5;#
+beta_star = c(beta_0, beta_star);#
+#
+#ratio = sum(b == 1) / N;#
+#mu = 0.7 * 1/N * max( (1 - ratio) * apply(A[(y==1),], 2, sum) + ratio * apply(A[(y==-1),], 2, sum) );#
+#
+set.seed(2015)#
+#
+## imitating the functions written in Boyds' implementation#
+#
+objective = function(A, b, mu, x, z){#
+	m = dim(A)[1];#
+	obj = sum(log(1 + exp(-A %*% x[-1] - b * x[1]))) + m * mu * sum(abs(z));#
+	return(obj)#
+}#
+#
+update_x = function(A, b, u, z, x, rho){#
+	Alpha = 0.1; # this Alpha is for backtracking, not the relaxing parameter.#
+	BETA = 0.5;#
+	TOLERANCE = 1e-5;#
+	MAX_ITER = 50;#
+	m = dim(A)[1]; n = dim(A)[2];#
+	I = diag(n+1);#
+	#if (exists('x0')) { #
+	#	x = x0;#
+	#	}#
+	#x = numeric(n+1);#
+	C = cbind(-b, -A);#
+	f = function(argx) (sum(log(1 + exp(C %*% argx))) + (rho/2) * sum((argx - z + u)^2));#
+	for (iter in 1:MAX_ITER){#
+		fx = f(x);#
+		g = t(C) %*% mylogit(C %*% x) + rho * (x - z + u);#
+		#H = t(C) %*% diag(as.vector( exp(C %*% x) / (1 + exp(C %*% x))^2 )) %*% C + rho * I;#
+		dx = -g;#
+		dfx = t(g) %*% dx;#
+		if(abs(dfx) < TOLERANCE) break;#
+		# backtracking #
+		t = 1;#
+		while(f(x + t * dx) > fx + Alpha * t * dfx){#
+			t = BETA * t;#
+		}#
+		x = x + t * dx;#
+	} #
+	return(x)#
+}#
+#
+shrinkage = function(a, kappa){#
+	z = pmax(0, a - kappa) - pmax(0, -a-kappa); # max() return max for all values, pmax() return parallel max.#
+	return(z)#
+}#
+#
+logreg_Boyd = function(A, b, mu, rho, alpha, N_ITER){#
+	#N_ITER = 2;#
+	#ABSTOL = 1e-4; RELTOL = 1e-2;#
+	m = dim(A)[1]; n = dim(A)[2];#
+	x = numeric(n+1);#
+	z = numeric(n+1);#
+	u = numeric(n+1);#
+	#history = as.data.frame(matrix(NA, nrow = N_ITER, ncol = 5));#
+	#names(history) = c('objval','r_norm','s_norm','eps_pri','eps_dual');#
+	for( k in 1:N_ITER ){#
+		# x update#
+		x = update_x(A, b, u, z, x, rho);#
+		# z update#
+		#zold = z;#
+		#x_hat = alpha * x + (1-alpha) * zold;#
+		#z = x_hat + u;#
+		z = x + u;#
+		z[-1] = shrinkage(z[-1], m*mu/rho);#
+		# multiplier update#
+		#u = u + ( x_hat - z );#
+		u = u + ( x - z );#
+		# diagnostics, reporting, termination checks#
+		#history$objval[k] = objective(A, b, mu, x, z);#
+		#history$r_norm[k] = norm( x - z );#
+		#history$s_norm[k] = norm( rho*(z - zold) );#
+		#history$eps_pri[k] = sqrt(n) * ABSTOL + RELTOL * max(vnorm(x), vnorm(z));#
+		#history$eps_dual[k] = sqrt(n) * ABSTOL + RELTOL * vnorm(rho*u);#
+		#if (history$r_norm[k] < history$eps_pri[k] & history$s_norm[k] < history$eps_dual[k]) {#
+		#	history = history[1:k,]#
+		#	break;#
+		#}#
+	}#
+	return(drop(z))#
+}#
+#
+mu = 0.05 * sqrt(log(p)/N)#
+ADMMBOY = logreg_Boyd(A, b, mu, rho = 1.0, alpha = 1.0, 20)
+setwd("/Users/guojun/Google Drive/15Summer/Simulation/SPGA-R/SPGA-logistic/Boyd/Current")#
+#setwd("C:/Users/TEMP/Downloads")#
+library(MASS)#
+#library(mvtnorm)#
+#library(MCMCpack)#
+#library(BayesLogit)#
+#
+##Simulate data#
+#
+mylogit = function(x) 1/(1+exp(-x)) # compare with exp(x)/(1+exp(x))#
+vnorm = function(x) sqrt(sum(x^2))#
+#
+N1=200; p1=50;#
+X1 = as.matrix(read.table('Xdta'))#
+colnames(X1) = NULL#
+y1 = as.matrix(read.table('Ydta'))#
+b1 = drop(y1)#
+b1[which(b1==0)] = -1;#
+#
+#A1 = diag(b1) %*% X1;#
+#
+beta_star1 = drop(as.matrix(read.table('trBdta')))#
+beta_01 = 1.5;#
+beta_star1 = c(beta_01, beta_star1);#
+#
+set.seed(2015)#
+#
+##	ADMM with Newton Ralphson update for beta;#
+#
+myxupdate = function(x, z, u, bD, rho){#
+	MAXITER = 50;#
+	TOL = 1e-5;#
+	alpha = 0.1; beta = 0.5;#
+	fx = function(argx) sum(log(1 + exp(-bD %*% argx))) + (rho / 2) * sum((argx - z + u)^2)#
+	for(iter in 1:MAXITER){#
+		gradx = - t(bD) %*% mylogit(-bD %*% x) + rho * (x - z + u)#
+		if(sum(gradx^2) < TOL) break;#
+		t = 1;#
+		fx0 = fx(x);#
+		while(fx0 < fx(x - t * gradx) + alpha * t * sum(gradx^2)){#
+			t = beta * t#
+			print(t)#
+		}#
+		x = x - t * gradx;#
+	}#
+	return(list(x,t))#
+}#
+#
+softshrink = function(a, kappa){#
+	z = pmax(a - kappa, 0) + pmin(a + kappa, 0)#
+	return(z)#
+}#
+#
+myADMM = function(b, X, rho, lambda0, Niter){#
+	n = dim(X)[1]; p = dim(X)[2];#
+	#ABSTOL = 1e-4; RELTOL = 1e-2;#
+	data = cbind(rep(1, n), X);#
+	lambda = lambda0 * sqrt(n*log(p));#
+	bD = diag(b) %*% data;#
+	x = numeric(p+1);#
+	z = numeric(p+1);#
+	u = numeric(p+1);#
+	step = 1;#
+	#objfunc = function(argx, argz) sum(log(1 + exp(-bD %*% argx))) + lambda * sum(abs(argz))#
+	#optpath = as.data.frame(matrix(NA, nrow = Niter, ncol = 5));#
+	#names(optpath) = c('objval','r_norm','s_norm','eps_pri','eps_dual');#
+	for (k in 1:Niter){#
+		#update#
+		xupdate = myxupdate(x, z, u, bD, rho);#
+		x = xupdate[[1]]#
+		step = c(step, xupdate[[2]])#
+		#zold = z#
+		z = x + u#
+		z[-1] = softshrink(z[-1], lambda/rho);#
+		u = u + x - z;#
+		#stopping#
+		#optpath$objval[k] = objfunc(x, z);#
+		#optpath$r_norm[k] = norm( x - z );#
+		#optpath$s_norm[k] = norm( rho*(z - zold) );#
+		#optpath$eps_pri[k] = sqrt(p) * ABSTOL + RELTOL * max(vnorm(x), vnorm(z));#
+		#optpath$eps_dual[k] = sqrt(p) * ABSTOL + RELTOL * vnorm(rho*u);#
+		#if (optpath$r_norm[k] < optpath$eps_pri[k] & optpath$s_norm[k] < optpath$eps_dual[k]) {#
+		#	optpath = optpath[1:k,]#
+		#	break;#
+		#}	#
+	}#
+	#return(list(drop(z), step, optpath))#
+	return(drop(z))#
+}#
+#
+ADMM1 = myADMM(b1, X1, 1.0, 0.05, 20)
+ADMMBOY
+ADMMBOY - ADMM1
+vnorm(ADMMBOY - ADMM1)
+rm(list=ls())
+setwd("/Users/guojun/Google Drive/15Summer/Simulation/SPGA-R/SPGA-logistic/Boyd/Current")#
+#setwd("C:/Users/TEMP/Downloads")#
+library(MASS)#
+#library(mvtnorm)#
+#library(MCMCpack)#
+#library(BayesLogit)#
+#
+##Simulate data#
+#
+mylogit = function(x) 1/(1+exp(-x)) # compare with exp(x)/(1+exp(x))#
+vnorm = function(x) sqrt(sum(x^2))#
+#
+N1=200; p1=50;#
+X1 = as.matrix(read.table('Xdta'))#
+colnames(X1) = NULL#
+y1 = as.matrix(read.table('Ydta'))#
+b1 = drop(y1)#
+b1[which(b1==0)] = -1;#
+#
+#A1 = diag(b1) %*% X1;#
+#
+beta_star1 = drop(as.matrix(read.table('trBdta')))#
+beta_01 = 1.5;#
+beta_star1 = c(beta_01, beta_star1);#
+#
+set.seed(2015)#
+#
+##	ADMM with Newton Ralphson update for beta;#
+#
+myxupdate = function(x, z, u, bD, rho){#
+	MAXITER = 50;#
+	TOL = 1e-5;#
+	alpha = 0.1; beta = 0.5;#
+	fx = function(argx) sum(log(1 + exp(-bD %*% argx))) + (rho / 2) * sum((argx - z + u)^2)#
+	for(iter in 1:MAXITER){#
+		gradx = - t(bD) %*% mylogit(-bD %*% x) + rho * (x - z + u)#
+		if(sum(gradx^2) < TOL) break;#
+		t = 1;#
+		fx0 = fx(x);#
+		while(fx0 < fx(x - t * gradx) + alpha * t * sum(gradx^2)){#
+			t = beta * t#
+			print(t)#
+		}#
+		x = x - t * gradx;#
+	}#
+	return(list(x,t))#
+}#
+#
+softshrink = function(a, kappa){#
+	z = pmax(a - kappa, 0) + pmin(a + kappa, 0)#
+	return(z)#
+}#
+#
+myADMM = function(b, X, rho, lambda0, Niter){#
+	n = dim(X)[1]; p = dim(X)[2];#
+	ABSTOL = 1e-4; RELTOL = 1e-2;#
+	data = cbind(rep(1, n), X);#
+	lambda = lambda0 * sqrt(n*log(p));#
+	bD = diag(b) %*% data;#
+	x = numeric(p+1);#
+	z = numeric(p+1);#
+	u = numeric(p+1);#
+	step = 1;#
+	objfunc = function(argx, argz) sum(log(1 + exp(-bD %*% argx))) + lambda * sum(abs(argz))#
+	optpath = as.data.frame(matrix(NA, nrow = Niter, ncol = 5));#
+	names(optpath) = c('objval','r_norm','s_norm','eps_pri','eps_dual');#
+	for (k in 1:Niter){#
+		#update#
+		xupdate = myxupdate(x, z, u, bD, rho);#
+		x = xupdate[[1]]#
+		step = c(step, xupdate[[2]])#
+		#zold = z#
+		z = x + u#
+		z[-1] = softshrink(z[-1], lambda/rho);#
+		u = u + x - z;#
+		#stopping#
+		optpath$objval[k] = objfunc(x, z);#
+		optpath$r_norm[k] = norm( x - z );#
+		optpath$s_norm[k] = norm( rho*(z - zold) );#
+		optpath$eps_pri[k] = sqrt(p) * ABSTOL + RELTOL * max(vnorm(x), vnorm(z));#
+		optpath$eps_dual[k] = sqrt(p) * ABSTOL + RELTOL * vnorm(rho*u);#
+		if (optpath$r_norm[k] < optpath$eps_pri[k] & optpath$s_norm[k] < optpath$eps_dual[k]) {#
+			optpath = optpath[1:k,]#
+			break;#
+		}	#
+	}#
+	return(list(drop(z), step, optpath))#
+	#return(drop(z))#
+}#
+#
+ADMM1 = myADMM(b1, X1, 1.0, 0.05, 20)#
+print(ADMM1)
+myADMM = function(b, X, rho, lambda0, Niter){#
+	n = dim(X)[1]; p = dim(X)[2];#
+	ABSTOL = 1e-4; RELTOL = 1e-2;#
+	data = cbind(rep(1, n), X);#
+	lambda = lambda0 * sqrt(n*log(p));#
+	bD = diag(b) %*% data;#
+	x = numeric(p+1);#
+	z = numeric(p+1);#
+	u = numeric(p+1);#
+	step = 1;#
+	objfunc = function(argx, argz) sum(log(1 + exp(-bD %*% argx))) + lambda * sum(abs(argz))#
+	optpath = as.data.frame(matrix(NA, nrow = Niter, ncol = 5));#
+	names(optpath) = c('objval','r_norm','s_norm','eps_pri','eps_dual');#
+	for (k in 1:Niter){#
+		#update#
+		xupdate = myxupdate(x, z, u, bD, rho);#
+		x = xupdate[[1]]#
+		step = c(step, xupdate[[2]])#
+		zold = z#
+		z = x + u#
+		z[-1] = softshrink(z[-1], lambda/rho);#
+		u = u + x - z;#
+		#stopping#
+		optpath$objval[k] = objfunc(x, z);#
+		optpath$r_norm[k] = norm( x - z );#
+		optpath$s_norm[k] = norm( rho*(z - zold) );#
+		optpath$eps_pri[k] = sqrt(p) * ABSTOL + RELTOL * max(vnorm(x), vnorm(z));#
+		optpath$eps_dual[k] = sqrt(p) * ABSTOL + RELTOL * vnorm(rho*u);#
+		if (optpath$r_norm[k] < optpath$eps_pri[k] & optpath$s_norm[k] < optpath$eps_dual[k]) {#
+			optpath = optpath[1:k,]#
+			break;#
+		}	#
+	}#
+	return(list(drop(z), step, optpath))#
+	#return(drop(z))#
+}#
+#
+ADMM1 = myADMM(b1, X1, 1.0, 0.05, 20)
+setwd("/Users/guojun/Google Drive/15Summer/Simulation/SPGA-R/SPGA-logistic/Boyd/Current")#
+#setwd("C:/Users/TEMP/Downloads")#
+library(MASS)#
+#library(mvtnorm)#
+#library(MCMCpack)#
+#library(BayesLogit)#
+#
+##Simulate data#
+#
+mylogit = function(x) 1/(1+exp(-x)) # compare with exp(x)/(1+exp(x))#
+vnorm = function(x) sqrt(sum(x^2))#
+#
+N=200; p=50;#
+X = as.matrix(read.table('Xdta'))#
+colnames(X) = NULL#
+y = as.matrix(read.table('Ydta'))#
+b = drop(y)#
+b[which(b==0)] = -1;#
+#
+A = diag(b) %*% X;#
+#
+beta_star = drop(as.matrix(read.table('trBdta')))#
+beta_0 = 1.5;#
+beta_star = c(beta_0, beta_star);#
+#
+#ratio = sum(b == 1) / N;#
+#mu = 0.7 * 1/N * max( (1 - ratio) * apply(A[(y==1),], 2, sum) + ratio * apply(A[(y==-1),], 2, sum) );#
+#
+set.seed(2015)#
+#
+## imitating the functions written in Boyds' implementation#
+#
+objective = function(A, b, mu, x, z){#
+	m = dim(A)[1];#
+	obj = sum(log(1 + exp(-A %*% x[-1] - b * x[1]))) + m * mu * sum(abs(z));#
+	return(obj)#
+}#
+#
+update_x = function(A, b, u, z, x, rho){#
+	Alpha = 0.1; # this Alpha is for backtracking, not the relaxing parameter.#
+	BETA = 0.5;#
+	TOLERANCE = 1e-5;#
+	MAX_ITER = 50;#
+	m = dim(A)[1]; n = dim(A)[2];#
+	I = diag(n+1);#
+	#if (exists('x0')) { #
+	#	x = x0;#
+	#	}#
+	#x = numeric(n+1);#
+	C = cbind(-b, -A);#
+	f = function(argx) (sum(log(1 + exp(C %*% argx))) + (rho/2) * sum((argx - z + u)^2));#
+	for (iter in 1:MAX_ITER){#
+		fx = f(x);#
+		g = t(C) %*% mylogit(C %*% x) + rho * (x - z + u);#
+		#H = t(C) %*% diag(as.vector( exp(C %*% x) / (1 + exp(C %*% x))^2 )) %*% C + rho * I;#
+		dx = -g;#
+		dfx = t(g) %*% dx;#
+		if(abs(dfx) < TOLERANCE) break;#
+		# backtracking #
+		t = 1;#
+		while(f(x + t * dx) > fx + Alpha * t * dfx){#
+			t = BETA * t;#
+		}#
+		x = x + t * dx;#
+	} #
+	return(x)#
+}#
+#
+shrinkage = function(a, kappa){#
+	z = pmax(0, a - kappa) - pmax(0, -a-kappa); # max() return max for all values, pmax() return parallel max.#
+	return(z)#
+}#
+#
+logreg_Boyd = function(A, b, mu, rho, alpha, N_ITER){#
+	#N_ITER = 2;#
+	ABSTOL = 1e-4; RELTOL = 1e-2;#
+	m = dim(A)[1]; n = dim(A)[2];#
+	x = numeric(n+1);#
+	z = numeric(n+1);#
+	u = numeric(n+1);#
+	history = as.data.frame(matrix(NA, nrow = N_ITER, ncol = 5));#
+	names(history) = c('objval','r_norm','s_norm','eps_pri','eps_dual');#
+	for( k in 1:N_ITER ){#
+		# x update#
+		x = update_x(A, b, u, z, x, rho);#
+		# z update#
+		zold = z;#
+		#x_hat = alpha * x + (1-alpha) * zold;#
+		#z = x_hat + u;#
+		z = x + u;#
+		z[-1] = shrinkage(z[-1], m*mu/rho);#
+		# multiplier update#
+		#u = u + ( x_hat - z );#
+		u = u + ( x - z );#
+		# diagnostics, reporting, termination checks#
+		history$objval[k] = objective(A, b, mu, x, z);#
+		history$r_norm[k] = norm( x - z );#
+		history$s_norm[k] = norm( rho*(z - zold) );#
+		history$eps_pri[k] = sqrt(n) * ABSTOL + RELTOL * max(vnorm(x), vnorm(z));#
+		history$eps_dual[k] = sqrt(n) * ABSTOL + RELTOL * vnorm(rho*u);#
+		if (history$r_norm[k] < history$eps_pri[k] & history$s_norm[k] < history$eps_dual[k]) {#
+			history = history[1:k,]#
+			break;#
+		}#
+	}#
+	return(list(drop(z), history))#
+}#
+#
+mu = 0.05 * sqrt(log(p)/N)#
+ADMMBOY = logreg_Boyd(A, b, mu, rho = 1.0, alpha = 1.0, 20)
+ADMM1[[1]]-ADMMBOY[[1]]
+vnorm(ADMM1[[1]]-ADMMBOY[[1]])
+ADMM1[[3]]-ADMMBOY[[2]]
+(ADMM1[[3]]-ADMMBOY[[2]])[,1]
+vnorm((ADMM1[[3]]-ADMMBOY[[2]])[,1])
+vnorm((ADMM1[[3]]-ADMMBOY[[2]])[,2])
+vnorm((ADMM1[[3]]-ADMMBOY[[2]])[,3])
+vnorm((ADMM1[[3]]-ADMMBOY[[2]])[,4])
+vnorm((ADMM1[[3]]-ADMMBOY[[2]])[,5])
+vnorm((ADMM1[[3]]-ADMMBOY[[2]])[,6])
+rm(list=ls())
+setwd("/Users/guojun/Google Drive/15Summer/Simulation/SPGA-R/SPGA-logistic/Boyd/Current")#
+#setwd("C:/Users/TEMP/Downloads")#
+library(MASS)#
+#library(mvtnorm)#
+#library(MCMCpack)#
+#library(BayesLogit)#
+#
+##Simulate data#
+#
+mylogit = function(x) 1/(1+exp(-x)) # compare with exp(x)/(1+exp(x))#
+vnorm = function(x) sqrt(sum(x^2))#
+#
+N=200; p=50;#
+X = as.matrix(read.table('Xdta'))#
+colnames(X) = NULL#
+y = as.matrix(read.table('Ydta'))#
+b = drop(y)#
+b[which(b==0)] = -1;#
+#
+A = diag(b) %*% X;#
+#
+beta_star = drop(as.matrix(read.table('trBdta')))#
+beta_0 = 1.5;#
+beta_star = c(beta_0, beta_star);#
+#
+ratio = sum(b == 1) / N;#
+mu = 0.7 * 1/N * max( (1 - ratio) * apply(A[(y==1),], 2, sum) + ratio * apply(A[(y==-1),], 2, sum) );#
+#
+set.seed(2015)#
+#
+## imitating the functions written in Boyds' implementation#
+#
+objective = function(A, b, mu, x, z){#
+	m = dim(A)[1];#
+	obj = sum(log(1 + exp(-A %*% x[-1] - b * x[1]))) + m * mu * sum(abs(z));#
+	return(obj)#
+}#
+#
+update_x = function(A, b, u, z, rho){#
+	Alpha = 0.1; # this Alpha is for backtracking, not the relaxing parameter.#
+	BETA = 0.5;#
+	TOLERANCE = 1e-5;#
+	MAX_ITER = 50;#
+	m = dim(A)[1]; n = dim(A)[2];#
+	I = diag(n+1);#
+	#if (exists('x0')) { #
+	#	x = x0;#
+	#	}#
+	x = numeric(n+1);#
+	C = cbind(-b, -A);#
+	f = function(argx) (sum(log(1 + exp(C %*% argx))) + (rho/2) * sum((argx - z + u)^2));#
+	for (iter in 1:MAX_ITER){#
+		fx = f(x);#
+		g = t(C) %*% mylogit(C %*% x) + rho * (x - z + u);#
+		#H = t(C) %*% diag(as.vector( exp(C %*% x) / (1 + exp(C %*% x))^2 )) %*% C + rho * I;#
+		dx = -g;#
+		dfx = t(g) %*% dx;#
+		if(abs(dfx) < TOLERANCE) break;#
+		# backtracking #
+		t = 1;#
+		while(f(x + t * dx) > fx + Alpha * t * dfx){#
+			t = BETA * t;#
+		}#
+		x = x + t * dx;#
+	} #
+	return(x)#
+}#
+#
+shrinkage = function(a, kappa){#
+	z = pmax(0, a - kappa) - pmax(0, -a-kappa); # max() return max for all values, pmax() return parallel max.#
+	return(z)#
+}#
+#
+logreg_Boyd = function(A, b, mu, rho, alpha, N_ITER){#
+	#N_ITER = 2;#
+	ABSTOL = 1e-4; RELTOL = 1e-2;#
+	m = dim(A)[1]; n = dim(A)[2];#
+	x = numeric(n+1);#
+	z = numeric(n+1);#
+	u = numeric(n+1);#
+	history = as.data.frame(matrix(NA, nrow = N_ITER, ncol = 5));#
+	names(history) = c('objval','r_norm','s_norm','eps_pri','eps_dual');#
+	for( k in 1:N_ITER ){#
+		# x update#
+		x = update_x(A, b, u, z, rho);#
+		# z update#
+		zold = z;#
+		#x_hat = alpha * x + (1-alpha) * zold;#
+		#z = x_hat + u;#
+		z = x + u;#
+		z[-1] = shrinkage(z[-1], m*mu/rho);#
+		# multiplier update#
+		#u = u + ( x_hat - z );#
+		u = u + ( x - z );#
+		# diagnostics, reporting, termination checks#
+		history$objval[k] = objective(A, b, mu, x, z);#
+		history$r_norm[k] = norm( x - z );#
+		history$s_norm[k] = norm( rho*(z - zold) );#
+		history$eps_pri[k] = sqrt(n) * ABSTOL + RELTOL * max(vnorm(x), vnorm(z));#
+		history$eps_dual[k] = sqrt(n) * ABSTOL + RELTOL * vnorm(rho*u);#
+		if (history$r_norm[k] < history$eps_pri[k] & history$s_norm[k] < history$eps_dual[k]) {#
+			history = history[1:k,]#
+			break;#
+		}#
+	}#
+	return(list(drop(z),history))#
+}#
+#
+mu = 0.05 * sqrt(log(p)/N)#
+ADMMBOY_gd = logreg_Boyd(A, b, mu, rho = 1.0, alpha = 1.0, 100)#
+print(ADMMBOY_gd)
+setwd("/Users/guojun/Google Drive/15Summer/Simulation/SPGA-R/SPGA-logistic/Boyd")#
+#setwd("C:/Users/TEMP/Downloads")#
+library(MASS)#
+#library(mvtnorm)#
+#library(MCMCpack)#
+#library(BayesLogit)#
+#
+##Simulate data#
+#
+mylogit = function(x) 1/(1+exp(-x)) # compare with exp(x)/(1+exp(x))#
+vnorm = function(x) sqrt(sum(x^2))#
+#
+N=200; p=50;#
+X = as.matrix(read.table('Xdta'))#
+colnames(X) = NULL#
+y = as.matrix(read.table('Ydta'))#
+b = drop(y)#
+b[which(b==0)] = -1;#
+#
+A = diag(b) %*% X;#
+#
+beta_star = drop(as.matrix(read.table('trBdta')))#
+beta_0 = 1.5;#
+beta_star = c(beta_0, beta_star);#
+#
+ratio = sum(b == 1) / N;#
+mu = 0.7 * 1/N * max( (1 - ratio) * apply(A[(y==1),], 2, sum) + ratio * apply(A[(y==-1),], 2, sum) );#
+#
+set.seed(2015)#
+#
+## imitating the functions written in Boyds' implementation#
+#
+objective = function(A, b, mu, x, z){#
+	m = dim(A)[1];#
+	obj = sum(log(1 + exp(-A %*% x[-1] - b * x[1]))) + m * mu * sum(abs(z));#
+	return(obj)#
+}#
+#
+update_x = function(A, b, u, z, rho){#
+	Alpha = 0.1; # this Alpha is for backtracking, not the relaxing parameter.#
+	BETA = 0.5;#
+	TOLERANCE = 1e-5;#
+	MAX_ITER = 50;#
+	m = dim(A)[1]; n = dim(A)[2];#
+	I = diag(n+1);#
+	#if (exists('x0')) { #
+	#	x = x0;#
+	#	}#
+	x = numeric(n+1);#
+	C = cbind(-b, -A);#
+	f = function(argx) (sum(log(1 + exp(C %*% argx))) + (rho/2) * sum((argx - z + u)^2));#
+	for (iter in 1:MAX_ITER){#
+		fx = f(x);#
+		g = t(C) %*% mylogit(C %*% x) + rho * (x - z + u);#
+		H = t(C) %*% diag(as.vector( exp(C %*% x) / (1 + exp(C %*% x))^2 )) %*% C + rho * I;#
+		dx = -solve(H , g);#
+		dfx = t(g) %*% dx;#
+		if(abs(dfx) < TOLERANCE) break;#
+		# backtracking #
+		t = 1;#
+		while(f(x + t * dx) > fx + Alpha * t * dfx){#
+			t = BETA * t;#
+		}#
+		x = x + t * dx;#
+	} #
+	return(x)#
+}#
+#
+shrinkage = function(a, kappa){#
+	z = pmax(0, a - kappa) - pmax(0, -a-kappa); # max() return max for all values, pmax() return parallel max.#
+	return(z)#
+}#
+#
+logreg_Boyd = function(A, b, mu, rho, alpha, N_ITER){#
+	#N_ITER = 2;#
+	ABSTOL = 1e-4; RELTOL = 1e-2;#
+	m = dim(A)[1]; n = dim(A)[2];#
+	x = numeric(n+1);#
+	z = numeric(n+1);#
+	u = numeric(n+1);#
+	history = as.data.frame(matrix(NA, nrow = N_ITER, ncol = 5));#
+	names(history) = c('objval','r_norm','s_norm','eps_pri','eps_dual');#
+	for( k in 1:N_ITER ){#
+		# x update#
+		x = update_x(A, b, u, z, rho);#
+		# z update#
+		zold = z;#
+		x_hat = alpha * x + (1-alpha) * zold;#
+		z = x_hat + u;#
+		z[-1] = shrinkage(z[-1], m*mu/rho);#
+		# multiplier update#
+		u = u + ( x_hat - z );#
+		# diagnostics, reporting, termination checks#
+		history$objval[k] = objective(A, b, mu, x, z);#
+		history$r_norm[k] = norm( x - z );#
+		history$s_norm[k] = norm( rho*(z - zold) );#
+		history$eps_pri[k] = sqrt(n) * ABSTOL + RELTOL * max(vnorm(x), vnorm(z));#
+		history$eps_dual[k] = sqrt(n) * ABSTOL + RELTOL * vnorm(rho*u);#
+		if (history$r_norm[k] < history$eps_pri[k] & history$s_norm[k] < history$eps_dual[k]) {#
+			history = history[1:k,]#
+			break;#
+		}#
+	}#
+	return(list(drop(z),history))#
+}#
+#
+mu = 0.05 * sqrt(log(p)/N)#
+ADMMBOY = logreg_Boyd(A, b, mu, rho = 1.0, alpha = 1.0, 100)
+vnorm(ADMMBOY_gd[[1]] - ADMMBOY[[1]])
+vnorm(ADMMBOY_gd[[2]] - ADMMBOY[[2]])
+ADMMBOY_gd[[2]]
+setwd("/Users/guojun/Google Drive/15Summer/Simulation/SPGA-R/SPGA-logistic/Boyd/Current")#
+#setwd("C:/Users/TEMP/Downloads")#
+library(MASS)#
+#library(mvtnorm)#
+#library(MCMCpack)#
+#library(BayesLogit)#
+#
+##Simulate data#
+#
+mylogit = function(x) 1/(1+exp(-x)) # compare with exp(x)/(1+exp(x))#
+vnorm = function(x) sqrt(sum(x^2))#
+#
+N=200; p=50;#
+X = as.matrix(read.table('Xdta'))#
+colnames(X) = NULL#
+y = as.matrix(read.table('Ydta'))#
+b = drop(y)#
+b[which(b==0)] = -1;#
+#
+A = diag(b) %*% X;#
+#
+beta_star = drop(as.matrix(read.table('trBdta')))#
+beta_0 = 1.5;#
+beta_star = c(beta_0, beta_star);#
+#
+ratio = sum(b == 1) / N;#
+mu = 0.7 * 1/N * max( (1 - ratio) * apply(A[(y==1),], 2, sum) + ratio * apply(A[(y==-1),], 2, sum) );#
+#
+set.seed(2015)#
+#
+## imitating the functions written in Boyds' implementation#
+#
+objective = function(A, b, mu, x, z){#
+	m = dim(A)[1];#
+	obj = sum(log(1 + exp(-A %*% x[-1] - b * x[1]))) + m * mu * sum(abs(z));#
+	return(obj)#
+}#
+#
+update_x = function(A, b, u, z, rho){#
+	Alpha = 0.1; # this Alpha is for backtracking, not the relaxing parameter.#
+	BETA = 0.5;#
+	TOLERANCE = 1e-5;#
+	MAX_ITER = 50;#
+	m = dim(A)[1]; n = dim(A)[2];#
+	I = diag(n+1);#
+	#if (exists('x0')) { #
+	#	x = x0;#
+	#	}#
+	x = numeric(n+1);#
+	C = cbind(-b, -A);#
+	f = function(argx) (sum(log(1 + exp(C %*% argx))) + (rho/2) * sum((argx - z + u)^2));#
+	for (iter in 1:MAX_ITER){#
+		fx = f(x);#
+		g = t(C) %*% mylogit(C %*% x) + rho * (x - z + u);#
+		#H = t(C) %*% diag(as.vector( exp(C %*% x) / (1 + exp(C %*% x))^2 )) %*% C + rho * I;#
+		dx = -g;#
+		dfx = t(g) %*% dx;#
+		if(abs(dfx) < TOLERANCE) break;#
+		# backtracking #
+		t = 1;#
+		while(f(x + t * dx) > fx + Alpha * t * dfx){#
+			t = BETA * t;#
+		}#
+		x = x + t * dx;#
+	} #
+	return(x)#
+}#
+#
+shrinkage = function(a, kappa){#
+	z = pmax(0, a - kappa) - pmax(0, -a-kappa); # max() return max for all values, pmax() return parallel max.#
+	return(z)#
+}#
+#
+logreg_Boyd = function(A, b, mu, rho, alpha, N_ITER){#
+	#N_ITER = 2;#
+	ABSTOL = 1e-4; RELTOL = 1e-2;#
+	m = dim(A)[1]; n = dim(A)[2];#
+	x = numeric(n+1);#
+	z = numeric(n+1);#
+	u = numeric(n+1);#
+	history = as.data.frame(matrix(NA, nrow = N_ITER, ncol = 5));#
+	names(history) = c('objval','r_norm','s_norm','eps_pri','eps_dual');#
+	for( k in 1:N_ITER ){#
+		# x update#
+		x = update_x(A, b, u, z, rho);#
+		# z update#
+		zold = z;#
+		x_hat = alpha * x + (1-alpha) * zold;#
+		z = x_hat + u;#
+		#z = x + u;#
+		z[-1] = shrinkage(z[-1], m*mu/rho);#
+		# multiplier update#
+		#u = u + ( x_hat - z );#
+		u = u + ( x - z );#
+		# diagnostics, reporting, termination checks#
+		history$objval[k] = objective(A, b, mu, x, z);#
+		history$r_norm[k] = norm( x - z );#
+		history$s_norm[k] = norm( rho*(z - zold) );#
+		history$eps_pri[k] = sqrt(n) * ABSTOL + RELTOL * max(vnorm(x), vnorm(z));#
+		history$eps_dual[k] = sqrt(n) * ABSTOL + RELTOL * vnorm(rho*u);#
+		if (history$r_norm[k] < history$eps_pri[k] & history$s_norm[k] < history$eps_dual[k]) {#
+			history = history[1:k,]#
+			break;#
+		}#
+	}#
+	return(list(drop(z),history))#
+}#
+#
+mu = 0.05 * sqrt(log(p)/N)#
+ADMMBOY_gd = logreg_Boyd(A, b, mu, rho = 1.0, alpha = 1.0, 100)
+setwd("/Users/guojun/Google Drive/15Summer/Simulation/SPGA-R/SPGA-logistic/Boyd")#
+#setwd("C:/Users/TEMP/Downloads")#
+library(MASS)#
+#library(mvtnorm)#
+#library(MCMCpack)#
+#library(BayesLogit)#
+#
+##Simulate data#
+#
+mylogit = function(x) 1/(1+exp(-x)) # compare with exp(x)/(1+exp(x))#
+vnorm = function(x) sqrt(sum(x^2))#
+#
+N=200; p=50;#
+X = as.matrix(read.table('Xdta'))#
+colnames(X) = NULL#
+y = as.matrix(read.table('Ydta'))#
+b = drop(y)#
+b[which(b==0)] = -1;#
+#
+A = diag(b) %*% X;#
+#
+beta_star = drop(as.matrix(read.table('trBdta')))#
+beta_0 = 1.5;#
+beta_star = c(beta_0, beta_star);#
+#
+ratio = sum(b == 1) / N;#
+mu = 0.7 * 1/N * max( (1 - ratio) * apply(A[(y==1),], 2, sum) + ratio * apply(A[(y==-1),], 2, sum) );#
+#
+set.seed(2015)#
+#
+## imitating the functions written in Boyds' implementation#
+#
+objective = function(A, b, mu, x, z){#
+	m = dim(A)[1];#
+	obj = sum(log(1 + exp(-A %*% x[-1] - b * x[1]))) + m * mu * sum(abs(z));#
+	return(obj)#
+}#
+#
+update_x = function(A, b, u, z, rho){#
+	Alpha = 0.1; # this Alpha is for backtracking, not the relaxing parameter.#
+	BETA = 0.5;#
+	TOLERANCE = 1e-5;#
+	MAX_ITER = 50;#
+	m = dim(A)[1]; n = dim(A)[2];#
+	I = diag(n+1);#
+	#if (exists('x0')) { #
+	#	x = x0;#
+	#	}#
+	x = numeric(n+1);#
+	C = cbind(-b, -A);#
+	f = function(argx) (sum(log(1 + exp(C %*% argx))) + (rho/2) * sum((argx - z + u)^2));#
+	for (iter in 1:MAX_ITER){#
+		fx = f(x);#
+		g = t(C) %*% mylogit(C %*% x) + rho * (x - z + u);#
+		H = t(C) %*% diag(as.vector( exp(C %*% x) / (1 + exp(C %*% x))^2 )) %*% C + rho * I;#
+		dx = -solve(H , g);#
+		dfx = t(g) %*% dx;#
+		if(abs(dfx) < TOLERANCE) break;#
+		# backtracking #
+		t = 1;#
+		while(f(x + t * dx) > fx + Alpha * t * dfx){#
+			t = BETA * t;#
+		}#
+		x = x + t * dx;#
+	} #
+	return(x)#
+}#
+#
+shrinkage = function(a, kappa){#
+	z = pmax(0, a - kappa) - pmax(0, -a-kappa); # max() return max for all values, pmax() return parallel max.#
+	return(z)#
+}#
+#
+logreg_Boyd = function(A, b, mu, rho, alpha, N_ITER){#
+	#N_ITER = 2;#
+	ABSTOL = 1e-4; RELTOL = 1e-2;#
+	m = dim(A)[1]; n = dim(A)[2];#
+	x = numeric(n+1);#
+	z = numeric(n+1);#
+	u = numeric(n+1);#
+	history = as.data.frame(matrix(NA, nrow = N_ITER, ncol = 5));#
+	names(history) = c('objval','r_norm','s_norm','eps_pri','eps_dual');#
+	for( k in 1:N_ITER ){#
+		# x update#
+		x = update_x(A, b, u, z, rho);#
+		# z update#
+		zold = z;#
+		x_hat = alpha * x + (1-alpha) * zold;#
+		z = x_hat + u;#
+		z[-1] = shrinkage(z[-1], m*mu/rho);#
+		# multiplier update#
+		u = u + ( x_hat - z );#
+		# diagnostics, reporting, termination checks#
+		history$objval[k] = objective(A, b, mu, x, z);#
+		history$r_norm[k] = norm( x - z );#
+		history$s_norm[k] = norm( rho*(z - zold) );#
+		history$eps_pri[k] = sqrt(n) * ABSTOL + RELTOL * max(vnorm(x), vnorm(z));#
+		history$eps_dual[k] = sqrt(n) * ABSTOL + RELTOL * vnorm(rho*u);#
+		if (history$r_norm[k] < history$eps_pri[k] & history$s_norm[k] < history$eps_dual[k]) {#
+			history = history[1:k,]#
+			break;#
+		}#
+	}#
+	return(list(drop(z),history))#
+}#
+#
+mu = 0.05 * sqrt(log(p)/N)#
+ADMMBOY = logreg_Boyd(A, b, mu, rho = 1.0, alpha = 1.0, 100)
+vnorm(ADMMBOY[[1]]-ADMMBOY_gd[[1]])
+setwd("/Users/guojun/Google Drive/15Summer/Simulation/SPGA-R/SPGA-logistic/Boyd/Current")#
+#setwd("C:/Users/TEMP/Downloads")#
+library(MASS)#
+#library(mvtnorm)#
+#library(MCMCpack)#
+#library(BayesLogit)#
+#
+##Simulate data#
+#
+mylogit = function(x) 1/(1+exp(-x)) # compare with exp(x)/(1+exp(x))#
+vnorm = function(x) sqrt(sum(x^2))#
+#
+N=200; p=50;#
+X = as.matrix(read.table('Xdta'))#
+colnames(X) = NULL#
+y = as.matrix(read.table('Ydta'))#
+b = drop(y)#
+b[which(b==0)] = -1;#
+#
+A = diag(b) %*% X;#
+#
+beta_star = drop(as.matrix(read.table('trBdta')))#
+beta_0 = 1.5;#
+beta_star = c(beta_0, beta_star);#
+#
+ratio = sum(b == 1) / N;#
+mu = 0.7 * 1/N * max( (1 - ratio) * apply(A[(y==1),], 2, sum) + ratio * apply(A[(y==-1),], 2, sum) );#
+#
+set.seed(2015)#
+#
+## imitating the functions written in Boyds' implementation#
+#
+objective = function(A, b, mu, x, z){#
+	m = dim(A)[1];#
+	obj = sum(log(1 + exp(-A %*% x[-1] - b * x[1]))) + m * mu * sum(abs(z));#
+	return(obj)#
+}#
+#
+update_x = function(A, b, u, z, rho){#
+	Alpha = 0.1; # this Alpha is for backtracking, not the relaxing parameter.#
+	BETA = 0.5;#
+	TOLERANCE = 1e-5;#
+	MAX_ITER = 50;#
+	m = dim(A)[1]; n = dim(A)[2];#
+	I = diag(n+1);#
+	#if (exists('x0')) { #
+	#	x = x0;#
+	#	}#
+	x = numeric(n+1);#
+	C = cbind(-b, -A);#
+	f = function(argx) (sum(log(1 + exp(C %*% argx))) + (rho/2) * sum((argx - z + u)^2));#
+	for (iter in 1:MAX_ITER){#
+		fx = f(x);#
+		g = t(C) %*% mylogit(C %*% x) + rho * (x - z + u);#
+		#H = t(C) %*% diag(as.vector( exp(C %*% x) / (1 + exp(C %*% x))^2 )) %*% C + rho * I;#
+		dx = -g;#
+		dfx = t(g) %*% dx;#
+		if(abs(dfx) < TOLERANCE) break;#
+		# backtracking #
+		t = 1;#
+		while(f(x + t * dx) > fx + Alpha * t * dfx){#
+			t = BETA * t;#
+		}#
+		x = x + t * dx;#
+	} #
+	return(x)#
+}#
+#
+shrinkage = function(a, kappa){#
+	z = pmax(0, a - kappa) - pmax(0, -a-kappa); # max() return max for all values, pmax() return parallel max.#
+	return(z)#
+}#
+#
+logreg_Boyd = function(A, b, mu, rho, alpha, N_ITER){#
+	#N_ITER = 2;#
+	ABSTOL = 1e-4; RELTOL = 1e-2;#
+	m = dim(A)[1]; n = dim(A)[2];#
+	x = numeric(n+1);#
+	z = numeric(n+1);#
+	u = numeric(n+1);#
+	history = as.data.frame(matrix(NA, nrow = N_ITER, ncol = 5));#
+	names(history) = c('objval','r_norm','s_norm','eps_pri','eps_dual');#
+	for( k in 1:N_ITER ){#
+		# x update#
+		x = update_x(A, b, u, z, rho);#
+		# z update#
+		zold = z;#
+		x_hat = alpha * x + (1-alpha) * zold;#
+		z = x_hat + u;#
+		#z = x + u;#
+		z[-1] = shrinkage(z[-1], m*mu/rho);#
+		# multiplier update#
+		u = u + ( x_hat - z );#
+		#u = u + ( x - z );#
+		# diagnostics, reporting, termination checks#
+		history$objval[k] = objective(A, b, mu, x, z);#
+		history$r_norm[k] = norm( x - z );#
+		history$s_norm[k] = norm( rho*(z - zold) );#
+		history$eps_pri[k] = sqrt(n) * ABSTOL + RELTOL * max(vnorm(x), vnorm(z));#
+		history$eps_dual[k] = sqrt(n) * ABSTOL + RELTOL * vnorm(rho*u);#
+		if (history$r_norm[k] < history$eps_pri[k] & history$s_norm[k] < history$eps_dual[k]) {#
+			history = history[1:k,]#
+			break;#
+		}#
+	}#
+	return(list(drop(z),history))#
+}#
+#
+mu = 0.05 * sqrt(log(p)/N)#
+ADMMBOY_gd = logreg_Boyd(A, b, mu, rho = 1.0, alpha = 1.0, 100)#
+print(ADMMBOY_gd)
+setwd("/Users/guojun/Google Drive/15Summer/Simulation/SPGA-R/SPGA-logistic/Boyd")#
+#setwd("C:/Users/TEMP/Downloads")#
+library(MASS)#
+#library(mvtnorm)#
+#library(MCMCpack)#
+#library(BayesLogit)#
+#
+##Simulate data#
+#
+mylogit = function(x) 1/(1+exp(-x)) # compare with exp(x)/(1+exp(x))#
+vnorm = function(x) sqrt(sum(x^2))#
+#
+N=200; p=50;#
+X = as.matrix(read.table('Xdta'))#
+colnames(X) = NULL#
+y = as.matrix(read.table('Ydta'))#
+b = drop(y)#
+b[which(b==0)] = -1;#
+#
+A = diag(b) %*% X;#
+#
+beta_star = drop(as.matrix(read.table('trBdta')))#
+beta_0 = 1.5;#
+beta_star = c(beta_0, beta_star);#
+#
+ratio = sum(b == 1) / N;#
+mu = 0.7 * 1/N * max( (1 - ratio) * apply(A[(y==1),], 2, sum) + ratio * apply(A[(y==-1),], 2, sum) );#
+#
+set.seed(2015)#
+#
+## imitating the functions written in Boyds' implementation#
+#
+objective = function(A, b, mu, x, z){#
+	m = dim(A)[1];#
+	obj = sum(log(1 + exp(-A %*% x[-1] - b * x[1]))) + m * mu * sum(abs(z));#
+	return(obj)#
+}#
+#
+update_x = function(A, b, u, z, rho){#
+	Alpha = 0.1; # this Alpha is for backtracking, not the relaxing parameter.#
+	BETA = 0.5;#
+	TOLERANCE = 1e-5;#
+	MAX_ITER = 50;#
+	m = dim(A)[1]; n = dim(A)[2];#
+	I = diag(n+1);#
+	#if (exists('x0')) { #
+	#	x = x0;#
+	#	}#
+	x = numeric(n+1);#
+	C = cbind(-b, -A);#
+	f = function(argx) (sum(log(1 + exp(C %*% argx))) + (rho/2) * sum((argx - z + u)^2));#
+	for (iter in 1:MAX_ITER){#
+		fx = f(x);#
+		g = t(C) %*% mylogit(C %*% x) + rho * (x - z + u);#
+		H = t(C) %*% diag(as.vector( exp(C %*% x) / (1 + exp(C %*% x))^2 )) %*% C + rho * I;#
+		dx = -solve(H , g);#
+		dfx = t(g) %*% dx;#
+		if(abs(dfx) < TOLERANCE) break;#
+		# backtracking #
+		t = 1;#
+		while(f(x + t * dx) > fx + Alpha * t * dfx){#
+			t = BETA * t;#
+		}#
+		x = x + t * dx;#
+	} #
+	return(x)#
+}#
+#
+shrinkage = function(a, kappa){#
+	z = pmax(0, a - kappa) - pmax(0, -a-kappa); # max() return max for all values, pmax() return parallel max.#
+	return(z)#
+}#
+#
+logreg_Boyd = function(A, b, mu, rho, alpha, N_ITER){#
+	#N_ITER = 2;#
+	ABSTOL = 1e-4; RELTOL = 1e-2;#
+	m = dim(A)[1]; n = dim(A)[2];#
+	x = numeric(n+1);#
+	z = numeric(n+1);#
+	u = numeric(n+1);#
+	history = as.data.frame(matrix(NA, nrow = N_ITER, ncol = 5));#
+	names(history) = c('objval','r_norm','s_norm','eps_pri','eps_dual');#
+	for( k in 1:N_ITER ){#
+		# x update#
+		x = update_x(A, b, u, z, rho);#
+		# z update#
+		zold = z;#
+		x_hat = alpha * x + (1-alpha) * zold;#
+		z = x_hat + u;#
+		z[-1] = shrinkage(z[-1], m*mu/rho);#
+		# multiplier update#
+		u = u + ( x_hat - z );#
+		# diagnostics, reporting, termination checks#
+		history$objval[k] = objective(A, b, mu, x, z);#
+		history$r_norm[k] = norm( x - z );#
+		history$s_norm[k] = norm( rho*(z - zold) );#
+		history$eps_pri[k] = sqrt(n) * ABSTOL + RELTOL * max(vnorm(x), vnorm(z));#
+		history$eps_dual[k] = sqrt(n) * ABSTOL + RELTOL * vnorm(rho*u);#
+		if (history$r_norm[k] < history$eps_pri[k] & history$s_norm[k] < history$eps_dual[k]) {#
+			history = history[1:k,]#
+			break;#
+		}#
+	}#
+	return(list(drop(z),history))#
+}#
+#
+mu = 0.05 * sqrt(log(p)/N)#
+ADMMBOY = logreg_Boyd(A, b, mu, rho = 1.0, alpha = 1.0, 100)#
+print(ADMMBOY)#
+print(which(ADMMBOY1[[1]] != 0))#
+print(which(beta_star != 0))#
+print(ADMMBOY1[[2]])#
+print(ADMMBOY1[[1]])#
+print(beta_star)
+vnorm(ADMMBOY[[1]] - ADMMBOY_gd[[1]])
+rm(list = ls())
+setwd("/Users/guojun/Google Drive/15Summer/Simulation/SPGA-R/SPGA-logistic/Boyd/Current")#
+#setwd("C:/Users/TEMP/Downloads")#
+library(MASS)#
+#library(mvtnorm)#
+#library(MCMCpack)#
+#library(BayesLogit)#
+#
+##Simulate data#
+#
+mylogit = function(x) 1/(1+exp(-x)) # compare with exp(x)/(1+exp(x))#
+vnorm = function(x) sqrt(sum(x^2))#
+#
+N=200; p=50;#
+X = as.matrix(read.table('Xdta'))#
+colnames(X) = NULL#
+y = as.matrix(read.table('Ydta'))#
+b = drop(y)#
+b[which(b==0)] = -1;#
+#
+A = diag(b) %*% X;#
+#
+beta_star = drop(as.matrix(read.table('trBdta')))#
+beta_0 = 1.5;#
+beta_star = c(beta_0, beta_star);
+set.seed(2015)#
+#
+## imitating the functions written in Boyds' implementation#
+#
+objective = function(A, b, mu, x, z){#
+	m = dim(A)[1];#
+	obj = sum(log(1 + exp(-A %*% x[-1] - b * x[1]))) + m * mu * sum(abs(z));#
+	return(obj)#
+}#
+#
+update_x = function(A, b, u, z, rho){#
+	Alpha = 0.1; # this Alpha is for backtracking, not the relaxing parameter.#
+	BETA = 0.5;#
+	TOLERANCE = 1e-5;#
+	MAX_ITER = 50;#
+	m = dim(A)[1]; n = dim(A)[2];#
+	I = diag(n+1);#
+	#if (exists('x0')) { #
+	#	x = x0;#
+	#	}#
+	x = numeric(n+1);#
+	C = cbind(-b, -A);#
+	f = function(argx) (sum(log(1 + exp(C %*% argx))) + (rho/2) * sum((argx - z + u)^2));#
+	for (iter in 1:MAX_ITER){#
+		fx = f(x);#
+		g = t(C) %*% mylogit(C %*% x) + rho * (x - z + u);#
+		#H = t(C) %*% diag(as.vector( exp(C %*% x) / (1 + exp(C %*% x))^2 )) %*% C + rho * I;#
+		dx = -g;#
+		dfx = t(g) %*% dx;#
+		if(abs(dfx) < TOLERANCE) break;#
+		# backtracking #
+		t = 1;#
+		while(f(x + t * dx) > fx + Alpha * t * dfx){#
+			t = BETA * t;#
+		}#
+		x = x + t * dx;#
+	} #
+	return(x)#
+}#
+#
+shrinkage = function(a, kappa){#
+	z = pmax(0, a - kappa) - pmax(0, -a-kappa); # max() return max for all values, pmax() return parallel max.#
+	return(z)#
+}#
+#
+logreg_Boyd = function(A, b, mu, rho, alpha, N_ITER){#
+	#N_ITER = 2;#
+	ABSTOL = 1e-4; RELTOL = 1e-2;#
+	m = dim(A)[1]; n = dim(A)[2];#
+	x = numeric(n+1);#
+	z = numeric(n+1);#
+	u = numeric(n+1);#
+	history = as.data.frame(matrix(NA, nrow = N_ITER, ncol = 5));#
+	names(history) = c('objval','r_norm','s_norm','eps_pri','eps_dual');#
+	for( k in 1:N_ITER ){#
+		# x update#
+		x = update_x(A, b, u, z, rho);#
+		# z update#
+		zold = z;#
+		x_hat = alpha * x + (1-alpha) * zold;#
+		z = x_hat + u;#
+		#z = x + u;#
+		z[-1] = shrinkage(z[-1], m*mu/rho);#
+		# multiplier update#
+		u = u + ( x_hat - z );#
+		#u = u + ( x - z );#
+		# diagnostics, reporting, termination checks#
+		history$objval[k] = objective(A, b, mu, x, z);#
+		history$r_norm[k] = norm( x - z );#
+		history$s_norm[k] = norm( rho*(z - zold) );#
+		history$eps_pri[k] = sqrt(n) * ABSTOL + RELTOL * max(vnorm(x), vnorm(z));#
+		history$eps_dual[k] = sqrt(n) * ABSTOL + RELTOL * vnorm(rho*u);#
+		if (history$r_norm[k] < history$eps_pri[k] & history$s_norm[k] < history$eps_dual[k]) {#
+			history = history[1:k,]#
+			break;#
+		}#
+	}#
+	return(list(drop(z),history))#
+}#
+#
+mu = 0.05 * sqrt(log(p)/N)#
+ADMMBOY_gd = logreg_Boyd(A, b, mu, rho = 1.0, alpha = 1.0, 10)
+setwd("/Users/guojun/Google Drive/15Summer/Simulation/SPGA-R/SPGA-logistic/Boyd")#
+#setwd("C:/Users/TEMP/Downloads")#
+library(MASS)#
+#library(mvtnorm)#
+#library(MCMCpack)#
+#library(BayesLogit)#
+#
+##Simulate data#
+#
+mylogit = function(x) 1/(1+exp(-x)) # compare with exp(x)/(1+exp(x))#
+vnorm = function(x) sqrt(sum(x^2))#
+#
+N=200; p=50;#
+X = as.matrix(read.table('Xdta'))#
+colnames(X) = NULL#
+y = as.matrix(read.table('Ydta'))#
+b = drop(y)#
+b[which(b==0)] = -1;#
+#
+A = diag(b) %*% X;#
+#
+beta_star = drop(as.matrix(read.table('trBdta')))#
+beta_0 = 1.5;#
+beta_star = c(beta_0, beta_star);
+set.seed(2015)#
+#
+## imitating the functions written in Boyds' implementation#
+#
+objective = function(A, b, mu, x, z){#
+	m = dim(A)[1];#
+	obj = sum(log(1 + exp(-A %*% x[-1] - b * x[1]))) + m * mu * sum(abs(z));#
+	return(obj)#
+}#
+#
+update_x = function(A, b, u, z, rho){#
+	Alpha = 0.1; # this Alpha is for backtracking, not the relaxing parameter.#
+	BETA = 0.5;#
+	TOLERANCE = 1e-5;#
+	MAX_ITER = 50;#
+	m = dim(A)[1]; n = dim(A)[2];#
+	I = diag(n+1);#
+	#if (exists('x0')) { #
+	#	x = x0;#
+	#	}#
+	x = numeric(n+1);#
+	C = cbind(-b, -A);#
+	f = function(argx) (sum(log(1 + exp(C %*% argx))) + (rho/2) * sum((argx - z + u)^2));#
+	for (iter in 1:MAX_ITER){#
+		fx = f(x);#
+		g = t(C) %*% mylogit(C %*% x) + rho * (x - z + u);#
+		H = t(C) %*% diag(as.vector( exp(C %*% x) / (1 + exp(C %*% x))^2 )) %*% C + rho * I;#
+		dx = -solve(H , g);#
+		dfx = t(g) %*% dx;#
+		if(abs(dfx) < TOLERANCE) break;#
+		# backtracking #
+		t = 1;#
+		while(f(x + t * dx) > fx + Alpha * t * dfx){#
+			t = BETA * t;#
+		}#
+		x = x + t * dx;#
+	} #
+	return(x)#
+}#
+#
+shrinkage = function(a, kappa){#
+	z = pmax(0, a - kappa) - pmax(0, -a-kappa); # max() return max for all values, pmax() return parallel max.#
+	return(z)#
+}#
+#
+logreg_Boyd = function(A, b, mu, rho, alpha, N_ITER){#
+	#N_ITER = 2;#
+	ABSTOL = 1e-4; RELTOL = 1e-2;#
+	m = dim(A)[1]; n = dim(A)[2];#
+	x = numeric(n+1);#
+	z = numeric(n+1);#
+	u = numeric(n+1);#
+	history = as.data.frame(matrix(NA, nrow = N_ITER, ncol = 5));#
+	names(history) = c('objval','r_norm','s_norm','eps_pri','eps_dual');#
+	for( k in 1:N_ITER ){#
+		# x update#
+		x = update_x(A, b, u, z, rho);#
+		# z update#
+		zold = z;#
+		x_hat = alpha * x + (1-alpha) * zold;#
+		z = x_hat + u;#
+		z[-1] = shrinkage(z[-1], m*mu/rho);#
+		# multiplier update#
+		u = u + ( x_hat - z );#
+		# diagnostics, reporting, termination checks#
+		history$objval[k] = objective(A, b, mu, x, z);#
+		history$r_norm[k] = norm( x - z );#
+		history$s_norm[k] = norm( rho*(z - zold) );#
+		history$eps_pri[k] = sqrt(n) * ABSTOL + RELTOL * max(vnorm(x), vnorm(z));#
+		history$eps_dual[k] = sqrt(n) * ABSTOL + RELTOL * vnorm(rho*u);#
+		if (history$r_norm[k] < history$eps_pri[k] & history$s_norm[k] < history$eps_dual[k]) {#
+			history = history[1:k,]#
+			break;#
+		}#
+	}#
+	return(list(drop(z),history))#
+}#
+#
+mu = 0.05 * sqrt(log(p)/N)#
+ADMMBOY = logreg_Boyd(A, b, mu, rho = 1.0, alpha = 1.0, 10)
+ADMMBOY[[1]]-ADMMBOY_gd[[1]]
+vnorm(ADMMBOY[[1]]-ADMMBOY_gd[[1]])
+ADMMBOY_gd = logreg_Boyd(A, b, mu, rho = 1.0, alpha = 1.0, 50)
+ADMMBOY = logreg_Boyd(A, b, mu, rho = 1.0, alpha = 1.0, 50)
+vnorm(ADMMBOY[[1]]-ADMMBOY_gd[[1]])
+ADMMBOY_gd[[1]]
+ADMMBOY[[1]]
+update_x = function(A, b, u, z, x, rho){#
+	Alpha = 0.1; # this Alpha is for backtracking, not the relaxing parameter.#
+	BETA = 0.5;#
+	TOLERANCE = 1e-5;#
+	MAX_ITER = 50;#
+	m = dim(A)[1]; n = dim(A)[2];#
+	I = diag(n+1);#
+	#if (exists('x0')) { #
+	#	x = x0;#
+	#	}#
+	#x = numeric(n+1);#
+	C = cbind(-b, -A);#
+	f = function(argx) (sum(log(1 + exp(C %*% argx))) + (rho/2) * sum((argx - z + u)^2));#
+	for (iter in 1:MAX_ITER){#
+		fx = f(x);#
+		g = t(C) %*% mylogit(C %*% x) + rho * (x - z + u);#
+		#H = t(C) %*% diag(as.vector( exp(C %*% x) / (1 + exp(C %*% x))^2 )) %*% C + rho * I;#
+		dx = -g;#
+		dfx = t(g) %*% dx;#
+		if(abs(dfx) < TOLERANCE) break;#
+		# backtracking #
+		t = 1;#
+		while(f(x + t * dx) > fx + Alpha * t * dfx){#
+			t = BETA * t;#
+		}#
+		x = x + t * dx;#
+	} #
+	return(x)#
+}
+ADMMBOY_gd = logreg_Boyd(A, b, mu, rho = 1.0, alpha = 1.0, 50)
+logreg_Boyd = function(A, b, mu, rho, alpha, N_ITER){#
+	#N_ITER = 2;#
+	ABSTOL = 1e-4; RELTOL = 1e-2;#
+	m = dim(A)[1]; n = dim(A)[2];#
+	x = numeric(n+1);#
+	z = numeric(n+1);#
+	u = numeric(n+1);#
+	history = as.data.frame(matrix(NA, nrow = N_ITER, ncol = 5));#
+	names(history) = c('objval','r_norm','s_norm','eps_pri','eps_dual');#
+	for( k in 1:N_ITER ){#
+		# x update#
+		x = update_x(A, b, u, z, x, rho);#
+		# z update#
+		zold = z;#
+		x_hat = alpha * x + (1-alpha) * zold;#
+		z = x_hat + u;#
+		#z = x + u;#
+		z[-1] = shrinkage(z[-1], m*mu/rho);#
+		# multiplier update#
+		u = u + ( x_hat - z );#
+		#u = u + ( x - z );#
+		# diagnostics, reporting, termination checks#
+		history$objval[k] = objective(A, b, mu, x, z);#
+		history$r_norm[k] = norm( x - z );#
+		history$s_norm[k] = norm( rho*(z - zold) );#
+		history$eps_pri[k] = sqrt(n) * ABSTOL + RELTOL * max(vnorm(x), vnorm(z));#
+		history$eps_dual[k] = sqrt(n) * ABSTOL + RELTOL * vnorm(rho*u);#
+		if (history$r_norm[k] < history$eps_pri[k] & history$s_norm[k] < history$eps_dual[k]) {#
+			history = history[1:k,]#
+			break;#
+		}#
+	}#
+	return(list(drop(z),history))#
+}#
+#
+mu = 0.05 * sqrt(log(p)/N)#
+ADMMBOY_gd = logreg_Boyd(A, b, mu, rho = 1.0, alpha = 1.0, 50)
+vnorm(ADMMBOY_gd[[1]] - ADMMBOY[[1]])
+update_x = function(A, b, u, z, rho){#
+	Alpha = 0.1; # this Alpha is for backtracking, not the relaxing parameter.#
+	BETA = 0.5;#
+	TOLERANCE = 1e-5;#
+	MAX_ITER = 50;#
+	m = dim(A)[1]; n = dim(A)[2];#
+	I = diag(n+1);#
+	#if (exists('x0')) { #
+	#	x = x0;#
+	#	}#
+	x = numeric(n+1);#
+	C = cbind(-b, -A);#
+	f = function(argx) (sum(log(1 + exp(C %*% argx))) + (rho/2) * sum((argx - z + u)^2));#
+	for (iter in 1:MAX_ITER){#
+		fx = f(x);#
+		g = t(C) %*% mylogit(C %*% x) + rho * (x - z + u);#
+		#H = t(C) %*% diag(as.vector( exp(C %*% x) / (1 + exp(C %*% x))^2 )) %*% C + rho * I;#
+		dx = -g;#
+		dfx = t(g) %*% dx;#
+		if(abs(dfx) < TOLERANCE) break;#
+		# backtracking #
+		t = 1;#
+		while(f(x + t * dx) > fx + Alpha * t * dfx){#
+			t = BETA * t;#
+		}#
+		x = x + t * dx;#
+	} #
+	return(x)#
+}
+logreg_Boyd = function(A, b, mu, rho, alpha, N_ITER){#
+	#N_ITER = 2;#
+	ABSTOL = 1e-4; RELTOL = 1e-2;#
+	m = dim(A)[1]; n = dim(A)[2];#
+	x = numeric(n+1);#
+	z = numeric(n+1);#
+	u = numeric(n+1);#
+	history = as.data.frame(matrix(NA, nrow = N_ITER, ncol = 5));#
+	names(history) = c('objval','r_norm','s_norm','eps_pri','eps_dual');#
+	for( k in 1:N_ITER ){#
+		# x update#
+		x = update_x(A, b, u, z, rho);#
+		# z update#
+		zold = z;#
+		x_hat = alpha * x + (1-alpha) * zold;#
+		z = x_hat + u;#
+		#z = x + u;#
+		z[-1] = shrinkage(z[-1], m*mu/rho);#
+		# multiplier update#
+		u = u + ( x_hat - z );#
+		#u = u + ( x - z );#
+		# diagnostics, reporting, termination checks#
+		history$objval[k] = objective(A, b, mu, x, z);#
+		history$r_norm[k] = norm( x - z );#
+		history$s_norm[k] = norm( rho*(z - zold) );#
+		history$eps_pri[k] = sqrt(n) * ABSTOL + RELTOL * max(vnorm(x), vnorm(z));#
+		history$eps_dual[k] = sqrt(n) * ABSTOL + RELTOL * vnorm(rho*u);#
+		if (history$r_norm[k] < history$eps_pri[k] & history$s_norm[k] < history$eps_dual[k]) {#
+			history = history[1:k,]#
+			break;#
+		}#
+	}#
+	return(list(drop(z),history))#
+}#
+#
+mu = 0.05 * sqrt(log(p)/N)#
+ADMMBOY_gd = logreg_Boyd(A, b, mu, rho = 1.0, alpha = 1.0, 50)
+vnorm(ADMMBOY_gd[[1]] - ADMMBOY[[1]])
+vnorm(ADMMBOY_gd[[1]] - ADMMBOY[[1]])
+update_x = function(A, b, u, z, rho){#
+	Alpha = 0.1; # this Alpha is for backtracking, not the relaxing parameter.#
+	BETA = 0.5;#
+	TOLERANCE = 1e-5;#
+	MAX_ITER = 50;#
+	m = dim(A)[1]; n = dim(A)[2];#
+	I = diag(n+1);#
+	#if (exists('x0')) { #
+	#	x = x0;#
+	#	}#
+	x = numeric(n+1);#
+	C = cbind(-b, -A);#
+	f = function(argx) (sum(log(1 + exp(C %*% argx))) + (rho/2) * sum((argx - z + u)^2));#
+	for (iter in 1:MAX_ITER){#
+		fx = f(x);#
+		g = t(C) %*% mylogit(C %*% x) + rho * (x - z + u);#
+		#H = t(C) %*% diag(as.vector( exp(C %*% x) / (1 + exp(C %*% x))^2 )) %*% C + rho * I;#
+		dx = -g;#
+		dfx = t(g) %*% dx;#
+		if(abs(dfx) < TOLERANCE) break;#
+		# backtracking #
+		t = 1;#
+		while(f(x + t * dx) > fx + Alpha * t * dfx){#
+			t = BETA * t;#
+		}#
+		x = x + t * dx;#
+	} #
+	return(x)#
+}#
+#
+shrinkage = function(a, kappa){#
+	z = pmax(0, a - kappa) - pmax(0, -a-kappa); # max() return max for all values, pmax() return parallel max.#
+	return(z)#
+}#
+#
+logreg_Boyd = function(A, b, mu, rho, alpha, N_ITER){#
+	#N_ITER = 2;#
+	ABSTOL = 1e-4; RELTOL = 1e-2;#
+	m = dim(A)[1]; n = dim(A)[2];#
+	x = numeric(n+1);#
+	z = numeric(n+1);#
+	u = numeric(n+1);#
+	history = as.data.frame(matrix(NA, nrow = N_ITER, ncol = 5));#
+	names(history) = c('objval','r_norm','s_norm','eps_pri','eps_dual');#
+	for( k in 1:N_ITER ){#
+		# x update#
+		x = update_x(A, b, u, z, rho);#
+		# z update#
+		zold = z;#
+		x_hat = alpha * x + (1-alpha) * zold;#
+		z = x_hat + u;#
+		#z = x + u;#
+		z[-1] = shrinkage(z[-1], m*mu/rho);#
+		# multiplier update#
+		u = u + ( x_hat - z );#
+		#u = u + ( x - z );#
+		# diagnostics, reporting, termination checks#
+		history$objval[k] = objective(A, b, mu, x, z);#
+		history$r_norm[k] = norm( x - z );#
+		history$s_norm[k] = norm( rho*(z - zold) );#
+		history$eps_pri[k] = sqrt(n) * ABSTOL + RELTOL * max(vnorm(x), vnorm(z));#
+		history$eps_dual[k] = sqrt(n) * ABSTOL + RELTOL * vnorm(rho*u);#
+		if (history$r_norm[k] < history$eps_pri[k] & history$s_norm[k] < history$eps_dual[k]) {#
+			history = history[1:k,]#
+			break;#
+		}#
+	}#
+	return(list(drop(z),history))#
+}#
+#
+mu = 0.05 * sqrt(log(p)/N)#
+ADMMBOY_gd = logreg_Boyd(A, b, mu, rho = 1.0, alpha = 1.0, 50)
+vnorm(ADMMBOY_gd[[1]] - ADMMBOY[[1]])
+rm(list=ls())
+setwd("/Users/guojun/Google Drive/15Summer/Simulation/SPGA-R/SPGA-logistic/Boyd/Current")#
+#setwd("C:/Users/TEMP/Downloads")#
+library(MASS)#
+#library(mvtnorm)#
+#library(MCMCpack)#
+#library(BayesLogit)#
+#
+##Simulate data#
+#
+mylogit = function(x) 1/(1+exp(-x)) # compare with exp(x)/(1+exp(x))#
+vnorm = function(x) sqrt(sum(x^2))#
+#
+N=200; p=50;#
+X = as.matrix(read.table('Xdta'))#
+colnames(X) = NULL#
+y = as.matrix(read.table('Ydta'))#
+b = drop(y)#
+b[which(b==0)] = -1;#
+#
+A = diag(b) %*% X;#
+#
+beta_star = drop(as.matrix(read.table('trBdta')))#
+beta_0 = 1.5;#
+beta_star = c(beta_0, beta_star);
+set.seed(2015)#
+#
+## imitating the functions written in Boyds' implementation#
+#
+objective = function(A, b, mu, x, z){#
+	m = dim(A)[1];#
+	obj = sum(log(1 + exp(-A %*% x[-1] - b * x[1]))) + m * mu * sum(abs(z));#
+	return(obj)#
+}#
+#
+update_x = function(A, b, u, z, rho){#
+	Alpha = 0.1; # this Alpha is for backtracking, not the relaxing parameter.#
+	BETA = 0.5;#
+	TOLERANCE = 1e-5;#
+	MAX_ITER = 50;#
+	m = dim(A)[1]; n = dim(A)[2];#
+	I = diag(n+1);#
+	#if (exists('x0')) { #
+	#	x = x0;#
+	#	}#
+	x = numeric(n+1);#
+	C = cbind(-b, -A);#
+	f = function(argx) (sum(log(1 + exp(C %*% argx))) + (rho/2) * sum((argx - z + u)^2));#
+	for (iter in 1:MAX_ITER){#
+		fx = f(x);#
+		g = t(C) %*% mylogit(C %*% x) + rho * (x - z + u);#
+		#H = t(C) %*% diag(as.vector( exp(C %*% x) / (1 + exp(C %*% x))^2 )) %*% C + rho * I;#
+		dx = -g;#
+		dfx = t(g) %*% dx;#
+		if(abs(dfx) < TOLERANCE) break;#
+		# backtracking #
+		t = 1;#
+		while(f(x + t * dx) > fx + Alpha * t * dfx){#
+			t = BETA * t;#
+		}#
+		x = x + t * dx;#
+	} #
+	return(x)#
+}#
+#
+shrinkage = function(a, kappa){#
+	z = pmax(0, a - kappa) - pmax(0, -a-kappa); # max() return max for all values, pmax() return parallel max.#
+	return(z)#
+}#
+#
+logreg_Boyd = function(A, b, mu, rho, alpha, N_ITER){#
+	#N_ITER = 2;#
+	ABSTOL = 1e-4; RELTOL = 1e-2;#
+	m = dim(A)[1]; n = dim(A)[2];#
+	x = numeric(n+1);#
+	z = numeric(n+1);#
+	u = numeric(n+1);#
+	history = as.data.frame(matrix(NA, nrow = N_ITER, ncol = 5));#
+	names(history) = c('objval','r_norm','s_norm','eps_pri','eps_dual');#
+	for( k in 1:N_ITER ){#
+		# x update#
+		x = update_x(A, b, u, z, rho);#
+		# z update#
+		zold = z;#
+		x_hat = alpha * x + (1-alpha) * zold;#
+		z = x_hat + u;#
+		#z = x + u;#
+		z[-1] = shrinkage(z[-1], m*mu/rho);#
+		# multiplier update#
+		u = u + ( x_hat - z );#
+		#u = u + ( x - z );#
+		# diagnostics, reporting, termination checks#
+		history$objval[k] = objective(A, b, mu, x, z);#
+		history$r_norm[k] = norm( x - z );#
+		history$s_norm[k] = norm( rho*(z - zold) );#
+		history$eps_pri[k] = sqrt(n) * ABSTOL + RELTOL * max(vnorm(x), vnorm(z));#
+		history$eps_dual[k] = sqrt(n) * ABSTOL + RELTOL * vnorm(rho*u);#
+		if (history$r_norm[k] < history$eps_pri[k] & history$s_norm[k] < history$eps_dual[k]) {#
+			history = history[1:k,]#
+			break;#
+		}#
+	}#
+	return(list(drop(z),history))#
+}#
+#
+mu = 0.05 * sqrt(log(p)/N)#
+ADMMBOY_gd = logreg_Boyd(A, b, mu, rho = 1.0, alpha = 1.0, 50)
+setwd("/Users/guojun/Google Drive/15Summer/Simulation/SPGA-R/SPGA-logistic/Boyd")#
+#setwd("C:/Users/TEMP/Downloads")#
+library(MASS)#
+#library(mvtnorm)#
+#library(MCMCpack)#
+#library(BayesLogit)#
+#
+##Simulate data#
+#
+mylogit = function(x) 1/(1+exp(-x)) # compare with exp(x)/(1+exp(x))#
+vnorm = function(x) sqrt(sum(x^2))#
+#
+N=200; p=50;#
+X = as.matrix(read.table('Xdta'))#
+colnames(X) = NULL#
+y = as.matrix(read.table('Ydta'))#
+b = drop(y)#
+b[which(b==0)] = -1;#
+#
+A = diag(b) %*% X;#
+#
+beta_star = drop(as.matrix(read.table('trBdta')))#
+beta_0 = 1.5;#
+beta_star = c(beta_0, beta_star);
+set.seed(2015)#
+#
+## imitating the functions written in Boyds' implementation#
+#
+objective = function(A, b, mu, x, z){#
+	m = dim(A)[1];#
+	obj = sum(log(1 + exp(-A %*% x[-1] - b * x[1]))) + m * mu * sum(abs(z));#
+	return(obj)#
+}#
+#
+update_x = function(A, b, u, z, rho){#
+	Alpha = 0.1; # this Alpha is for backtracking, not the relaxing parameter.#
+	BETA = 0.5;#
+	TOLERANCE = 1e-5;#
+	MAX_ITER = 50;#
+	m = dim(A)[1]; n = dim(A)[2];#
+	I = diag(n+1);#
+	#if (exists('x0')) { #
+	#	x = x0;#
+	#	}#
+	x = numeric(n+1);#
+	C = cbind(-b, -A);#
+	f = function(argx) (sum(log(1 + exp(C %*% argx))) + (rho/2) * sum((argx - z + u)^2));#
+	for (iter in 1:MAX_ITER){#
+		fx = f(x);#
+		g = t(C) %*% mylogit(C %*% x) + rho * (x - z + u);#
+		H = t(C) %*% diag(as.vector( exp(C %*% x) / (1 + exp(C %*% x))^2 )) %*% C + rho * I;#
+		dx = -solve(H , g);#
+		dfx = t(g) %*% dx;#
+		if(abs(dfx) < TOLERANCE) break;#
+		# backtracking #
+		t = 1;#
+		while(f(x + t * dx) > fx + Alpha * t * dfx){#
+			t = BETA * t;#
+		}#
+		x = x + t * dx;#
+	} #
+	return(x)#
+}#
+#
+shrinkage = function(a, kappa){#
+	z = pmax(0, a - kappa) - pmax(0, -a-kappa); # max() return max for all values, pmax() return parallel max.#
+	return(z)#
+}#
+#
+logreg_Boyd = function(A, b, mu, rho, alpha, N_ITER){#
+	#N_ITER = 2;#
+	ABSTOL = 1e-4; RELTOL = 1e-2;#
+	m = dim(A)[1]; n = dim(A)[2];#
+	x = numeric(n+1);#
+	z = numeric(n+1);#
+	u = numeric(n+1);#
+	history = as.data.frame(matrix(NA, nrow = N_ITER, ncol = 5));#
+	names(history) = c('objval','r_norm','s_norm','eps_pri','eps_dual');#
+	for( k in 1:N_ITER ){#
+		# x update#
+		x = update_x(A, b, u, z, rho);#
+		# z update#
+		zold = z;#
+		x_hat = alpha * x + (1-alpha) * zold;#
+		z = x_hat + u;#
+		z[-1] = shrinkage(z[-1], m*mu/rho);#
+		# multiplier update#
+		u = u + ( x_hat - z );#
+		# diagnostics, reporting, termination checks#
+		history$objval[k] = objective(A, b, mu, x, z);#
+		history$r_norm[k] = norm( x - z );#
+		history$s_norm[k] = norm( rho*(z - zold) );#
+		history$eps_pri[k] = sqrt(n) * ABSTOL + RELTOL * max(vnorm(x), vnorm(z));#
+		history$eps_dual[k] = sqrt(n) * ABSTOL + RELTOL * vnorm(rho*u);#
+		if (history$r_norm[k] < history$eps_pri[k] & history$s_norm[k] < history$eps_dual[k]) {#
+			history = history[1:k,]#
+			break;#
+		}#
+	}#
+	return(list(drop(z),history))#
+}#
+#
+mu = 0.05 * sqrt(log(p)/N)#
+ADMMBOY = logreg_Boyd(A, b, mu, rho = 1.0, alpha = 1.0, 50)
+vnorm(ADMMBOY_gd[[1]]-ADMMBOY[[1]])
+ADMMBOY_gd = logreg_Boyd(A, b, mu, rho = 1.0, alpha = 1.0, 10)
+ADMMBOY = logreg_Boyd(A, b, mu, rho = 1.0, alpha = 1.0, 10)
+vnorm(ADMMBOY_gd[[1]]-ADMMBOY[[1]])
+ADMMBOY_gd = logreg_Boyd(A, b, mu, rho = 1.0, alpha = 1.0, 50)
+ADMMBOY = logreg_Boyd(A, b, mu, rho = 1.0, alpha = 1.0, 50)
+vnorm(ADMMBOY_gd[[1]]-ADMMBOY[[1]])
+logreg_Boyd = function(A, b, mu, rho, alpha, N_ITER){#
+	#N_ITER = 2;#
+	ABSTOL = 1e-4; RELTOL = 1e-2;#
+	m = dim(A)[1]; n = dim(A)[2];#
+	x = numeric(n+1);#
+	z = numeric(n+1);#
+	u = numeric(n+1);#
+	history = as.data.frame(matrix(NA, nrow = N_ITER, ncol = 5));#
+	names(history) = c('objval','r_norm','s_norm','eps_pri','eps_dual');#
+	for( k in 1:N_ITER ){#
+		# x update#
+		x = update_x(A, b, u, z, rho);#
+		# z update#
+		zold = z;#
+		#x_hat = alpha * x + (1-alpha) * zold;#
+		#z = x_hat + u;#
+		z = x + u;#
+		z[-1] = shrinkage(z[-1], m*mu/rho);#
+		# multiplier update#
+		#u = u + ( x_hat - z );#
+		u = u + ( x - z );#
+		# diagnostics, reporting, termination checks#
+		history$objval[k] = objective(A, b, mu, x, z);#
+		history$r_norm[k] = norm( x - z );#
+		history$s_norm[k] = norm( rho*(z - zold) );#
+		history$eps_pri[k] = sqrt(n) * ABSTOL + RELTOL * max(vnorm(x), vnorm(z));#
+		history$eps_dual[k] = sqrt(n) * ABSTOL + RELTOL * vnorm(rho*u);#
+		if (history$r_norm[k] < history$eps_pri[k] & history$s_norm[k] < history$eps_dual[k]) {#
+			history = history[1:k,]#
+			break;#
+		}#
+	}#
+	return(list(drop(z),history))#
+}
+ADMMBOY_gd = logreg_Boyd(A, b, mu, rho = 1.0, alpha = 1.0, 50)
+vnorm(ADMMBOY_gd[[1]]-ADMMBOY[[1]])
+ADMMBOY = logreg_Boyd(A, b, mu, rho = 1.0, alpha = 1.0, 50)
+ADMMBOY_gd = logreg_Boyd(A, b, mu, rho = 1.0, alpha = 1.0, 50)
+vnorm(ADMMBOY_gd[[1]]-ADMMBOY[[1]])
+rm(list=ls())
+setwd("/Users/guojun/Google Drive/15Summer/Simulation/SPGA-R/SPGA-logistic/Boyd/Current")#
+#setwd("C:/Users/TEMP/Downloads")#
+library(MASS)#
+#library(mvtnorm)#
+#library(MCMCpack)#
+#library(BayesLogit)#
+#
+##Simulate data#
+#
+mylogit = function(x) 1/(1+exp(-x)) # compare with exp(x)/(1+exp(x))#
+vnorm = function(x) sqrt(sum(x^2))#
+#
+N=200; p=50;#
+X = as.matrix(read.table('Xdta'))#
+colnames(X) = NULL#
+y = as.matrix(read.table('Ydta'))#
+b = drop(y)#
+b[which(b==0)] = -1;#
+#
+A = diag(b) %*% X;#
+#
+beta_star = drop(as.matrix(read.table('trBdta')))#
+beta_0 = 1.5;#
+beta_star = c(beta_0, beta_star);
+set.seed(2015)#
+#
+## imitating the functions written in Boyds' implementation#
+#
+objective = function(A, b, mu, x, z){#
+	m = dim(A)[1];#
+	obj = sum(log(1 + exp(-A %*% x[-1] - b * x[1]))) + m * mu * sum(abs(z));#
+	return(obj)#
+}#
+#
+update_x = function(A, b, u, z, rho){#
+	Alpha = 0.1; # this Alpha is for backtracking, not the relaxing parameter.#
+	BETA = 0.5;#
+	TOLERANCE = 1e-5;#
+	MAX_ITER = 50;#
+	m = dim(A)[1]; n = dim(A)[2];#
+	I = diag(n+1);#
+	#if (exists('x0')) { #
+	#	x = x0;#
+	#	}#
+	x = numeric(n+1);#
+	C = cbind(-b, -A);#
+	f = function(argx) (sum(log(1 + exp(C %*% argx))) + (rho/2) * sum((argx - z + u)^2));#
+	for (iter in 1:MAX_ITER){#
+		fx = f(x);#
+		g = t(C) %*% mylogit(C %*% x) + rho * (x - z + u);#
+		#H = t(C) %*% diag(as.vector( exp(C %*% x) / (1 + exp(C %*% x))^2 )) %*% C + rho * I;#
+		dx = -g;#
+		dfx = t(g) %*% dx;#
+		if(abs(dfx) < TOLERANCE) break;#
+		# backtracking #
+		t = 1;#
+		while(f(x + t * dx) > fx + Alpha * t * dfx){#
+			t = BETA * t;#
+		}#
+		x = x + t * dx;#
+	} #
+	return(x)#
+}#
+#
+shrinkage = function(a, kappa){#
+	z = pmax(0, a - kappa) - pmax(0, -a-kappa); # max() return max for all values, pmax() return parallel max.#
+	return(z)#
+}#
+#
+logreg_Boyd = function(A, b, mu, rho, alpha, N_ITER){#
+	#N_ITER = 2;#
+	ABSTOL = 1e-4; RELTOL = 1e-2;#
+	m = dim(A)[1]; n = dim(A)[2];#
+	x = numeric(n+1);#
+	z = numeric(n+1);#
+	u = numeric(n+1);#
+	history = as.data.frame(matrix(NA, nrow = N_ITER, ncol = 5));#
+	names(history) = c('objval','r_norm','s_norm','eps_pri','eps_dual');#
+	for( k in 1:N_ITER ){#
+		# x update#
+		x = update_x(A, b, u, z, rho);#
+		# z update#
+		zold = z;#
+		#x_hat = alpha * x + (1-alpha) * zold;#
+		#z = x_hat + u;#
+		z = x + u;#
+		z[-1] = shrinkage(z[-1], m*mu/rho);#
+		# multiplier update#
+		#u = u + ( x_hat - z );#
+		u = u + ( x - z );#
+		# diagnostics, reporting, termination checks#
+		history$objval[k] = objective(A, b, mu, x, z);#
+		history$r_norm[k] = norm( x - z );#
+		history$s_norm[k] = norm( rho*(z - zold) );#
+		history$eps_pri[k] = sqrt(n) * ABSTOL + RELTOL * max(vnorm(x), vnorm(z));#
+		history$eps_dual[k] = sqrt(n) * ABSTOL + RELTOL * vnorm(rho*u);#
+		if (history$r_norm[k] < history$eps_pri[k] & history$s_norm[k] < history$eps_dual[k]) {#
+			history = history[1:k,]#
+			break;#
+		}#
+	}#
+	return(list(drop(z),history))#
+}#
+#
+mu = 0.05 * sqrt(log(p)/N)#
+ADMMBOY_gd = logreg_Boyd(A, b, mu, rho = 1.0, alpha = 1.0, 50)
+setwd("/Users/guojun/Google Drive/15Summer/Simulation/SPGA-R/SPGA-logistic/Boyd")#
+#setwd("C:/Users/TEMP/Downloads")#
+library(MASS)#
+#library(mvtnorm)#
+#library(MCMCpack)#
+#library(BayesLogit)#
+#
+##Simulate data#
+#
+mylogit = function(x) 1/(1+exp(-x)) # compare with exp(x)/(1+exp(x))#
+vnorm = function(x) sqrt(sum(x^2))#
+#
+N=200; p=50;#
+X = as.matrix(read.table('Xdta'))#
+colnames(X) = NULL#
+y = as.matrix(read.table('Ydta'))#
+b = drop(y)#
+b[which(b==0)] = -1;#
+#
+A = diag(b) %*% X;#
+#
+beta_star = drop(as.matrix(read.table('trBdta')))#
+beta_0 = 1.5;#
+beta_star = c(beta_0, beta_star);
+set.seed(2015)#
+#
+## imitating the functions written in Boyds' implementation#
+#
+objective = function(A, b, mu, x, z){#
+	m = dim(A)[1];#
+	obj = sum(log(1 + exp(-A %*% x[-1] - b * x[1]))) + m * mu * sum(abs(z));#
+	return(obj)#
+}#
+#
+update_x = function(A, b, u, z, rho){#
+	Alpha = 0.1; # this Alpha is for backtracking, not the relaxing parameter.#
+	BETA = 0.5;#
+	TOLERANCE = 1e-5;#
+	MAX_ITER = 50;#
+	m = dim(A)[1]; n = dim(A)[2];#
+	I = diag(n+1);#
+	#if (exists('x0')) { #
+	#	x = x0;#
+	#	}#
+	x = numeric(n+1);#
+	C = cbind(-b, -A);#
+	f = function(argx) (sum(log(1 + exp(C %*% argx))) + (rho/2) * sum((argx - z + u)^2));#
+	for (iter in 1:MAX_ITER){#
+		fx = f(x);#
+		g = t(C) %*% mylogit(C %*% x) + rho * (x - z + u);#
+		H = t(C) %*% diag(as.vector( exp(C %*% x) / (1 + exp(C %*% x))^2 )) %*% C + rho * I;#
+		dx = -solve(H , g);#
+		dfx = t(g) %*% dx;#
+		if(abs(dfx) < TOLERANCE) break;#
+		# backtracking #
+		t = 1;#
+		while(f(x + t * dx) > fx + Alpha * t * dfx){#
+			t = BETA * t;#
+		}#
+		x = x + t * dx;#
+	} #
+	return(x)#
+}#
+#
+shrinkage = function(a, kappa){#
+	z = pmax(0, a - kappa) - pmax(0, -a-kappa); # max() return max for all values, pmax() return parallel max.#
+	return(z)#
+}#
+#
+logreg_Boyd = function(A, b, mu, rho, alpha, N_ITER){#
+	#N_ITER = 2;#
+	ABSTOL = 1e-4; RELTOL = 1e-2;#
+	m = dim(A)[1]; n = dim(A)[2];#
+	x = numeric(n+1);#
+	z = numeric(n+1);#
+	u = numeric(n+1);#
+	history = as.data.frame(matrix(NA, nrow = N_ITER, ncol = 5));#
+	names(history) = c('objval','r_norm','s_norm','eps_pri','eps_dual');#
+	for( k in 1:N_ITER ){#
+		# x update#
+		x = update_x(A, b, u, z, rho);#
+		# z update#
+		zold = z;#
+		x_hat = alpha * x + (1-alpha) * zold;#
+		z = x_hat + u;#
+		z[-1] = shrinkage(z[-1], m*mu/rho);#
+		# multiplier update#
+		u = u + ( x_hat - z );#
+		# diagnostics, reporting, termination checks#
+		history$objval[k] = objective(A, b, mu, x, z);#
+		history$r_norm[k] = norm( x - z );#
+		history$s_norm[k] = norm( rho*(z - zold) );#
+		history$eps_pri[k] = sqrt(n) * ABSTOL + RELTOL * max(vnorm(x), vnorm(z));#
+		history$eps_dual[k] = sqrt(n) * ABSTOL + RELTOL * vnorm(rho*u);#
+		if (history$r_norm[k] < history$eps_pri[k] & history$s_norm[k] < history$eps_dual[k]) {#
+			history = history[1:k,]#
+			break;#
+		}#
+	}#
+	return(list(drop(z),history))#
+}#
+#
+mu = 0.05 * sqrt(log(p)/N)#
+ADMMBOY = logreg_Boyd(A, b, mu, rho = 1.0, alpha = 1.0, 50)
+vnorm(ADMMBOY[[1]]-ADMMBOY_gd[[1]])
+setwd("/Users/guojun/Google Drive/406_Lab_Prep/Lab12 & HW9")
+rm(list=ls())
+setwd("/Users/guojun/Google Drive/406_Lab_Prep/Lab12 & HW9")
+load("lab12.Rdata")#
+# what does the data look like#
+head(sampledata)
+setwd("/Users/guojun/Google Drive/15Fall/homework/lab8")
+load("lab8.Rdata")
+head(sampledata)
+n = dim(sampledata)[1]#
+#
+## calculate lambda-hat#
+lambda.hat = n/sum(x*y)
+n = dim(sampledata)[1]#
+x = sampledata[,1]#
+y = sampledata[,2]#
+#
+## calculate lambda-hat#
+lambda.hat = n/sum(x*y)
+lambda.hat
+B = 50
+lambda.hat.pboot = c() # save the estimated lambda.hat for each bootstrapped sample#
+for (i in 1:B){#
+	y.sample = c()#
+	for (j in 1:n){#
+		y.sample[j] = rexp(1,lambda.hat*x[j])#
+	}  #
+	lambda.hat.pboot[i] = n/sum(x*y.sample)#
+}#
+## bias#
+mean(lambda.hat.pboot)-lambda.hat#
+## variance#
+var(lambda.hat.pboot)
+mean(lambda.hat.pboot)-lambda.hat#
+## variance#
+var(lambda.hat.pboot)#
+# MSE#
+mean((lambda.hat.pboot - lambda.hat)^2)
+# bias#
+mean(lambda.hat.pnpboot)-lambda.hat#
+# variance#
+var(lambda.hat.pnpboot)#
+# MSE#
+mean((lambda.hat.pboot - lambda.hat)^2)
+lambda.hat.pnpboot = c() # save the estimated lambda.hat for each bootstrapped sample#
+for (i in 1:B){#
+	y.sample = c()#
+	for (j in 1:n){#
+		xsample.id = sample(1:n,size=n, replace=TRUE)#
+		y.sample[j] = rexp(1,lambda.hat*x[xsample.id[j]])#
+	}  #
+	lambda.hat.pnpboot[i] = n/sum(x*y.sample)#
+}#
+# bias#
+mean(lambda.hat.pnpboot)-lambda.hat#
+# variance#
+var(lambda.hat.pnpboot)#
+# MSE#
+mean((lambda.hat.pboot - lambda.hat)^2)
+lambda.hat.pnpboot = c() # save the estimated lambda.hat for each bootstrapped sample#
+for (i in 1:B){#
+	y.sample = c()#
+	for (j in 1:n){#
+		xsample.id = sample(1:n,size=n, replace=TRUE)#
+		y.sample[j] = rexp(1,lambda.hat*x[xsample.id[j]])#
+	}  #
+	lambda.hat.pnpboot[i] = n/sum(x[xsample.id]*y.sample)#
+}#
+# bias#
+mean(lambda.hat.pnpboot)-lambda.hat#
+# variance#
+var(lambda.hat.pnpboot)#
+# MSE#
+mean((lambda.hat.pboot - lambda.hat)^2)
+lambda.hat.pnpboot = c() # save the estimated lambda.hat for each bootstrapped sample#
+for (i in 1:B){#
+	y.sample = c()#
+	xsample.id = sample(1:n,size=n, replace=TRUE)#
+	x.sample = x[xsample.id]#
+	for (j in 1:n){#
+		y.sample[j] = rexp(1,lambda.hat*x.sample[j])#
+	}  #
+	lambda.hat.pnpboot[i] = n/sum(x.sample*y.sample)#
+}#
+# bias#
+mean(lambda.hat.pnpboot)-lambda.hat#
+# variance#
+var(lambda.hat.pnpboot)#
+# MSE#
+mean((lambda.hat.pboot - lambda.hat)^2)
+mean((lambda.hat.pnpboot - lambda.hat)^2)
+lambda.hat.npboot = c() #
+for (i in 1:B){#
+	sample.id = sample(1:n,size=n, replace=TRUE)#
+	lambda.hat.npboot[i] = n/sum(x[sample.id]*y[sample.id])#
+}#
+## bias#
+mean(lambda.hat.npboot)-lambda.hat#
+## variance#
+var(lambda.hat.npboot)#
+# MSE#
+mean((lambda.hat.npboot - lambda.hat)^2)

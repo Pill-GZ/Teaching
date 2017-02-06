@@ -1,0 +1,41 @@
+---
+title: 'Data wrangling:  Exercise 2'
+output:
+  html_notebook: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Daily precipitation has been collected for 56 weather stations in the Colorado Front Range and made available as a R list contained in the binary R file [FrontRange.RData](./data/FrontRange.RData). Use the command
+
+```{r eval=FALSE}
+load("./data/FrontRange.RData")
+```
+
+to load the data set (called `FR`) in R. 
+
+The data set FR is a list with 4 components "precip", "time", "info" and "Stot". The components "precip" and "times" are also lists, whereas "info" is a data frame and "Stot" is a vector. 
+
+(1) The list "precip" has 56 components, one for each station. `FR$precip[[i]]` thus has all the daily rainfalls recorded for the i-th station. 
+
+(2) In a similar structure, the component "time" of FR hold the dates at which the rainfalls are recorded. 
+
+(3) The component "info" is a data frame with various information on the stations (longitude, latitude, elevation, number of records, plus some other variables that are not so important for us here). 
+
+(4) Finally, the component "Stot" is a vector that contains the mean summer precipitation for each station.
+
+Explore the dataset. Answer the following questions:
+
+a. Are the number of entries recorded by each station the same?
+
+b. Find the station at the highest elevation and the station at the lowest elevation. Plot the daily rainfalls over time recorded by
+these two stations. What do you think is happening with the data after 1980?
+
+c. For each of the two stations identified above, what is the proportion of days with 10mm of rain or more?
+
+d. Write a function to find for a given station, the date of the record highest amount of precipitation.
+
+e. Do you see any relationship between precipitation and elevation? What about between air pressure in summer and precipitation?

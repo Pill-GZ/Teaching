@@ -1,0 +1,288 @@
+\documentclass[12pt]{article}
+\setlength{\oddsidemargin}{0.0in} \setlength{\evensidemargin}{0.0in}
+\setlength{\textwidth}{6.5in} \setlength{\topmargin}{-0.25in}
+\setlength{\textheight}{8.75in}
+\usepackage{amsmath, amssymb, amsfonts, amscd, xspace, pifont, natbib}
+\usepackage{epsfig, amsfonts, verbatim, multirow}
+\usepackage{epstopdf}
+%\usepackage{setspace}
+\newcommand{\mycite}[1]{{\citeNP{#1}}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Different font in captions
+\newcommand{\captionfonts}{\small}
+\makeatletter  % Allow the use of @ in command names
+\long\def\@makecaption#1#2{%
+  \vskip\abovecaptionskip
+  \sbox\@tempboxa{{\captionfonts #1: #2}}%
+  \ifdim \wd\@tempboxa >\hsize
+    {\captionfonts #1: #2\par}
+  \else
+    \hbox to\hsize{\hfil\box\@tempboxa\hfil}%
+  \fi
+  \vskip\belowcaptionskip}
+\makeatother   % Cancel the effect of \makeatletter
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Matrix, Vector
+\newcommand{\V}[1]{\ensuremath{\boldsymbol{#1}}\xspace}
+\newcommand{\M}[1]{\ensuremath{\boldsymbol{#1}}\xspace}
+%% Math Functions
+\newcommand{\F}[1]{\ensuremath{\mathrm{#1}}\xspace}
+\newcommand{\sgn}{\F{sgn}}
+\newcommand{\tr}{\F{trace}}
+\newcommand{\diag}{\F{diag}}
+\newcommand{\dett}{\F{det}}
+%% Transpose
+\newcommand{\T}[1]{\ensuremath{{#1}^{\mbox{\sf\tiny T}}}}
+
+%%
+\def\bX{\boldsymbol X}
+\def\bY{\boldsymbol Y}
+\def\bbeta{\boldsymbol \beta}
+\def\blambda{\boldsymbol \lambda}
+\def\bepsilon{\boldsymbol \epsilon}
+\def\bone{\boldsymbol{1}}
+\def\bzero{\boldsymbol 0}
+\def\E{\mbox{E}}
+\def\var{\mbox{var}}
+\def\gauss{\mbox{N}}
+\def\lap{\mbox{L}}
+\def\G{\mbox{G}}
+\def\go{\rightarrow}
+\def\invG{\mbox{G}^{-1}}
+\def\argmin{\arg\min}
+
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}{Proposition}
+\newtheorem{lemma}{Lemma}
+\newtheorem{corollary}{Corollary}
+\newtheorem{algorithm}{Algorithm}
+\newtheorem{definition}{Definition}
+\newtheorem{remark}{Remark}
+
+
+\begin{document}
+
+%\baselineskip = 1.\baselineskip
+%\baselineskip = 2.0\baselineskip
+%\doublespacing
+
+%\begin{titlepage}
+\title{\Large \bf STATS 406F15 Lab 08}
+\date{}
+
+\maketitle
+%\bigskip
+%\bigskip
+
+%\newpage
+%\par\noindent
+%{\sc Summary. \\
+
+%\bigskip
+%\medskip
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%555555555555555555555555555555555555555555555555555555555555555555555555555555555555555
+%\par\noindent
+%GLasso; Precision matrix; Spectral clustering; Commute similarity.
+
+%\thispagestyle{empty}
+%\end{titlepage}
+
+%\setcounter{equation}{0}
+
+\section{Monte-Carlo Sampling to Estimate Bias and MSE}
+The most common choice for evaluating estimator precision is the mean squared error,
+$$MSE (\hat{\theta}) = E ( ( \hat{\theta} - \theta)^2).$$
+
+\noindent
+Example: Suppose $X_1, X_2, \ldots, X_n$ are iid $N(\theta, \theta^2)$ and we are interested in estimation of $\theta$. Two reasonable estimators are the sample mean $\widehat{\theta}_1 = \frac{1}{n} \sum_{i=1}^n X_i$ and the sample standard deviation $\widehat{\theta}_2 = \sqrt{\frac{1}{n-1} \sum_{i=1}^n (X_i - \overline{X})^2}$. Use Monte-Carlo to compare the bias and MSE of the two estimators. 
+
+To compare these two estimators by Monte Carlo for a specific $n$ and $\theta$:
+
+\begin{enumerate}
+	\item Generate $X_1, \ldots, X_n \sim N(\theta, \theta^2)$
+	\item Calculate $\hat{\theta}_1$ and $\hat{\theta}_2$. This gives you one realization. 
+	\item Repeat steps 1-2  $k$ many times.
+	 \item Then the means of the $(\hat{\theta}_1 - \theta)^2$'s and $(\hat{\theta}_2 - \theta)^2$'s, over the $k$ replicates, are the Monte Carlo estimators of the MSEs (likewise for Bias). 
+\end{enumerate}
+
+
+\subsection*{Solution:}
+
+
+\begin{verbatim}
+## Number of replicates
+num_replicate <- 1000
+## Number of samples
+n <- 50
+## Different thetas
+thetas <- seq(0.5, 10, by=0.1)
+num_theta <- length(thetas)
+
+## Initialize MSEs
+MSE <- matrix(0, num_theta, 2)
+## Initialize bias
+bias <- matrix(0, num_theta, 2)
+
+for (i in seq(1, num_theta))
+{
+    ## Generate the data for all replications, each row is a replication
+    D <- matrix(rnorm(n*num_replicate, mean=thetas[i], sd=thetas[i]), n, num_replicate)
+
+    ## Theta_hat estimted by mean
+    Thetahat1 <- apply(D, 2, mean)
+
+    ## Theta_hat estimted by standard deviation
+    Thetahat2 <- apply(D, 2, sd)
+
+    ## Record MSEs
+    MSE[i, 1] <- mean((Thetahat1 - thetas[i])^2)
+    MSE[i, 2] <- mean((Thetahat2 - thetas[i])^2)
+
+    ## Record bias
+    bias[i, 1] <- mean(Thetahat1 - thetas[i])
+    bias[i, 2] <- mean(Thetahat2 - thetas[i])
+}
+
+## Plot MSEs
+plot(thetas, MSE[, 1], xlab=quote(theta), ylab='MSE', type='l', col=1)
+lines(thetas, MSE[, 2], lty=2, col=2)
+
+## Plot bias
+plot(thetas, bias[, 1], xlab=quote(theta), ylab='bias', type='l', col=1)
+lines(thetas, bias[, 2], lty=2, col=2)
+
+
+\end{verbatim}
+
+\noindent
+Exercise: Let $ X_1, \ldots, X_n \sim Uniform (0,\theta)$. Two estimates of theta are $\hat{\theta}_1 = 2 \bar{X}_n$ and $ \hat{\theta}_2 = \frac{n+1}{n} \max(X_1, \ldots, X_n )$. Compare their MSEs.
+
+
+%\begin{figure}[ht]\center
+%  % Requires \usepackage{graphicx}
+%  \includegraphics[width=12cm]{fig_Q1_MSE.eps}
+%  %\caption{Histogram.}
+%\end{figure}
+%
+%\begin{figure}[ht]\center
+%  % Requires \usepackage{graphicx}
+%  \includegraphics[width=12cm]{fig_Q1_bias.eps}
+%  %\caption{Histogram.}
+%\end{figure}
+\section{Bootstrap}
+\noindent
+Example(Parametric Bootstrap): Suppose $X_1, \ldots, X_n$ are i.i.d. $N(\mu,1)$. An estimate of $\mu$ is $\bar{X}$. So a reasonable estimate of $\theta = \mu^2$ could be $\hat{\theta} = \bar{X}^2$. Write a function that estimates the bias and MSE of $\hat{\theta}$ for a choice of $\mu$ through bootstrap and for $n =20$. Plot the bias and MSE averaged over several (say 100) realizations for different values of $\mu$. 
+
+\noindent
+Algorithm:
+For a fixed $\mu$
+\begin{enumerate}
+	\item Generate a sample $X = \{ X_1, \ldots, X_{20} \}$ from $N(\mu, 1)$.
+  \item Compute $\hat{\theta}(X) = \bar{X}^2$ 
+\item For $i$ = 1 up to B (say 1000) where B is the number of bootstrap samples being generated:
+\begin{enumerate}
+	\item Generate a bootstrap sample $X^i = \{ X^i_1, \ldots , X^i_n \} $ from $N ( \bar{X} , 1)$
+
+\item Compute $\hat{\theta}^i = \bar{X^i}^2$.
+\end{enumerate}
+\item Estimate MSE  $E(\hat{\theta} - \theta)^2$ by
+$$ \frac{1}{B} \sum_{i=1}^B (\hat{\theta}^i - \hat{\theta})^2 $$ 
+and bias by
+$$ \frac{1}{B} \sum_{i=1}^B (\hat{\theta}^i - \hat{\theta}) $$ 
+\end{enumerate}
+Run this for different choices of $\mu$ and over several replications report the averages. 
+
+\subsection*{Solution:}
+
+\vspace{10cm}
+Exercise: Compute the MSE and Bias when $\theta = |\mu|$ is estimated using $\hat{\theta} = |\bar{X}|$.
+
+\noindent
+Example (Non-parametric Bootstrap): Suppose we observe iid values $X_1, \ldots ,X_n$ that are uniformly distributed on the interval
+(0, $a$), where $a > 0$ is an unknown constant. We can estimate a using the maximum value
+of the sample:
+$\hat{a} = \max(X_1, . . . ,X_n)$.
+Since $\hat{a} < a$ it has negative bias. The relative bias is
+$$\frac{E\hat{a} - a}{a}$$
+
+It is a fact that the relative bias in this setting is $-1/(n + 1)$.
+
+\begin{verbatim}
+## Number of simulation replications.
+nrep = 100
+## Number of bootstrap samples.
+nboot = 1000
+## Population value of the upper limit of the uniform distribution.
+a = 2
+## Sample sizes.
+SS = c(5,10,20)
+## Storage for the bias estimates.
+Bias = NULL
+## Loop over the sample sizes.
+for (k in 1:3) {
+## The sample size for the current iteration.
+n = SS[k]
+bias = NULL
+for (r in 1:nrep) {
+## Generate a sample from the uniform population.
+X = runif(n, max=a)
+## Generate non-parametric bootstrap samples.
+ii = ceiling(n*runif(nboot*n))
+Xboot = X[ii]   
+Xboot = array(Xboot, c(nboot, n))
+##  Xboot = array(sample(x,n*nboot, replace= TRUE), c(nboot, n)) also works
+## The bootstrap estimate of the relative bias.
+MX = apply(Xboot, 1, max)
+bias[r] = (mean(MX) - max(X))/max(X)
+}
+## The overall estimate of the relative bias.
+Bias[k] = mean(bias)
+}
+\end{verbatim}
+
+
+\section{Bootstrap confidence intervals}
+
+A major advantage of the bootstrap is that it can be applied to any estimation problem, not just estimation of the expected value. 
+It is also very easy to apply. But it may not necessarily have good coverage
+properties. Here is an example where we check the coverage probabilities. 
+
+\begin{verbatim}
+## Sample sizes.
+N = c(10,20,40,60)
+nrep = 1000 ## Number of simulation replications per sample size value.
+nboot = 1000 ## The number of bootstrap data sets.
+## Coverage probabilities.
+CP = NULL
+for (j in 1:length(N))
+{
+## Keep track of how many times the interval covers the true value.
+nc = 0
+n = N[j]
+for (k in 1:nrep)
+{
+## Simulate a data set.
+X = rnorm(n)
+## Generate bootstrap data sets from X.
+ii = ceiling(n*runif(n*nboot))
+B = X[ii]
+B = array(B, c(nboot,n))
+## Get the sample mean for each bootstrap data set.
+M = apply(B, 1, mean)
+M = sort(M)
+## Get the confidence interval lower and upper bound.
+C = c(M[25], M[975])
+## Check for coverage.
+if ( (C[1] < 0) & (C[2] > 0) ) { nc = nc+1 }
+}
+CP[j] = nc/nrep
+}
+\end{verbatim}
+
+
+
+
+\end{document}

@@ -1,0 +1,503 @@
+\documentclass[12pt]{article}
+\setlength{\oddsidemargin}{0.0in} \setlength{\evensidemargin}{0.0in}
+\setlength{\textwidth}{6.5in} \setlength{\topmargin}{-0.25in}
+\setlength{\textheight}{8.75in}
+\usepackage{amsmath, amssymb, amsfonts, amscd, xspace, pifont, natbib}
+\usepackage{epsfig, amsfonts, verbatim, multirow}
+\usepackage{epstopdf}
+%\usepackage{setspace}
+\newcommand{\mycite}[1]{{\citeNP{#1}}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Different font in captions
+\newcommand{\captionfonts}{\small}
+\makeatletter  % Allow the use of @ in command names
+\long\def\@makecaption#1#2{%
+  \vskip\abovecaptionskip
+  \sbox\@tempboxa{{\captionfonts #1: #2}}%
+  \ifdim \wd\@tempboxa >\hsize
+    {\captionfonts #1: #2\par}
+  \else
+    \hbox to\hsize{\hfil\box\@tempboxa\hfil}%
+  \fi
+  \vskip\belowcaptionskip}
+\makeatother   % Cancel the effect of \makeatletter
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Matrix, Vector
+\newcommand{\V}[1]{\ensuremath{\boldsymbol{#1}}\xspace}
+\newcommand{\M}[1]{\ensuremath{\boldsymbol{#1}}\xspace}
+%% Math Functions
+\newcommand{\F}[1]{\ensuremath{\mathrm{#1}}\xspace}
+\newcommand{\sgn}{\F{sgn}}
+\newcommand{\tr}{\F{trace}}
+\newcommand{\diag}{\F{diag}}
+\newcommand{\dett}{\F{det}}
+%% Transpose
+\newcommand{\T}[1]{\ensuremath{{#1}^{\mbox{\sf\tiny T}}}}
+
+%%
+\def\bX{\boldsymbol X}
+\def\bY{\boldsymbol Y}
+\def\bbeta{\boldsymbol \beta}
+\def\blambda{\boldsymbol \lambda}
+\def\bepsilon{\boldsymbol \epsilon}
+\def\bone{\boldsymbol{1}}
+\def\bzero{\boldsymbol 0}
+\def\E{\mbox{E}}
+\def\var{\mbox{var}}
+\def\gauss{\mbox{N}}
+\def\lap{\mbox{L}}
+\def\G{\mbox{G}}
+\def\go{\rightarrow}
+\def\invG{\mbox{G}^{-1}}
+\def\argmin{\arg\min}
+
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}{Proposition}
+\newtheorem{lemma}{Lemma}
+\newtheorem{corollary}{Corollary}
+\newtheorem{algorithm}{Algorithm}
+\newtheorem{definition}{Definition}
+\newtheorem{remark}{Remark}
+
+
+\begin{document}
+
+%\baselineskip = 1.\baselineskip
+%\baselineskip = 2.0\baselineskip
+%\doublespacing
+
+%\begin{titlepage}
+\title{\Large \bf STATS 406W14 Lab 11}
+\date{}
+
+\maketitle
+%\bigskip
+%\bigskip
+
+%\newpage
+%\par\noindent
+%{\sc Summary. \\
+
+%\bigskip
+%\medskip
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%555555555555555555555555555555555555555555555555555555555555555555555555555555555555555
+%\par\noindent
+%GLasso; Precision matrix; Spectral clustering; Commute similarity.
+
+%\thispagestyle{empty}
+%\end{titlepage}
+
+\section{Recap: SQL }
+
+\begin{itemize}
+	\item RSQLite package helps with the database
+handling functionality.
+
+\begin{verbatim}
+install.packages("RSQLite", dependencies=T)
+\end{verbatim}
+
+\item To use the installed RSQLite package you would type
+\begin{verbatim}
+library(RSQLite)
+\end{verbatim}
+
+\item Reading in and initializing databases in R:
+\begin{itemize}
+	\item Specify that we are using the SQLite database handler to connect to the database, say baseball.db:
+\begin{verbatim}
+# the database driver is called SQLite
+drive <- dbDriver("SQLite")
+
+# establish a connection with the baseball database
+connect <- dbConnect(drive, "baseball.db")
+\end{verbatim}
+
+\item To see the various tables:
+\begin{verbatim}
+dbListTables(connect)
+\end{verbatim}
+
+\item to see what variables are stored
+in the "Salaries" table you would type
+\begin{verbatim}
+dbListFields(connect, "Salaries")
+[1] "yearID" "teamID" "lgID" "playerID" "salary"
+\end{verbatim}
+\item To obtain one entire table: 
+\begin{verbatim}
+Salaries = dbReadTable(connect, "Salaries")
+\end{verbatim}
+\end{itemize}
+\item Querying databases in R:
+\begin{itemize}
+	\item A query, or search, has the basic syntax:
+\begin{verbatim}
+dbGetQuery(dbconnection, SQLline)
+\end{verbatim}
+\item The basic psuedocode for the second argument of dbGetQuery is
+\begin{verbatim}
+"SELECT column(s) from table(s) WHERE constraint(s)"
+
+e.g.,
+
+# Extract player IDs from table Allstar for AL players after 1972
+D.AL1972 <- dbGetQuery(connect,
+"SELECT playerID from Allstar WHERE lgID in (’AL’) AND yearID>1972")
+
+\end{verbatim}
+\end{itemize}
+\end{itemize}
+
+\noindent
+A few more SQL options:
+\begin{itemize}
+	\item Ordering the results (ORDER BY):
+\begin{verbatim}
+SELECT  name, stock price
+FROM    Company
+WHERE   country=“USA” AND stockPrice > 50
+ORDERBY country, name
+\end{verbatim}
+Ordering is ascending, unless you specify the DESC keyword.
+Ties are broken by the second attribute on the ORDERBY list, etc.
+\item Aggregation (SUM)
+\begin{verbatim}
+SELECT  Sum(price)
+FROM      Product
+WHERE   manufacturer=“Toyota”
+\end{verbatim}
+SQL supports several aggregation operations:
+
+SUM, MIN, MAX, AVG, COUNT
+
+
+\item Extracting data from two tables (Joins):
+e.g., Two tables
+\begin{verbatim}
+Product (name,  price, category, maker)
+Purchase (buyer,  seller,  store,  product)
+\end{verbatim}
+
+\begin{verbatim}
+SELECT   name, store
+FROM      Person, Purchase
+WHERE    name=buyer AND city=“Seattle”
+                  AND product=“gizmo”
+
+\end{verbatim}
+
+
+\item Grouping and Aggregation (GROUP BY)
+\begin{verbatim}
+SELECT       product, Sum(price)
+FROM          Product,  Purchase
+WHERE       Product.name = Purchase.product
+GROUPBY  Product.name
+\end{verbatim}
+The above finds out how much was sold of every product.
+
+\item Subqueries:
+\begin{verbatim}
+SELECT  Company.name
+ FROM   Company, Product
+ WHERE  Company.name=maker
+        AND  Product.name  IN
+                          (SELECT product
+                           FROM   Purchase
+                           WHERE  buyer = “John Doe”);
+\end{verbatim}
+
+
+\end{itemize}
+
+\noindent
+Example: Open database baseball.db. Using R interface for SQLite database to do the following manipulations:
+\begin{enumerate}
+  \item Check which tables are involved.
+  \item From table ``Master'', for each college, compute the average weight and height of the players born after 1980.
+  \item From table ``Master'', select field birthyear for those rows where players come from ``Michigan'' or ``Michigan State''.
+  \item From table ``Master'', compute the number of players born in each year.      
+\end{enumerate}
+
+\begin{verbatim}
+
+library('RSQLite')
+
+## Set up the connection
+drv=dbDriver("SQLite")
+conn=dbConnect(drv,"baseball.db")
+
+## Like at what tables we have
+dbListTables(conn)
+
+## For each table, look at what fields there are
+dbListFields(conn,"Master")
+dbListFields(conn,"Teams")
+
+## From table Master, compute the average weight of the players from
+## each college and were born after 1980
+dt1 = dbGetQuery(conn, "SELECT college, AVG(weight), AVG(height) from Master
+where birthYear>1980 GROUP BY college")
+
+## From table Master, select field birthyear for those rows
+## where players come from Michigan or Michigan State
+dt2 = dbGetQuery(conn,"SELECT birthYear from Master where
+college in ('Michigan','Michigan State')")
+
+## From table Master, compute the number of players born in each year
+dt3 = dbGetQuery(conn, "SELECT birthYear, COUNT(playerID)
+from Master GROUP BY birthYear")
+
+
+## Close the connection
+dbDisconnect(conn)
+dbUnloadDriver(drv)
+\end{verbatim}
+
+
+\section{ A few things about XML}
+\begin{itemize}
+	\item XML is widely used for exchanging information on the World Wide
+Web. It stands for eXtensible Markup Language. 
+\item The user can define his own structure according to his purpose.
+
+\item Markup Language is a system of how the document is to be described or
+logically structured, e.g., HTML and XML.
+HTML is used for displaying data on the web browser,
+XML is used for carrying data on the web.
+
+\item Structure of XML
+\begin{itemize}
+	\item Declaration: XML document declaration includes the information of the XML
+version (and can also include info on how it is encoded, document type definition etc.)
+\begin{verbatim}
+<?xml version=”1.0”?>
+\end{verbatim}
+Any instructions
+declared between $<?$ and $?>$ is called as processing instruction.
+	\item Comments: Comments are used to inform the user of XML data or help the grader understand your code.
+	All XML comments begin with $<!--$ and close with $-->$.
+
+\begin{verbatim}
+<!-- This is a comment -->
+\end{verbatim}
+	
+	\item Elements and Attributes: Elements contain the actual data of XML document. Elements
+must have a start-tag and an end-tag which contain the element’s
+name. The content sits between these two tags. Elements have a
+tree-based data structure.
+
+\begin{verbatim}
+<?xml version = “1.0” ?>
+<BARS> <!-- This is a root tag -->
+  <BAR id = "412"><NAME>Joe’s Bar</NAME>
+    <BEER><NAME>Bud</NAME>
+     <PRICE>2.50</PRICE></BEER>
+    <BEER><NAME>Miller</NAME>
+      <PRICE>3.00</PRICE></BEER>
+  </BAR>
+	
+	<BAR>...
+	...
+	... 
+</BARS> <!-- This is the end of the  root tag -->
+\end{verbatim}
+In the example above, BARS is the root, BAR are the children/elements, BEERS are sub-elements etc. 
+There is one root per XML document. 
+
+In the start-tag of the BAR element, there is one piece of
+information, id. The information in the start-tag is called Attribute. The value of attribute must be quoted, using either single
+quotes or double quotes. 
+
+\noindent
+\begin{verbatim}
+<element_name attribute_name = "attribute value"> Content </element_name>
+\end{verbatim}
+
+\item Entities: Entities are often used in XML to represent single special characters which either are not easily typed or have a preassingned meaning in the language (e.g. $>$ and $<$). Entity reference consists of the type $"\& entity_name; "$Some special characters’ entity values are predefined. For
+example, the ampersand is defined as $"\& amp ;"$. Undefined special
+characters can also be defined (Later).
+
+
+\end{itemize}
+\item Parse XML data: A parser is a component  of the complier which checks for correct syntax and builds a data structure. The R package XML provides the required parser and extends R’s capability in processing
+XML files.
+
+\begin{verbatim}
+## Load the library and parse the XML file
+library(XML)
+doc <- xmlTreeParse('people.xml')
+\end{verbatim}
+
+\item Extracting the root:
+\begin{verbatim}
+root <- xmlRoot(doc)
+\end{verbatim}
+
+\item Extract all the children of the first child of the root:
+\begin{verbatim}
+ch <- xmlChildren(root[[1]])
+\end{verbatim}
+
+
+\item Get the name of the first node:
+\begin{verbatim}
+xmlName(root[[1]])
+[1] "person"
+\end{verbatim}
+
+\item Extract all the children of the first child of the root:
+\begin{verbatim}
+
+ch <- xmlChildren(root[[1]])
+ch
+$role
+<role type="rep" startdate="2009-01-06" enddate="2010-03-01" party="Democrat" 
+state="HI" district="1" url="http://www.house.gov/abercrombie"/>
+
+attr(,"class")
+[1] "XMLNodeList"
+
+\end{verbatim}
+
+\item Get the attributes 
+\begin{verbatim}
+
+ xmlAttrs(root[[1]])
+                               id                          lastname 
+                         "400001"                     "Abercrombie" 
+                        firstname                          birthday 
+                           "Neil"                      "1938-06-26" 
+                           gender                             pvsid 
+                              "M"                           "26827" 
+                             osid                        bioguideid 
+                      "N00007665"                         "A000014" 
+                        metavidid                         youtubeid 
+               "Neil_Abercrombie"                      "hawaiirep1" 
+                             name                             title 
+"Rep. Neil Abercrombie [D, HI-1]"                            "Rep." 
+                            state                          district 
+                             "HI"                               "1" 
+
+\end{verbatim}
+
+\item Get the value of a particular attribute (return NULL if no value specified)
+\begin{verbatim}
+ xmlGetAttr(root[[1]], 'state')
+[1] "HI"
+\end{verbatim}
+
+\item Apply a function to each child of the root
+\begin{verbatim}
+xmlSApply(root,xmlGetAttr,'state')
+\end{verbatim}
+
+
+
+\end{itemize}
+
+
+\section{Extract Data From XML Documents (Next Class)}
+In XML document ``people.xml'', extract the following features and pack them in a data frame:
+\begin{verbatim}
+id
+lastname
+firstname
+state
+party
+committee
+\end{verbatim}
+Note that the last item ``committee'' involves all codes of committees a congressman/woman belongs to.
+
+
+\begin{verbatim}
+
+rm(list=ls(all=TRUE))
+
+## Function to extract selected attributes for each child of root
+myproc <- function(x, attrs1, attrs2)
+{
+    ## Initialize the
+    output <- NULL
+    ## Number of attributes
+    L1 <- length(attrs1)
+    L2 <- length(attrs2)
+
+    ## Extract selected attributes from <person ...>
+    for (i in seq(1, L1))
+    {
+        if (!(is.null(xmlGetAttr(x, attrs1[i]))))
+        {
+            output <- c(output, xmlGetAttr(x, attrs1[i]))
+        }else
+        {
+            output <- c(output, NA)
+        }
+    }
+
+    ## Extract selected attributes from <role ...>
+    ch <- xmlChildren(x)$role
+    if (!is.null(ch))    ## Check if <role> exists
+    {
+        for (i in seq(1, L2))
+        {
+            if (!(is.null(xmlGetAttr(ch, attrs2[i]))))
+            {
+                output <- c(output, xmlGetAttr(ch, attrs2[i]))
+            }else
+            {
+                output <- c(output, NA)
+            }
+        }
+    }else
+    {
+        output <- c(output, NA, NA)
+    }
+
+    ## Extract selected attributes from <committee-assignment ...>
+    num1 <- length(x)
+    tmpout <- NULL
+    flag <- 0    ## A flag indicating the existence of <committee-assignment ...>
+    for (k in seq(1, num1))  ## Scan each child of <person>
+    {
+        if (xmlName(x[[k]]) == 'committee-assignment')
+        {
+            flag <- 1
+            tmpout <- paste(tmpout, xmlGetAttr(x[[k]], 'code'))
+        }
+    }
+    if (flag == 0)
+    {
+        tmpout <- 'NA'
+    }
+    output <- c(output, tmpout)
+    return(output)
+}
+
+
+## Load the library and parse the XML file
+library(XML)
+doc <- xmlTreeParse('people.xml')
+root <- xmlRoot(doc)
+
+## Selected attributes in <person>
+myattr1 <- c('id', 'lastname', 'firstname')
+## Selected attributes in <role>
+myattr2 <- c('state', 'party')
+
+## Apply the function "myproc" and extract the attributes
+tmp1 <- xmlSApply(root, myproc, myattr1, myattr2)
+tmp1 <- t(tmp1)
+rownames(tmp1) <- NULL
+dt <- as.data.frame(tmp1)
+
+#print(dt)
+
+\end{verbatim}
+
+
+\end{document}

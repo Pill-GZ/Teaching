@@ -1,0 +1,319 @@
+\documentclass[11pt]{article}
+\setlength{\oddsidemargin}{0.0in} \setlength{\evensidemargin}{0.0in}
+\setlength{\textwidth}{6.5in} \setlength{\topmargin}{-0.25in}
+\setlength{\textheight}{8.75in}
+\usepackage{amsmath, amssymb, amsfonts, amsthm, amscd, xspace, pifont, natbib, fullpage, enumitem, bm, bbm}
+\usepackage{fullpage}
+\usepackage{graphicx, float}
+\usepackage{epsfig, amsfonts, verbatim, multirow, hyperref}
+\usepackage{epstopdf}
+\usepackage{listings, boxedminipage}
+
+\lstset{
+	basicstyle=\ttfamily,
+	mathescape
+}
+%\usepackage{setspace}
+\newcommand{\mycite}[1]{{\citeNP{#1}}}
+
+\parindent=0pt
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Different font in captions
+\newcommand{\captionfonts}{\small}
+\makeatletter  % Allow the use of @ in command names
+\long\def\@makecaption#1#2{%
+	\vskip\abovecaptionskip
+	\sbox\@tempboxa{{\captionfonts #1: #2}}%
+	\ifdim \wd\@tempboxa >\hsize
+	{\captionfonts #1: #2\par}
+	\else
+	\hbox to\hsize{\hfil\box\@tempboxa\hfil}%
+	\fi
+	\vskip\belowcaptionskip}
+\makeatother   % Cancel the effect of \makeatletter
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Matrix, Vector
+\newcommand{\V}[1]{\ensuremath{\boldsymbol{#1}}\xspace}
+\newcommand{\M}[1]{\ensuremath{\boldsymbol{#1}}\xspace}
+%% Math Functions
+\newcommand{\F}[1]{\ensuremath{\mathrm{#1}}\xspace}
+\newcommand{\sgn}{\F{sgn}}
+\newcommand{\tr}{\F{trace}}
+\newcommand{\diag}{\F{diag}}
+\newcommand{\dett}{\F{det}}
+%% Transpose
+\newcommand{\T}[1]{\ensuremath{{#1}^{\mbox{\sf\tiny T}}}}
+
+%%
+\def  \R  {\boldsymbol R}
+\def\bX{\boldsymbol X}
+\def\bY{\boldsymbol Y}
+\def\bbeta{\boldsymbol \beta}
+\def\blambda{\boldsymbol \lambda}
+\def\bepsilon{\boldsymbol \epsilon}
+\def\bone{\boldsymbol{1}}
+\def\bzero{\boldsymbol 0}
+\def\E{\mbox{E}}
+\def\var{\mbox{var}}
+\def\gauss{\mbox{N}}
+\def\lap{\mbox{L}}
+\def\G{\mbox{G}}
+\def\go{  $\R$  ightarrow}
+\def\invG{\mbox{G}^{-1}}
+\def\argmin{\arg\min}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}{Proposition}
+\newtheorem{lemma}{Lemma}
+\newtheorem{corollary}{Corollary}
+\newtheorem{algorithm}{Algorithm}
+\newtheorem{definition}{Definition}
+\newtheorem{remark}{Remark}
+
+\usepackage{color}
+\usepackage[dvipsnames]{xcolor}
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+\lstdefinestyle{displaycode}{
+	backgroundcolor=\color{backcolour},   
+	commentstyle=\color{codegreen},
+	keywordstyle=\color{magenta},
+	numberstyle=\tiny\color{codegray},
+	stringstyle=\color{codepurple},
+	basicstyle=\footnotesize,
+	breakatwhitespace=false,         
+	breaklines=true,                 
+	captionpos=b,                    
+	keepspaces=true,                 
+	columns=flexible,
+	numbers=none,
+	numbersep=5pt,                  
+	showspaces=false,                
+	showstringspaces=false,
+	showtabs=false,                  
+	tabsize=2%,
+	%xleftmargin=2em,
+	%xrightmargin=2em,
+} 
+\lstdefinestyle{displaycode2}{
+	backgroundcolor=\color{backcolour},   
+	commentstyle=\color{red},
+	keywordstyle=\color{magenta},
+	numberstyle=\tiny\color{codegray},
+	stringstyle=\color{codepurple},
+	basicstyle=\footnotesize,
+	breakatwhitespace=false,         
+	breaklines=true,                 
+	captionpos=b,                    
+	keepspaces=true,                 
+	columns=flexible,
+	numbers=none,
+	numbersep=5pt,                  
+	showspaces=false,                
+	showstringspaces=false,
+	showtabs=false,                  
+	tabsize=2%,
+	%xleftmargin=2em,
+	%xrightmargin=2em,
+} 
+
+\lstset{style=displaycode}
+%\newcommand{\displaycodefile}[1]{\lstinputlisting[language=R]{./codeblocks/#1.txt}}
+
+\newcommand{\pr}{\mathbb{P}}
+\newcommand{\ep}{\mathbb{E}}
+\renewcommand{\var}{\textrm{Var}}
+
+\renewcommand{\thefootnote}{\fnsymbol{footnote}}
+\newcommand{\x}{\bm{x}}
+\newcommand{\X}{\bm{X}}
+\newcommand{\td}{\textrm{d}}
+
+\newcommand{\tblue}[1]{\textcolor{blue}{#1}}
+\newcommand{\tred}[1]{\textcolor{red}{#1}}
+\newcommand{\tplum}[1]{\textcolor{Plum}{#1}}
+\newcommand{\tcyan}[1]{\textcolor{Cyan}{#1}}
+\newcommand{\taqua}[1]{\textcolor{Aquamarine}{#1}}
+
+\newcommand{\CAL}[1]{{\cal #1}}
+
+\newcommand{\sumoveri}{\sum_{i=1}^n}
+\newcommand{\EpZi}{\langle Z_i \rangle}
+
+\begin{document}
+\title{\Large \bf STATS 406 F15: Lab 12\\Final Review Questions}
+\date{}
+
+\maketitle
+
+\begin{enumerate}
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	\item {\bf R coding.}
+	\begin{enumerate}
+		\item Suppose we have a vector $x$ of length $n$ stored in memory, write a few lines of R code that uses vectorization to perform the following transformation $T(x_i)$ on each element of $x$:
+		$$
+			T(u)=\begin{cases}
+				-1 &   \textrm{ if } u<-1\\
+				3u+1 & \textrm{ if } -1\leq u <1\\
+				1  &   \textrm{ if } u\geq 1
+			\end{cases}
+		$$
+		\item Suppose we have an integer vector:
+		\begin{verbatim}
+		y = c(1,2,3,5,1);
+		\end{verbatim}
+		What are the outputs of the following commands:
+		\begin{itemize}
+			\item \begin{verbatim}y[c(1,2)]	\end{verbatim}
+			\item \begin{verbatim}y[y==1]	\end{verbatim}
+			\item \begin{verbatim}y[-c(1,3)]	\end{verbatim}
+			\item \begin{verbatim}y + c(1,2)	\end{verbatim}
+			\item \begin{verbatim}which.max(y)	\end{verbatim}
+			\item \begin{verbatim}as.list(y)[1]	\end{verbatim}
+		\end{itemize}
+	\end{enumerate}
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	\item {\bf Random number generation.}
+	\begin{enumerate}
+		\item\label{Cauchy} Recall that the standard Cauchy distribution has PDF and CDF as follows:
+		\begin{align*}
+			f(x) &= \frac{1}{\pi(1+x^2)}\\
+			F(x) &= \frac{1}{\pi}\arctan(x)+\frac{1}{2}
+		\end{align*}
+		If we are only allowed access to a Uniform~$(0, 1)$ random number generator, how to sample from the standard Cauchy distribution?
+		\item Write a block of R code to sample from the Geometric(p) distribution, whose PMF is:
+		$$
+			\ep(X=k) = p(1-p)^{k-1}
+		$$
+		for $k=1,2,3,...$
+		\item Given the following CDF of a random variable supported on $[0, 1]$:
+		$$
+		F(x)=\begin{cases}
+		\sin(\pi x) & \textrm{ if } 0\leq x\leq \frac{1}{2}\\
+		0			& \textrm{ if } x<0\\
+		1			& \textrm{ if } x>\frac{1}{2}
+		\end{cases}
+		$$
+		Describe the steps of a rejection sampling to sample from $F(x)$. Notice here you are given a CDF.
+	\end{enumerate}
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	\item {\bf Monte-Carlo integration.}
+	\begin{enumerate}
+		\item Describe the steps to compute
+		$$
+			I:=\int_1^{+\infty} \frac{1}{x^2}\td x
+		$$
+		Using Monte-Carlo integration.
+		\item Describe the steps to compute $\ep[Y]$, where
+		$$
+			Y=\begin{cases}
+				X^3 & \textrm{ if } X>0\\
+				0 & \textrm{ otherwise}
+			\end{cases}
+		$$
+		and $X\sim N(0, 1)$, using importance sampling with an exponential distribution as the auxiliary distribution. Choose a proper $\lambda$ parameter for your exponential distribution. 
+		\item Suppose the random variable $X>0$ follows a distribution with PDF as follows:
+		$$
+		f_X(x)\propto \exp\left(-x^{3/2}\right)
+		$$
+		How to use a proper form of importance sampling to compute $\ep[X]$?
+	\end{enumerate}
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	\item {\bf Monte-Carlo performance evaluation and bootstrap.} Suppose we collect a sample $X:=\{X_1,\ldots,X_n\}$ from $N(\mu, 1)$, where the true $\mu=1$. Consider the following estimator for $\mu^2$:
+	$$
+	\widehat{\mu^2} = \left(\bar{X}\right)^2
+	$$
+	\begin{enumerate}
+		\item What is the mathematical definition of MSE$(\widehat{\mu^2})$?
+		\item If we know the true $\mu=1$, how to compute MSE$(\widehat{\mu^2})$?
+		\item If we do not know the true $\mu$, how to estimate MSE$(\widehat{\mu^2})$?
+	\end{enumerate}
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	\newpage
+	\item {\bf SQL.} The database contains the following three tables:
+	\begin{table}[H]
+		\centering
+		\caption{Composers}
+		\begin{tabular}{cccc}\hline
+			ID & Composer & Era & Country\\\hline
+			1  & JS Bach  & Baroque & Germany\\
+			2  & WA Mozart & Classical & Austria\\
+			3  & LV Beethoven & Classical, Romantic & Germany\\
+			4  & FF Chopin & Romantic & Poland\\\hline
+		\end{tabular}
+		\caption{Works}
+		\begin{tabular}{cccc}\hline
+			Work ID & Title & Composer & Pianist\\\hline
+			001 & Well-Temptered Clavier & JS Bach & Glenn Gould\\
+			002 & Goldberg Variations & JS Bach & Glenn Gould\\
+			003 & Italian Concerto & JS Bach & Sviatoslav Richter\\
+			004 & Complete Solo Piano Works & WA Mozart & Walter Gieseking\\
+			005 & Piano Sonata No. 18 & WA Mozart & Claudio Arrau\\
+			006 & Piano Concerto No. 20 & WA Mozart & Friedrich Gulda\\
+			007 & Piano Sontat No. 12 & LV Beethoven & Emil Gilels\\
+			008 & Piano Sonata No. 57 & LV Beethoven & Friedrich Gulda\\
+			009 & Waltzes & FF Chopin & Claudio Arrau\\
+			010 & Etudes & FF Chopin & Sviatoslav Richter\\\hline
+		\end{tabular}
+		\caption{Pianists}
+		\begin{tabular}{ccc}\hline
+			ID & Pianist & Country\\\hline
+			1 & Glenn Gould & Canada\\
+			2 & Sviatoslav Richter & Soviet\\
+			3 & Walter Gieseking & Germany\\
+			4 & Claudio Arrau & Chile\\
+			5 & Friedrich Gulda & Austria\\
+			6 & Emil Gilels & Soviet\\\hline
+		\end{tabular}
+	\end{table}
+	Write lines of SQL commands that complete each of the following tasks:
+	\begin{enumerate}
+		\item Query all \emph{pianists} from \emph{Soviet}. Only report \emph{pianist} and \emph{country}.
+		\item Query all \emph{works} performed by \emph{Glenn Gould}. Only report \emph{title} and \emph{composer}.
+		\item Combine tables \emph{Composers} and \emph{Works} and query works played by European(including Soviet) pianists. Only report \emph{title}, \emph{era}, \emph{composer} and \emph{pianist}.
+		\item Combine all three tables and query works composed by \emph{Germany composers} and performed by \emph{Soviet pianists}. Only report \emph{title}, \emph{composer} and \emph{pianist}.
+	\end{enumerate}
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	\item {\bf XML.} Rewrite the following entry, transforming the attributes into children:
+	\begin{verbatim}
+	<book Title="The Return of The Native" Author="Thomas Hardy" Published year="1878" />
+	\end{verbatim}
+	Consider the rewritten version: write an R command (assume the package ``XML'' is loaded) to query the content of the \emph{Author} tag.
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	\item {\bf Optimization.}
+	\begin{enumerate}
+		\item We want to minimize the following function:
+		$$
+		f(x, y) := x^2 + 4(y-1)^2
+		$$
+		Start at the initial guess $(x,y)=(2, 3)$.
+		\begin{enumerate}
+			\item Describe a gradient method to find the optimum. Calculate the first two iterations. Use a fixed step size of $0.5$.
+			\item Describe a Newton's method to find the optimum. Calculate the first two iterations.
+		\end{enumerate}
+		\item\label{ForEM} Consider a mixture of Poisson distributions. There are 3 Poisson distributions, with $\lambda=\lambda_1, \lambda_2, \lambda_3$ respectively, where $\lambda_i$'s are mutually different. The mixing probabilities $(\pi_1, \pi_2, \pi_3)$ are strictly positive and unknown. We have a set of collected data $X:=\{ X_1,\ldots,X_n \}$, and recall the PMF of Poisson distribution with rate $\lambda$:
+		$$
+			\pr\left(X=k\right) = \frac{\lambda_k}{k!}e^{-\lambda}
+		$$
+		\begin{enumerate}
+			\item Write down the (incomplete) log-likelihood function.
+			\item Describe (without explicitly formulating any step) how to obtain the MLE for the parameters $\Theta:=(\lambda_1, \lambda_2, \lambda_3, \pi_1, \pi_2, \pi_3)$ directly using optimization tools.
+		\end{enumerate}
+	\end{enumerate}
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	\item {\bf EM algorithm.} Continuing Question \ref{ForEM}, describe the EM algorithm for estimating the set of parameters $\Theta$.
+\end{enumerate}
+
+\end{document}

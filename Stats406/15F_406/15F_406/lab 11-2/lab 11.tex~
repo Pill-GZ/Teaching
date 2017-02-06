@@ -1,0 +1,356 @@
+\documentclass[12pt]{article}
+\setlength{\oddsidemargin}{0.0in} \setlength{\evensidemargin}{0.0in}
+\setlength{\textwidth}{6.5in} \setlength{\topmargin}{-0.25in}
+\setlength{\textheight}{8.75in}
+\usepackage{amsmath, amssymb, amsfonts, amscd, xspace, pifont, natbib}
+\usepackage{epsfig, amsfonts, verbatim, multirow}
+\usepackage{epstopdf}
+%\usepackage{setspace}
+\newcommand{\mycite}[1]{{\citeNP{#1}}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Different font in captions
+\newcommand{\captionfonts}{\small}
+\makeatletter  % Allow the use of @ in command names
+\long\def\@makecaption#1#2{%
+  \vskip\abovecaptionskip
+  \sbox\@tempboxa{{\captionfonts #1: #2}}%
+  \ifdim \wd\@tempboxa >\hsize
+    {\captionfonts #1: #2\par}
+  \else
+    \hbox to\hsize{\hfil\box\@tempboxa\hfil}%
+  \fi
+  \vskip\belowcaptionskip}
+\makeatother   % Cancel the effect of \makeatletter
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Matrix, Vector
+\newcommand{\V}[1]{\ensuremath{\boldsymbol{#1}}\xspace}
+\newcommand{\M}[1]{\ensuremath{\boldsymbol{#1}}\xspace}
+%% Math Functions
+\newcommand{\F}[1]{\ensuremath{\mathrm{#1}}\xspace}
+\newcommand{\sgn}{\F{sgn}}
+\newcommand{\tr}{\F{trace}}
+\newcommand{\diag}{\F{diag}}
+\newcommand{\dett}{\F{det}}
+%% Transpose
+\newcommand{\T}[1]{\ensuremath{{#1}^{\mbox{\sf\tiny T}}}}
+
+%%
+\def\bX{\boldsymbol X}
+\def\bY{\boldsymbol Y}
+\def\bbeta{\boldsymbol \beta}
+\def\blambda{\boldsymbol \lambda}
+\def\bepsilon{\boldsymbol \epsilon}
+\def\bone{\boldsymbol{1}}
+\def\bzero{\boldsymbol 0}
+\def\E{\mbox{E}}
+\def\var{\mbox{var}}
+\def\gauss{\mbox{N}}
+\def\lap{\mbox{L}}
+\def\G{\mbox{G}}
+\def\go{\rightarrow}
+\def\invG{\mbox{G}^{-1}}
+\def\argmin{\arg\min}
+
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}{Proposition}
+\newtheorem{lemma}{Lemma}
+\newtheorem{corollary}{Corollary}
+\newtheorem{algorithm}{Algorithm}
+\newtheorem{definition}{Definition}
+\newtheorem{remark}{Remark}
+
+
+\begin{document}
+
+%\baselineskip = 1.\baselineskip
+%\baselineskip = 2.0\baselineskip
+%\doublespacing
+
+%\begin{titlepage}
+\title{\Large \bf STATS 406F15 Lab 11}
+\date{}
+
+\maketitle
+%\bigskip
+%\bigskip
+
+%\newpage
+%\par\noindent
+%{\sc Summary. \\
+
+%\bigskip
+%\medskip
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%555555555555555555555555555555555555555555555555555555555555555555555555555555555555555
+%\par\noindent
+%GLasso; Precision matrix; Spectral clustering; Commute similarity.
+
+%\thispagestyle{empty}
+%\end{titlepage}
+
+%\setcounter{equation}{0}
+
+\section{Optimization using the optim function}
+
+\subsection*{Problem 1}
+
+Suppose $X_1, \ldots, X_n$ are i.i.d. $N(\mu, \sigma^2)$, where both $\mu$ and $\sigma^2$ are unknown. We will compute the MLE for parameters $(\mu, \sigma^2)$. The log-likelihood is:
+$$l(\mu, \sigma^2) = -\frac{n}{2} \log(2 \pi ) -\frac{1}{2} (n \log(\sigma^2 ) + \frac{1}{\sigma^2} \sum_{i=1}^n (x_i - \mu)^2) \ .$$
+Generate data with $\mu=2$ and $\sigma^2=4$.
+
+\subsection*{Solution}
+
+\begin{verbatim}
+
+## Simulate 100 data points from Normal distribution with mu=2, sigma^2=4
+X <- rnorm(100, mean=2, sd=sqrt(4))
+n <- 100
+
+# likelihood t[1]: mu, t[2]: sigma^2
+# if sigma < 0 return Inf, instead of NaN.
+f <- function(t)
+{print(X)
+    if( t[2] > 0)
+    {
+        return( -sum( dnorm(X, mean=t[1], sd=sqrt(t[2]), log=TRUE) ) )
+    } else
+    {
+        return(Inf)
+    }
+}
+
+# gradient function
+
+
+
+## Run optim() 
+objoptim <- optim(par=c(0, 1), fn=f, gr=df, method='BFGS')
+print(objoptim$par)
+
+\end{verbatim}
+
+\section{Newton-Raphson methods}
+\subsection*{Newton's method for solving $f(x)=0$}
+
+$$
+y=f(x_{0})+f'(x_{0})(x-x_{0})
+$$
+The tangent line crosses $0$ when $y=0$, which happens when
+$$
+f(x_{0})=-f'(x_{0})(x-x_{0})
+$$
+rearranging terms approporiately, we find that
+$$
+x=x_{0}-f(x_{0})/f'(x_{0})
+$$
+Now setting $x_{0}=x$ and repeating until convergence is essentially Newton $\mathrm{s}$ method. We can see graphically how this works with the function: $f(x)=e^{x}-5$
+
+\subsection*{Solution}
+
+\begin{verbatim}
+# f and f'
+f <- function(x) exp(x)-5
+df <- function(x) exp(x)
+# make the initial plot
+v <- seq(0,4,length=1000)
+plot(v,f(v),type="l",col=8)
+abline(h=0)
+# start point
+x0 <- 3.5
+# paste this repeatedly to see Newton's method work
+segments(x0,0,x0,f(x0),col=2,lty=3)
+slope <- df(x0)
+g <- function(x) f(x0) + slope*(x - x0)
+v = seq(x0 - f(x0)/df(x0),x0,length=1000)
+lines(v,g(v),lty=3,col=4)
+x0 <- x0 - f(x0)/df(x0)
+\end{verbatim}
+
+\subsection*{Newton's method for finding where $f(x)$ is at its maximum}
+
+We can write this as a generic function in R as follows.
+\begin{verbatim}
+# f: the function you want the max of
+# df: derivative of f; d2f: second derivative
+# x0: start value, tol: convergence criterion
+# maxit: max # of iterations before it is considered to have failed
+newton <- function(x0, f, df, d2f, tol=1e-4, pr=FALSE){
+  # iteration counter
+  k <- 0
+  # initial function, derivatives, and x values
+  fval <- f(x0)
+  grad <- df(x0)
+  hess <- d2f(x0)
+  xk_1 <- x0
+  cond1 <- sqrt(sum(grad^2))
+  cond2 <- Inf
+  # see if the starting value is already close enough
+  if( (cond1 < tol) ) return(x0)
+  while( (cond1 > tol) & (cond2 > tol) )
+  {
+    L <- 1
+    bool <- TRUE
+    while(bool == TRUE){
+      xk <- xk_1 - L * solve(hess) %*% grad
+      # see if we've found an uphill step
+      if( f(xk) > fval ){
+        bool = FALSE
+        grad <- df(xk)
+        fval <- f(xk)
+        hess <- d2f(xk)
+        # make the stepsize a little smaller
+      } 
+      else {
+        L = L/2
+        if( abs(L) < 1e-20 ) return("Failed to find uphill step - try new start val")
+      }
+    }
+    # calculate convergence criteria
+    cond1 <- sqrt( sum(grad^2) )
+    cond2 <- sqrt( sum( (xk-xk_1)^2 ))/(tol + sqrt(sum(xk^2)))
+    # add to counter and update x
+    k <- k + 1
+    xk_1 <- xk
+  }
+  if(pr == TRUE) print( sprintf("Took %i iterations", k) )
+  return(xk)
+}
+\end{verbatim}
+
+\subsection*{Problem 2}
+
+Let $f(x)=e^{-(x^{2})}$. It is easy to see that $f^{\prime}(x)=-2xf(x)$ and $f^{\prime\prime}(x)=-2f(x)-2xf^{\prime}(x)$. 
+Now we code each of these functions and call the newton $()$ function:
+\subsection*{Solution}
+\begin{verbatim}
+
+
+
+
+# Newton's method starting at x0 = 2/3
+newton(2/3, f, df, d2f, 1e-7)
+\end{verbatim}
+
+
+The maximum at $0$ appears to have been found.
+\subsection*{Problem 3}
+Suppose $X_{1}$, . . . , $X_{n}$ are iid $N(\mu,\ \sigma^{2})$ where both $\mu$ and $\sigma^{2}$ are unknown. We will write a program to do maximum likelihood estimation for $\theta=(\mu,\ \sigma^{2})$. The log-likelihood is
+$$
+l(\mu,\ \sigma^{2})=-\frac{1}{2}[n\ \log(2\pi\sigma^{2})+\frac{1}{\sigma^{2}}\sum_{i=1}^{n}(x_{i}-\mu)^{2}]
+$$
+so the elements of the gradient are
+$$
+\frac{\partial l}{\partial\mu}=\frac{1}{\sigma^{2}}\sum_{i=1}^{n}(x_{i}-\mu)
+$$
+and
+$$
+\frac{\partial l}{\partial\sigma^{2}}=-\frac{n}{2\sigma^{2}}+\frac{1}{2\sigma^{4}}\sum_{i=1}^{n}(x_{i}-\mu)^{2}
+$$
+finally, the elements of the hessian are
+$$
+\frac{\partial^{2}l}{\partial\mu^{2}}=-\frac{n}{\sigma^{2}},
+$$
+$$
+\frac{\partial^{2}l}{\partial(\sigma^{2})^{2}}=\frac{n}{2\sigma^{4}}-\frac{1}{\sigma^{6}}\sum_{i=1}^{n}(x_{i}-\mu)^{2}
+$$
+and
+$$
+\frac{\partial^{2}l}{\partial\mu\partial\sigma^{2}}=-\frac{1}{\sigma^{4}}\sum_{i=1}^{n}(x_{i}-\mu)
+$$
+We can code these functions easily in $\mathrm{R}$ and call newton to get the MLEs
+\begin{verbatim}
+X <- rnorm(100, mean=2, sd=sqrt(4))
+n <- 100
+# likelihood t[1]: mu, t[2]: sigma^2
+# if sigma < 0 return -Inf, instead of NaN.
+f <- function(t){
+  if( t[2] > 0)
+  { return( sum( dnorm(X, mean=t[1], sd=sqrt(t[2]), log=TRUE) ) )
+  } 
+  else {
+	  return(-Inf)
+  }
+}
+# score function
+
+
+
+
+
+
+# hessian
+
+
+
+
+
+
+newton( c(0,1), f, df, d2f)
+c( mean(X), (n-1)*var(X)/n)
+\end{verbatim}
+
+
+\section{EM algorithm}
+\subsection*{Example}
+Consider a simple regression model $Y_{i}=\beta x_{i}+\epsilon_{i}$, where $\epsilon_{i}\sim N(0,\ 1)$, for $ i=1\ldots n+m$. 
+Suppose that the first $n$ data $Y_{i}$ are observed while the last $m$ are censored at some positive threshold $C$. 
+Censoring means that all we know is that $Y_{i}>C$, but we do not actually observe $Y_{i}$. 
+We wish to estimate $\beta$. If we have seen all the $Y_{i}$, then the complete likelihood is
+$$
+l_{com}(\beta|Y)=-\frac{\beta^{2}}{2}\sum_{i=1}^{n+m}x_{i}^{2}+\beta\sum_{i=1}^{n+m}x_{i}y_{i}+const.
+$$
+Therefore the estimate of $\beta$ in complete data setting is $[\displaystyle \sum_{i=1}^{n+m}x_{i}y_{i}]/[\sum_{i=1}^{n+m}x_{i}^{2}]$. With censoring, all we see on the last $m$ samples is that $I_{i}=1$, where $I_{i}=1$ if $Y_{i}>C$, and $I_{i}=0$ otherwise. In this problem the complete likelihood depends only linearly on $Y_{i}$. So to implement the EM, we only need to find $E(Y_{i}|I_{i}=1)$, for a given value of $\beta$. Since $Z_{i}=Y_{i}-x_{i}\beta\sim N(0,1)$, we have $E(Y_{i}|I_{i}=1)=x_{i}\beta+E(Z_{i}|I_{i}=1)$. Further
+
+$E(Z_{i}|I_{i}=1)=E(Y_{i}-x_{i}\displaystyle \beta|Y_{i}-x_{i}\beta>C-x_{i}\beta)=E(Z_{i}|Z_{i}>C-x_{i}\beta)=\frac{\int_{C-x_{i}\beta}^{\infty}z\phi(z)dz}{1-\Phi(C-x_{i}\beta)}$
+
+$$
+E(Y_{i}|I_{i}=1)=x_{i}\beta+\frac{\phi(C-x_{i}\beta)}{1-\Phi(C-x_{i}\beta)}=m_{i}(\beta).
+$$
+Given $\beta_{k}$, if we replace the $Y_{i}$ for $n+1\leq i\leq n+m$ by $m_{i}(\beta_{k})$, we obtain the $Q$ function
+$$
+Q(\beta|\beta_{k})=-\frac{\beta^{2}}{2}\sum_{i=1}^{n+m}x_{i}^{2}+\beta\sum_{i=1}^{n}x_{i}y_{i}+\beta\sum_{i=n+1}^{n+m}x_{i}m_{i}+const.
+$$
+Maximizing this function gives easily the solution
+$$
+\frac{\sum_{i=1}^{n}x_{i}y_{i}+\sum_{i=n+1}^{n+m}x_{i}m_{i}}{\sum_{i=1}^{n+m_{\chi_{i}^{2}}}}
+$$
+We obtain the following EM algorithm for estimating the mle of $\beta$.
+
+Algorithm (The EM algorithm for the censored data model).
+
+( $\mathrm{E}$ step): At stage $k$, given $\beta_{k}$ a current guess of $\beta$, compute $m_{i}=x_{i}\beta_{k}+\phi(C-x_{i}\beta_{k})/[1-\Phi(C-x_{i}\beta_{k})]$, for $i=(n+1),\ \ldots,\ (n+m)$.
+
+( $\mathrm{M}$ step): Compute the new estimate of $\beta$,
+$$
+\beta_{k+1}=\frac{\sum_{i=1}^{n}x_{i}y_{i}+\sum_{i=n+1}^{n+m}x_{i}m_{i}}{\sum_{i=1}^{n+m}x_{i}^2}
+$$
+\subsection*{Solution}
+
+\begin{verbatim}
+############
+#Censored regression
+#Generate data
+beta_star=2; n_0=100
+X=rnorm(n_0,0,1)
+Y=rnorm(n_0,mean=beta_star*X,sd=1)
+C=2.5
+n=sum(Y<=C); m=sum(Y>C)
+X=c(X[Y<=C],X[Y>C])
+Y=Y[Y<=C]
+beta=0; K=50; Res=double(K)
+for (k in 1:K)
+{
+  m_beta= X[(n+1):(n+m)]*beta +
+  dnorm(C-X[(n+1):(n+m)]*beta)/(1-pnorm(C-X[(n+1):(n+m)]*beta
+
+  beta =( sum(X[1:n]*Y) + sum(X[(n+1):(n+m)]*m_beta) ) / ( sum(X^2) )
+
+  Res[k]=beta
+}
+plot(Res,type='b',col='blue')
+\end{verbatim}
+
+
+\end{document}

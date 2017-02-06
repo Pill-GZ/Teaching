@@ -1,0 +1,313 @@
+%\documentclass[letter,10.5pt]{article}
+\documentclass[12pt]{article}
+\usepackage{graphicx}
+\usepackage{pdfpages}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{amsfonts,amssymb,amsmath,amsthm}
+\usepackage{listings, boxedminipage}
+\usepackage{bm}
+%\usepackage{color}
+\usepackage{url}
+\usepackage{enumerate}
+
+\newcommand{\rmnum}[1]{\romannumeral #1}
+\newcommand{\Rmnum}[1]{\MakeUppercase{\romannumeral #1}}
+\newcommand{\prob}{\mathbb{P}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Normal}{\mathsf{N}}
+\newcommand{\iid}{\stackrel{\text{iid}}{\sim}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\varx}{\mathbf{x}}
+% grouping operators
+\newcommand{\brac}[1]{\left[#1\right]}
+\newcommand{\set}[1]{\left\{#1\right\}}
+\newcommand{\abs}[1]{\left\lvert #1 \right\rvert}
+\newcommand{\paren}[1]{\left(#1\right)}
+\newcommand{\norm}[1]{\left\|#1\right\|}
+
+\numberwithin{equation}{subsection}
+
+\setlength{\textwidth}{150mm}
+\setlength{\textheight}{230mm}
+\setlength{\headheight}{-1.5cm}
+\setlength{\topmargin}{-0.1cm}
+\setlength{\oddsidemargin}{0cm}
+\setlength{\evensidemargin}{0cm}
+\setlength{\parskip}{1mm}
+\setlength{\unitlength}{1mm}
+\setlength{\parindent}{2.06em}
+\pagestyle{plain}
+
+\usepackage{color}
+%\usepackage[dvipsnames]{xcolor}
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+\lstdefinestyle{displaycode}{
+	backgroundcolor=\color{backcolour},   
+	commentstyle=\color{codegreen},
+	keywordstyle=\color{magenta},
+	numberstyle=\tiny\color{codegray},
+	stringstyle=\color{codepurple},
+	basicstyle=\footnotesize,
+	breakatwhitespace=false,         
+	breaklines=true,                 
+	captionpos=b,                    
+	keepspaces=true,                 
+	columns=flexible,
+	numbers=none,
+	numbersep=5pt,                  
+	showspaces=false,                
+	showstringspaces=false,
+	showtabs=false,                  
+	tabsize=2%,
+	%xleftmargin=2em,
+	%xrightmargin=2em,
+} 
+\lstdefinestyle{displaycode2}{
+	backgroundcolor=\color{backcolour},   
+	commentstyle=\color{red},
+	keywordstyle=\color{magenta},
+	numberstyle=\tiny\color{codegray},
+	stringstyle=\color{codepurple},
+	basicstyle=\footnotesize,
+	breakatwhitespace=false,         
+	breaklines=true,                 
+	captionpos=b,                    
+	keepspaces=true,                 
+	columns=flexible,
+	numbers=none,
+	numbersep=5pt,                  
+	showspaces=false,                
+	showstringspaces=false,
+	showtabs=false,                  
+	tabsize=2%,
+	%xleftmargin=2em,
+	%xrightmargin=2em,
+} 
+
+\lstset{style=displaycode}
+%\newcommand{\displaycodefile}[1]{\lstinputlisting[language=R]{./codeblocks/#1.txt}}
+
+\lstset{
+	basicstyle=\ttfamily,
+	mathescape
+}
+
+
+\title{\textbf{STAT 406 Lab 10 Handout}}
+\author{Jun Guo}
+\date{\today}
+\begin{document}
+\begin{center}
+\large
+\textbf{STAT 406 Lab 10 : Working with XML files}
+\end{center}\vspace*{5mm}
+
+\section{XML Basic Overview}
+\begin{itemize}
+	\item XML is widely used for exchanging information on the World Wide
+Web. It stands for eXtensible Markup Language. 
+
+\item Markup Language is a system of how the document is to be described or
+logically structured, e.g., HTML and XML.
+HTML is used for displaying data on the web browser,
+XML is used for carrying data on the web.
+
+\item The underpining data structure for XML files is of tree structure, called ``document tree''.
+
+\item Structure of XML. 
+
+Except for the file head declaration like 
+\begin{lstlisting}[style=displaycode, language=XML]
+<?xml version=�1.0�?>
+\end{lstlisting} and comments in XML file like
+\begin{lstlisting}[style=displaycode, language=XML]
+<!-- This is a comment -->
+\end{lstlisting}
+The most concerned structure of an XML file in our class is in the main body of the file:
+
+\item Elements(Nodes of the document tree) and Attributes: Elements contain the actual data of XML document. Elements
+must have a start-tag and an end-tag which contain the element�s
+name. The content sits between these two tags. 
+
+\textbf{Elements have a
+tree-based data structure.} \newline
+The general tree structure of a XML file looks like below:
+
+\begin{lstlisting}[style=displaycode, language=XML]
+<root>
+  <child>
+    <subchild>.....</subchild>
+  </child>
+</root>
+\end{lstlisting}
+
+The following is a simple XML file, scan through it and answer the questions:
+\begin{lstlisting}[style=displaycode, language=XML]
+<?xml version="1.0" encoding="UTF-8"?>
+<bookstore>
+  <book category="children">
+    <title lang="en">Harry Potter</title>
+    <author>J K. Rowling</author>
+    <year>2005</year>
+    <price>29.99</price>
+  </book>
+  <book category="web">
+    <title lang="en">Learning XML</title>
+    <author>Erik T. Ray</author>
+    <year>2003</year>
+    <price>39.95</price>
+  </book>
+</bookstore>
+\end{lstlisting}
+
+\begin{enumerate}[1.] 
+\item How many root nodes does this XML file have? What is the name of the root node? 
+\item What are the the children nodes of the the root node? How many children nodes does the root have?
+\item Please draw the document tree for this XML file.
+\item What are the attribute and its value of the first ``book'' node? How about attribute and its value of the subchild node ``title''?
+\item What is the value of the node ``author'' for the second book? 
+\end{enumerate}
+
+Notice that unlike the value of the nodes, \textbf{the value of attributes must be quoted}, using either single quotes or double quotes, like the following.
+\noindent
+\begin{lstlisting}[style=displaycode, language=XML]
+<node_name attribute_name = "attribute value">  Node_value  </node_name>
+\end{lstlisting}
+
+\item Parse XML data: A parser is a component  of the complier which checks for correct syntax and builds a data structure. \textcolor{blue}{The R package XML provides the required parser and extends R�s capability in processing
+XML files.}
+
+\textbf{Download and save the XML file ``filename.xml'' in your R working directory first or nothing can be done even with correct codes}.
+\begin{lstlisting}[style=displaycode, language=XML]
+## Install and quote the R package XML first ##
+if(!(require(RSQLite))){
+	install.packages("XML", dep=T);
+	require(XML);
+}
+doc <- xmlTreeParse('filename.xml') 
+# doc contains the underpining tree structure of the file
+\end{lstlisting}
+\end{itemize}
+
+\noindent
+In the following two examples, we will parse and process the NSF award XML file and the US congress people XML file respectively.
+
+\section{Examples of Processing XML files}
+
+\subsection{Example I. NSF Award files}
+
+\noindent First we want to parse a .xml file to reveal the document tree structure. Download the \textbf{award1.xml} file in ctools and save to your working directory in R.
+\begin{itemize}
+\item Parse the file:
+\begin{verbatim}
+doctree = xmlParse(`award1.xml');
+\end{verbatim}
+
+
+\item Extracting the root:
+\begin{verbatim}
+root <- xmlRoot(doctree);
+xmlName(root);
+# [1] "rootTag"
+\end{verbatim}
+
+\item List the children nodes for the root, how many are there and what are the names?
+\begin{verbatim}
+rtCh = xmlChildren(root);
+length(rtCh);
+# [1] 1
+names(rtCh);
+# [1] "Award"
+\end{verbatim}
+
+\item Extract all the children of the first child of the root:
+\begin{verbatim}
+ch <- xmlChildren(root[[1]]); 
+head(ch, 3);
+# $AwardTitle ...
+  $AwardEffectiveDate ... 
+  $AwardExpirationDate ...
+length(ch);
+# [1] 16
+names(ch);
+# [1] "AwardTitle"         
+  [2] "AwardEffectiveDate" 
+  [3] "AwardExpirationDate"
+  [4] "AwardAmount"
+  ...
+\end{verbatim}
+\end{itemize}
+\noindent 
+Once we understand the document structure, we will pull out the information we need.\newline
+
+\textbf{Question 1} : Download and save the 2016 folder in ctools to your working directory, extract with R the \textbf{title, start/end dates, amount, investigator's name and the institution name} for each award in the 2016 award folder and output these information in a data frame. Each XML file in the NSF award folder 2016 records one award. \newline
+
+\textbf{Solution 1} : \textcolor{green}{See lab10.r code.}
+
+\subsection{Example II. US congress people.xml file}
+
+\begin{itemize}
+\item Parse and explore the document tree structure as usual.
+\begin{verbatim}
+doc = xmlTreeParse("people.xml");
+root = xmlRoot(doc); 
+ls_people = xmlChildren(root); length(ls_people);
+
+person1 = root[[1]]; 
+print(person1);
+# use xmlAttr() to list the attributes, 
+# and xmlGetAttr() to get each attribute's value
+xmlAttr(person1);
+xmlGetAttr(person1, 'id');
+# list all children nodes for person1;
+ls_person1 = xmlChildren(person1);
+names(ls_person); # only 1 'role' child node
+
+person2 = root[[2]]; 
+print(person2);
+ls_person2 = xmlChildren(person2);
+names(ls_person2); # 3 children nodes
+# get the first committee assignment subchild for person2
+ls_person2$"committee-assignment";
+\end{verbatim}
+\end{itemize}
+
+\noindent
+After the exploration, we begin processing the file. \newline
+
+\noindent
+\textbf{Question 2} : Get the following attributes of nodes in people.xml file, they are 'id','lastname','firstname','gender','party','state','committee'.\newline
+
+\noindent
+\textbf{Solution 2} : \textcolor{green}{See lab10.r code.}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\end{document}

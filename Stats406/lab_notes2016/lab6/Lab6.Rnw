@@ -1,0 +1,196 @@
+%In R, use require("knitr") and knit("this Rnw file") to generate the tex file
+
+\documentclass[12pt]{article}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{fullpage}
+\usepackage{amsmath}
+
+\begin{document}
+
+\begin{center}
+\bf
+\LARGE
+STATS 406 Fall 2016: Lab 06
+\end{center}
+
+\section{R}
+\subsection{Vectors}
+A vector contains elements of the same type, such as integer, numeric, character, and others. There are various ways to get a subset of a vector. And there are many operations that can be carried out on a vector. Many methods on vectors are the basis for more complicated data structures.
+<<eval=T>>=
+v = c(3,1,5,9,7)
+print(v)
+length(v)
+# access elements by []
+v[1]
+v[1:3]
+v[-1]
+# use logic values to select subset
+v[v>4]
+# get the index satisfying certain conditions
+which(v>4)
+# maximum of a vector
+max(v)
+# index that maximizes the vector
+which.max(v)
+# average of a vector
+mean(v)
+# calculation on logical vectors
+sum(v>4)
+# sort increasingly
+sort(v) 
+# sort decreasingly
+sort(v, decreasing = T)
+# order of elements increasingly
+order(v)
+# order of elements decreasingly
+order(v,decreasing = T)
+@
+  
+\subsection{Lists}
+A list can store elements that are not necessarily of the same type. Subsetting lists is different from subsetting a vector.
+<<eval=T>>=
+list1 = list(c(2,5,3),21.3,"hello")
+print(list1)
+# use [[]] to subset lists
+list1[[1]]
+
+list2 = list(c(1,2,3,4),c(5,6,7),c(8,9))
+print(list2)
+# use lapply and sapply to run a function on every element of the list
+lapply(list2,sum)
+sapply(list2,sum)
+@
+
+\subsection{Matrices}
+A matrix is two-dimensional and stores elements of the same type. There are various ways to subset a matrix and many operations for matrices.
+<<eval=T>>=
+A = matrix(1:6,nrow=3,ncol=2)
+# In R, the default is by column
+print(A)
+B = matrix(1:6,nrow=3,ncol=2,byrow=T)
+print(B)
+# subset of a matrix
+A[1,2]
+A[2,]
+A[,1]
+
+# elementwise operations
+A+B
+A*B
+
+# matrix multiplication
+A%*%t(B)
+
+# apply a function to every row/column
+apply(A,1,max)
+apply(A,2,max)
+@
+
+\subsection{Dataframes}
+Dataframes are two-dimensional and they allow columns to be of different types. There are some similarities dealing with dataframes comparing to matrices. The following data file ``student-mat.csv'' is from Lab 2.
+<<eval=F>>=
+student = read.table("student-mat.csv",header=T,sep=";")
+# subset of a dataframe
+student[1,3]
+student$age[1]
+student[1,]
+# select subset satisfying certain conditions
+tmp = student[student$age==18,]
+# operations
+sum(student$age==18)
+which(student$age>18)
+# average of three grades G1, G2, G3
+avg_G = apply(student[,c("G1","G2","G3")],1,mean)
+@
+
+\subsection{For loops}
+For loops can be used to carry out a sequence of operations sharing some common patterns. Sometimes (not always) we can express a for loop in more efficient ways without the loop.
+
+<<eval=T>>=
+s = 0
+for(i in 1:100){
+  s = s + i
+}
+print(s)
+
+# another way without using for loop
+sum(1:100)
+@
+
+\subsection{While loops}
+When the number of iterations is not known, we can use while loops to do a sequence of operations. The code below calculates the largest $K$ such that $\sum_{i=1}^{K}i\leq 200$.
+<<eval=T>>=
+s = 0
+i = 0
+while(s<=200){
+  i = i + 1
+  s = s + i
+}
+K = i - 1
+print(K)
+@
+
+\subsection{Functions}
+We can call and use existing functions in R. Also we can define functions by ourselves. 
+<<eval=T>>=
+f <- function(n){
+  return(sum(1:n))
+}
+f(100)
+@
+
+\section{SQL}
+We can use the language SQL to work with relational databases.
+
+The basic form of ``SELECT'' in SQL is:
+<<eval=F>>=
+sqltext1="
+SELECT ColumnNames
+FROM TableName
+WHERE Conditions
+GROUP BY VariableNames HAVING Conditions
+ORDER BY VariableNames;"
+@
+We can also join two tables to get data, with the following basic form:
+<<eval=F>>=
+sqltext2="
+SELECT T1.ColumnNames, T2.ColumnNames
+FROM T1 INNER JOIN T2 ON JoiningConditions;"
+@
+An example from Lab 4: Using ``baseball.db'', join table \emph{Schools} with table \emph{SchoolsPlayers}. Generate a table showing the number of players from each school in Michigan. Sort by the number of players in descending order.
+<<eval=T>>=
+library("RSQLite")
+driver = dbDriver("SQLite")
+conn = dbConnect(driver, "baseball.db")
+sqltext="SELECT Schools.schoolID, schoolName, COUNT(playerID) AS NumOfPlayers 
+                FROM Schools INNER JOIN SchoolsPlayers 
+                ON Schools.schoolID = SchoolsPlayers.schoolID 
+                WHERE schoolState = 'MI' 
+                GROUP BY Schools.schoolID 
+                ORDER BY NumOfPlayers DESC;"
+
+dt = dbGetQuery(conn,sqltext)
+head(dt)
+@
+
+\section{XML}
+XML can be used to write documents that store both the data and data descriptions. It has a tree-like format. Note that XML is case-sensitive. An example from Lab 5:
+\begin{verbatim}
+<?xml version="1.0" encoding="UTF-8"?>
+<students>
+  <person SocialID="123" SchoolID="92031482">
+    <name>Jim Brown</name>
+    <gender>Male</gender>
+    <major>Mathematics</major>
+    <minor> Statistics </minor>
+  </person>
+  <person SocialID="234" SchoolID="91405720">
+    <name>Susan Leicester</name>
+    <gender>Female</gender>
+    <major>Chemistry</major>
+  </person>
+</students>
+\end{verbatim}
+Here ``students'' is the \textbf{root}, which is the first \textbf{node}. Its first child \textbf{node} has \textbf{name} ``person''. This node has two \textbf{attributes} ``SocialID'' and ``SchoolID''.
+\end{document}

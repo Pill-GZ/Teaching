@@ -1,0 +1,289 @@
+\documentclass[12pt]{article}
+\setlength{\oddsidemargin}{0.0in} \setlength{\evensidemargin}{0.0in}
+\setlength{\textwidth}{6.5in} \setlength{\topmargin}{-0.25in}
+\setlength{\textheight}{8.75in}
+\usepackage{amsmath, amssymb, amsfonts, amsthm, amscd, xspace, pifont, natbib, fullpage, enumitem, bm, bbm}
+\usepackage{fullpage}
+\usepackage{graphicx, float}
+\usepackage{epsfig, amsfonts, verbatim, multirow, hyperref}
+\usepackage{epstopdf}
+\usepackage{listings, boxedminipage}
+
+\lstset{
+	basicstyle=\ttfamily,
+	mathescape
+}
+%\usepackage{setspace}
+\newcommand{\mycite}[1]{{\citeNP{#1}}}
+
+\parindent=0pt
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Different font in captions
+\newcommand{\captionfonts}{\small}
+\makeatletter  % Allow the use of @ in command names
+\long\def\@makecaption#1#2{%
+	\vskip\abovecaptionskip
+	\sbox\@tempboxa{{\captionfonts #1: #2}}%
+	\ifdim \wd\@tempboxa >\hsize
+	{\captionfonts #1: #2\par}
+	\else
+	\hbox to\hsize{\hfil\box\@tempboxa\hfil}%
+	\fi
+	\vskip\belowcaptionskip}
+\makeatother   % Cancel the effect of \makeatletter
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Matrix, Vector
+\newcommand{\V}[1]{\ensuremath{\boldsymbol{#1}}\xspace}
+\newcommand{\M}[1]{\ensuremath{\boldsymbol{#1}}\xspace}
+%% Math Functions
+\newcommand{\F}[1]{\ensuremath{\mathrm{#1}}\xspace}
+\newcommand{\sgn}{\F{sgn}}
+\newcommand{\tr}{\F{trace}}
+\newcommand{\diag}{\F{diag}}
+\newcommand{\dett}{\F{det}}
+%% Transpose
+\newcommand{\T}[1]{\ensuremath{{#1}^{\mbox{\sf\tiny T}}}}
+
+%%
+\def  \R  {\boldsymbol R}
+\def\bX{\boldsymbol X}
+\def\bY{\boldsymbol Y}
+\def\bbeta{\boldsymbol \beta}
+\def\blambda{\boldsymbol \lambda}
+\def\bepsilon{\boldsymbol \epsilon}
+\def\bone{\boldsymbol{1}}
+\def\bzero{\boldsymbol 0}
+\def\E{\mbox{E}}
+\def\var{\mbox{var}}
+\def\gauss{\mbox{N}}
+\def\lap{\mbox{L}}
+\def\G{\mbox{G}}
+\def\go{  $\R$  ightarrow}
+\def\invG{\mbox{G}^{-1}}
+\def\argmin{\arg\min}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}{Proposition}
+\newtheorem{lemma}{Lemma}
+\newtheorem{corollary}{Corollary}
+\newtheorem{algorithm}{Algorithm}
+\newtheorem{definition}{Definition}
+\newtheorem{remark}{Remark}
+
+\usepackage{color}
+\usepackage[dvipsnames]{xcolor}
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+\lstdefinestyle{displaycode}{
+	backgroundcolor=\color{backcolour},   
+	commentstyle=\color{codegreen},
+	keywordstyle=\color{magenta},
+	numberstyle=\tiny\color{codegray},
+	stringstyle=\color{codepurple},
+	basicstyle=\footnotesize,
+	breakatwhitespace=false,         
+	breaklines=true,                 
+	captionpos=b,                    
+	keepspaces=true,                 
+	columns=flexible,
+	numbers=none,
+	numbersep=5pt,                  
+	showspaces=false,                
+	showstringspaces=false,
+	showtabs=false,                  
+	tabsize=2%,
+	%xleftmargin=2em,
+	%xrightmargin=2em,
+} 
+\lstdefinestyle{displaycode2}{
+	backgroundcolor=\color{backcolour},   
+	commentstyle=\color{red},
+	keywordstyle=\color{magenta},
+	numberstyle=\tiny\color{codegray},
+	stringstyle=\color{codepurple},
+	basicstyle=\footnotesize,
+	breakatwhitespace=false,         
+	breaklines=true,                 
+	captionpos=b,                    
+	keepspaces=true,                 
+	columns=flexible,
+	numbers=none,
+	numbersep=5pt,                  
+	showspaces=false,                
+	showstringspaces=false,
+	showtabs=false,                  
+	tabsize=2%,
+	%xleftmargin=2em,
+	%xrightmargin=2em,
+} 
+
+\lstset{style=displaycode}
+%\newcommand{\displaycodefile}[1]{\lstinputlisting[language=R]{./codeblocks/#1.txt}}
+
+\newcommand{\pr}{\mathbb{P}}
+\newcommand{\ep}{\mathbb{E}}
+\renewcommand{\var}{\textrm{Var}}
+
+\renewcommand{\thefootnote}{\fnsymbol{footnote}}
+\newcommand{\x}{\bm{x}}
+\newcommand{\X}{\bm{X}}
+\newcommand{\td}{\textrm{d}}
+
+\newcommand{\tblue}[1]{\textcolor{blue}{#1}}
+\newcommand{\tred}[1]{\textcolor{red}{#1}}
+\newcommand{\tplum}[1]{\textcolor{Plum}{#1}}
+\newcommand{\tcyan}[1]{\textcolor{Cyan}{#1}}
+\newcommand{\taqua}[1]{\textcolor{Aquamarine}{#1}}
+
+\newcommand{\CAL}[1]{{\cal #1}}
+
+\begin{document}
+\title{\Large \bf STATS 406 Fall 2016: Lab 04}
+\date{}
+
+\maketitle
+
+\section{Introduction to relational databases}
+\begin{itemize}
+	\item The advantage of using relational databases:
+	\begin{itemize}[label=*]
+		\item Data can be maintained and queried by different threads independently.
+		\item More efficient queries for objectives that only concerns one subtable.
+	\end{itemize}
+	\item Relational database files and their management systems:
+	\begin{itemize}[label=*]
+		\item A .db file is to relational database management systems (SQLite, MySQL, Oracle, etc) as a .pdf file is to PDF readers (Adobe, Foxit, Okular, etc).
+		\item There is one file format (.db) and many tools (management systems) you can use to manage the file.
+		\item Different management systems have very similar syntaxes on basic operations and return queried data in very similar forms. They differ in efficiency and other aspects, but not much grammatically.
+		\item In fact, the commands and even most code lines you learned in this class will run without modification under most management systems.
+	\end{itemize}
+\end{itemize}
+
+\section{Using SQLite in R}
+\begin{itemize}
+	\item We can work with databases within R by installing related packages.
+	\item Install package RSQLite and connect to a database.
+\begin{lstlisting}[style=displaycode, language=R]
+## Load the RSQLite package (install it first if haven't yet)
+install.packages("RSQLite", dep=TRUE);
+library("RSQLite");
+## Make sure the file is under the working directory and then connect to it
+driver = dbDriver("SQLite");
+conn = dbConnect(driver, "baseball.db");
+## Check the tables in a database
+dbListTables(conn);
+## Check the variables in a table
+dbListFields(conn, "Teams");
+\end{lstlisting}
+	
+\end{itemize}
+
+
+\section{SQL commands}
+
+\subsection{A few notes}
+\begin{itemize}
+	\item SQL keywords are not case sensitive, but when calling SQL in R, capitalizing key words helps to improve readability.
+	\item SQL is designed mainly for extracting data from databases, NOT for analyzing them. SQL provides basic summarizing commands and tools, but do not expect too much. We can use R for further analysis.
+\end{itemize}
+
+\subsection{Basic SQL commands:}
+\begin{itemize}
+	\item The very basic form of SQL queries is:
+\begin{lstlisting}[style=displaycode, language=SQL]
+/* Pseudo-code */
+/* Required clauses */
+SELECT ColumnNames
+FROM TableName
+/* Optional clauses */
+WHERE Conditions
+GROUP BY VariableNames HAVING Conditions
+ORDER BY VariableNames
+\end{lstlisting}
+	In {\bf SELECT}:
+	\begin{itemize}[label=*] 
+		\item {\bf AS} renames the extracted variables for convenience. It is especially useful when a. they are summarized; or b. (will see later) when they have to come with prefixes like table names.
+		\item {\bf AS} can often be omitted. Thus the variable name should NOT contain space (Why?).
+		\item Aggregate functions. For a list, check, for example, \url{http://www.techonthenet.com/sql_server/functions/index_alpha.php}.
+\begin{lstlisting}[style=displaycode, language=SQL]
+/* Pseudo-code: SQLite */
+SELECT Var1, MIN(Var2) AS MinVar2, AVG(Var3) AS AvgVar3
+FROM TableName
+\end{lstlisting}
+	\end{itemize}
+	In {\bf FROM}:
+	\begin{itemize}[label=*]
+		\item In this course, unless we combine tables, otherwise we only select from one table.
+	\end{itemize}
+	In {\bf WHERE}:
+	\begin{itemize}[label=*]
+		\item If there are multiple conditions, they should be connected by logical connectives ({\bf AND}, {\bf OR} and parenthesis when needed). Conditions can also be decorated by other logical operators ({\bf NOT}, etc). For a list of logical operators in SQL, see \url{http://www.w3resource.com/sql/boolean-operator/sql-boolean-operators.php}.
+\begin{lstlisting}[style=displaycode, language=SQL]
+/* Pseudo-code: SQLite */
+/* Example from: http://beginner-sql-tutorial.com/sql-logical-operators.htm */
+SELECT first_name, last_name, age, games 
+FROM student_details 
+WHERE age >= 10 AND age <= 15 OR NOT games = 'Football'
+\end{lstlisting}
+	\end{itemize}
+{\bf Quiz 1:} Extract data from table \emph{Master}. Generate a table with all variables in Master for players born in 1980s and sort by their names.
+\begin{lstlisting}[style=displaycode, language=SQL]
+# Solution: see Lab4.R
+\end{lstlisting}
+	\item For {\bf GROUP BY}:
+	\begin{itemize}[label=*]
+		\item {\bf GROUP BY} is used in combination with aggregate functions in {\bf SELECT}.
+		\item (From Wikipedia) {\bf HAVING} modifies {\bf GROUP BY}. It is indispensable because {\bf WHERE} does not allow aggregate functions.
+\begin{lstlisting}[style=displaycode, language=SQL]
+/* Pseudo-code: SQLite */
+/* Example from: https://en.wikipedia.org/wiki/Having_(SQL) */
+SELECT DeptID, SUM(SaleAmount)
+FROM Sales
+WHERE SaleDate = '01-Jan-2000'
+GROUP BY DeptID
+HAVING SUM(SaleAmount) > 1000
+\end{lstlisting}
+	\end{itemize}
+\end{itemize}
+
+{\bf Quiz 2:} Query data from table \emph{Teams}. Generate a table showing the number of teams that won more than half of the games each year since 1950. Sort by year.
+
+\begin{lstlisting}[style=displaycode, language=SQL]
+# Solution: see Lab4.R
+\end{lstlisting}
+
+\subsection{Inner joining tables}
+\begin{itemize}
+	\item Basic form (not quite ``basic'', look closely):
+\begin{lstlisting}[style=displaycode, language=SQL]
+/* Pseudo-code */
+SELECT T1.ColumnNames, T2.ColumnNames
+FROM T1 INNER JOIN T2 ON JoiningConditions
+/* Other clauses */
+WHERE Conditions
+/* etc */
+\end{lstlisting}
+	\item What are the different roles of Table ``T1'' and Table ``T2''?
+	\item {\bf ON}: Specify which rows to combine from the two tables
+	\item In {\bf SELECT} here: specify table names as prefixes for variable names when needed.
+	\item \underline{\bf Example:} 
+\begin{lstlisting}[style=displaycode, language=SQL]
+SELECT Schools.schoolID, schoolName, schoolCity, schoolState, playerID 
+FROM Schools INNER JOIN SchoolsPlayers ON Schools.schoolID = SchoolsPlayers.schoolID 
+WHERE schoolState = 'MI'
+\end{lstlisting}	
+\begin{itemize}[label=*]
+\item If we omit ``Schools'' in the first ``Schools.schoolID'', there will be an error.
+\item In general, DO NOT omit table names if causing ambiguity.
+\end{itemize}
+\end{itemize}
+{\bf Quiz 3:} Join table \emph{Schools} with table \emph{SchoolsPlayers}. Generate a table showing the number of players from each school in Michigan. Sort by the number of players in decreasing order.
+
+\begin{lstlisting}[style=displaycode, language=SQL]
+# Solution: see Lab4.R
+\end{lstlisting}
+\end{document}

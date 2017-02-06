@@ -1,0 +1,62 @@
+\documentclass[letter,10.5pt]{article}
+\usepackage{graphicx}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{amsfonts,amssymb,amsmath,amsthm}
+\usepackage{boxedminipage}
+\usepackage{bm}
+\usepackage{color}
+\usepackage{url}
+\usepackage{enumerate}
+
+\newcommand{\rmnum}[1]{\romannumeral #1}
+\newcommand{\Rmnum}[1]{\MakeUppercase{\romannumeral #1}}
+\newcommand{\prob}{\mathbb{P}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Normal}{\mathsf{N}}
+\newcommand{\iid}{\stackrel{\text{iid}}{\sim}}
+\newcommand{\R}{\mathbb{R}}
+% grouping operators
+\newcommand{\brac}[1]{\left[#1\right]}
+\newcommand{\set}[1]{\left\{#1\right\}}
+\newcommand{\abs}[1]{\left\lvert #1 \right\rvert}
+\newcommand{\paren}[1]{\left(#1\right)}
+\newcommand{\norm}[1]{\left\|#1\right\|}
+
+\numberwithin{equation}{subsection}
+
+\setlength{\textwidth}{150mm}
+\setlength{\textheight}{230mm}
+\setlength{\headheight}{-1.5cm}
+\setlength{\topmargin}{-0.1cm}
+\setlength{\oddsidemargin}{0cm}
+\setlength{\evensidemargin}{0cm}
+\setlength{\parskip}{1mm}
+\setlength{\unitlength}{1mm}
+\setlength{\parindent}{2.06em}
+\pagestyle{plain}
+
+\title{\textbf{STAT 406 Fall 2015 Lab 8}}
+\author{Jun Guo}
+\date{\today}
+\begin{document}
+\begin{center}
+\large
+\textbf{STAT 406 Fall 2015 Lab 8}
+\end{center}\vspace*{5mm}
+
+Consider the following model. Given the data tuples $(y_i,x_i), i=1,2,\cdots,n$, we model the distribution of $Y_i$'s such that $$Y_i|x_i,\lambda \sim \text{Exponential}(\lambda x_i)$$ with parameter $\lambda$. Notice that we treat $x_i$'s as fixed input data values (as one does for linear regressions in usual case which is called ''fixed design'') without modeling them as realizations of a random variable with a distribution. \newline
+
+Given the maximum likelihood estimator $$\widehat{\lambda}_{\text{MLE}} = \frac{n}{\sum_{i=1}^n x_iy_i}$$
+
+We are interested in the bias, variance and MSE of the maximum likelihood estimator $\widehat{\lambda}_{\text{MLE}} $: \newline
+
+Now please download \texttt{lab8.Rdata} from CTools, and load the data using \texttt{load("lab8.Rdata")}. The name of the dataset is \texttt{sampledata}. We will explore and solve the interested question in the sequel. 
+\begin{enumerate}
+\item Suppose the parameter $\lambda$ is given apriori, estimate bias, variance and MSE of the maximum likelihood estimator $\widehat{\lambda}_{\text{MLE}}$ with Monte Carlo methods (this is a review and warm up question).
+\item Use parametric bootstrap to evaluate the bias and variance of the MLE estimate $\widehat{\lambda}_{\text{MLE}}$ with Monte Carlo methods.
+\item Suppose that you still use the same estimator for $\lambda$ as in (2). Apply nonparametric bootstrap technique to evaluate the bias and variance of the point estimate applied to the given data set. 
+\end{enumerate}
+
+
+\end{document}

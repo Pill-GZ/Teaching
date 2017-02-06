@@ -1,0 +1,205 @@
+---
+title: "Lab3"
+author: "GAO Zheng"
+date: "September 27, 2016"
+output: html_document
+---
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+
+```{r, echo=FALSE}
+setwd("/home/gaozheng/Teaching/Stats406/R_scripts/lab3/data")
+```
+
+#More on plotting
+
+There are many ways you can make your plots for 
+
+This example contains a few frequently used plotting parameters:
+
+- Line/Point styles: `type`, `lty`, `pch`, `col`, ...
+
+    - `type`: consult `?plot`, it refers to the type of the line. ‘b’ for showing both the points and the line, ‘o’ for both but over-positioning each other, ‘l’ for line-only and ‘p’ for points-only.
+
+    - `lty`: line type, take integer values.
+
+    - `pch`: the point marker used, take integer or character values.
+    
+    - `col`: color, take integer or character values.
+
+- Plot range: `xlim`, `ylim`. Here we expanded the plot ranges to have more comfortable margins.
+
+- Texts: `main`, `sub`, `xlab`, `ylab`, ...
+
+    - `main`: main title of the plot.
+
+    - `sub`: subtitle.
+
+    - `xlim`, `ylim`: ranges of axes.
+
+- Font sizes: `cex` (default), `cex.main`, `cex.sub`, `cex.lab`, `cex.axis`, ... 
+
+- Axes: `axes` ...
+
+- Margin: `par(mar = )` ...
+
+- Layout: `layout`, `par(mfrow = )` ...
+
+
+Let us improve the plot from lecture. 
+
+```{r,fig.width=8,fig.height=4}
+simulated.X = rnorm(n=10000)
+dens = density(simulated.X)
+plot(dens, col = 'blue', lty = 2, xlim=c(-4,4), ylim=c(0,0.4))
+par(new=T)
+curve(dnorm,lty=1, col='red',xlim=c(-4,4),ylim=c(0,0.4))
+legend(x='topleft',legend=c('Estimated density','True density'),
+       col=c('blue','red'),lty=c(2,1))
+```
+
+Notice the overlapping axes and axes labels, we want to get rid of them.
+
+A slightly improved plot looks like this:
+
+```{r,fig.width=8,fig.height=4}
+plot(
+  dens, col = 'blue', lty = 2, xlim = c(-4,4), ylim = c(0,0.4),
+  main = "A comparison of true and estimated normal density"
+)
+par(new = T)
+curve(
+  dnorm,lty = 1, col = 'red',xlim = c(-4,4), ylim = c(0,0.4),
+  axes = FALSE, xlab = "", ylab = ""
+)
+legend(
+  x = 'topleft',legend = c('Estimated density','True density'),
+  col = c('blue','red'), lty = c(2,1)
+)
+```
+
+It is possible to come up with pretty plots using only base packages. Plotting needs a little practice (and some Googling).
+
+#Data wrangling
+
+In real life (in work), most of our time is spent wrangling with datasets; figuring out how things are recorded, dealing with missing data, extract the useful bits of information from a menagerie of variables.
+Much less time is spent on actual discovery and trying to draw insights from the datasets. Unfortunate, but most of the time it is the case.
+
+Datasets in classes are mostly curated, clearly annotated. The real world is a lot messier.
+
+The following is an example of real world dataset, still quite well-behaved, but it is closer to what datasets look like out there.
+
+The dataset is adapted from:
+
+[Allison, T. and Chichetti, D. (1976) Sleep in mammals: ecological and constitutional correlates. Science 194 (4266), 732–734.](http://science.sciencemag.org/content/194/4266/732)
+
+- The dataset consists of animal sleep data with 62 observations on 10 variables.
+
+- Some of the variables are missing.
+
+- The dataset is splitted into two (deliberately): 
+First contains the observation ID plus the first 6 variables. Second contains the observation ID plus the last 4 variables.
+
+We are going to read the datasets, combine them according to their ID, calculate some simple statistics, and visulaize the results.
+
+## Read the dataset into R
+
+Download the datasets [sleep1.csv](./data/sleep1.csv), [sleep2.csv](./data/sleep2.csv) here by following the links or download from Canvas.
+
+Inspect the datasets. Read both files into R.
+
+You should be getting the following header names and data types
+
+```{r, echo=FALSE}
+sleepdata1 <- read.csv("sleep1.csv",header = T,na.strings = "NULL")
+sleepdata2 <- read.csv("sleep2.csv",header = T,na.strings = "NULL")
+
+sapply(sleepdata1,class)
+sapply(sleepdata2,class)
+```
+
+## Combine the datasets according to observation ID
+
+You shoud be merging the two datasets where their ID's match.
+
+The combined headers and data types should look like this:
+
+```{r, echo=FALSE}
+sleepdata <- merge(sleepdata1,sleepdata2)
+sapply(sleepdata, class)
+```
+
+*Hint*: Does `cbind` work? Why? What about `merge`?
+
+## Calculate the proportion of dream time in sleep
+
+Notice there is a numeric column "Dream" and a numerical column "Sleep". We want to calculate the ratio of the two, where neither of them are `NA`'s.
+
+Then append the new column to the dataframe. Call the new Column "Ratio". The first 10 rows should look like this:
+
+```{r, echo=FALSE}
+sleepdata <- cbind(sleepdata,"Ratio" = with(sleepdata,Dream/Sleep))
+head(sleepdata[2:12],10)
+```
+
+## Boxplot of a variable against another
+
+Now we want to viualize the relationship between the variables "Ratio" and "Danger" using a boxplot.
+
+Try replicate this:
+
+```{r, echo=FALSE}
+with(sleepdata,boxplot(Ratio~Danger,xlab='Danger',ylab = 'Ratio',main='Ratio by Danger Category'))
+```
+
+*Tip*: The function `with` can shorten the code significantly for expressions involving dataframes.
+
+`with` creates an environment from the data, so that when you refer to the variables in the dataset, you no longer have refer to the dataset by name.
+
+For example instead of writing 
+
+```{r}
+# plot(really_long_dataframe_name$really_long_variable_name_1,
+#       really_long_dataframe_name$really_long_variable_name2)
+```
+you can write
+```{r}
+# with(really_long_dataframe_name, 
+#     plot(really_long_variable_name_1,really_long_variable_name2))
+```
+
+See more on `?with`.
+
+
+## Order the dataset by a variable
+
+What if we want to reorder the dataframe accoring to the variable "Ratio", in increasing order?
+
+```{r,echo=FALSE}
+sleepdata <- sleepdata[order(sleepdata$Ratio),]
+head(sleepdata[,2:12],10)
+```
+
+Hint: Does `sort` work? What about `order`?
+
+## Extras
+
+## Q&A
+
+What's the difference between `|` (OR) and `||` (OR)?
+
+A: `|` (OR) is bitwise operation. `||` (OR) is not.
+
+```{r}
+A <- c(F,T,F,T,F,T,T,F,T)
+B <- c(F,F,T,F,T,F,F,T,F)
+A|B
+A||B
+```
+
+Similarly for `&` (AND) and `&&` (AND).
+
+
+
+.

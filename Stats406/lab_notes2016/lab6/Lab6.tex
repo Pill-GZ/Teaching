@@ -1,0 +1,484 @@
+%In R, use require("knitr") and knit("this Rnw file") to generate the tex file
+
+\documentclass[12pt]{article}\usepackage[]{graphicx}\usepackage[]{color}
+%% maxwidth is the original width if it is less than linewidth
+%% otherwise use linewidth (to make sure the graphics do not exceed the margin)
+\makeatletter
+\def\maxwidth{ %
+  \ifdim\Gin@nat@width>\linewidth
+    \linewidth
+  \else
+    \Gin@nat@width
+  \fi
+}
+\makeatother
+
+\definecolor{fgcolor}{rgb}{0.345, 0.345, 0.345}
+\newcommand{\hlnum}[1]{\textcolor[rgb]{0.686,0.059,0.569}{#1}}%
+\newcommand{\hlstr}[1]{\textcolor[rgb]{0.192,0.494,0.8}{#1}}%
+\newcommand{\hlcom}[1]{\textcolor[rgb]{0.678,0.584,0.686}{\textit{#1}}}%
+\newcommand{\hlopt}[1]{\textcolor[rgb]{0,0,0}{#1}}%
+\newcommand{\hlstd}[1]{\textcolor[rgb]{0.345,0.345,0.345}{#1}}%
+\newcommand{\hlkwa}[1]{\textcolor[rgb]{0.161,0.373,0.58}{\textbf{#1}}}%
+\newcommand{\hlkwb}[1]{\textcolor[rgb]{0.69,0.353,0.396}{#1}}%
+\newcommand{\hlkwc}[1]{\textcolor[rgb]{0.333,0.667,0.333}{#1}}%
+\newcommand{\hlkwd}[1]{\textcolor[rgb]{0.737,0.353,0.396}{\textbf{#1}}}%
+\let\hlipl\hlkwb
+
+\usepackage{framed}
+\makeatletter
+\newenvironment{kframe}{%
+ \def\at@end@of@kframe{}%
+ \ifinner\ifhmode%
+  \def\at@end@of@kframe{\end{minipage}}%
+  \begin{minipage}{\columnwidth}%
+ \fi\fi%
+ \def\FrameCommand##1{\hskip\@totalleftmargin \hskip-\fboxsep
+ \colorbox{shadecolor}{##1}\hskip-\fboxsep
+     % There is no \\@totalrightmargin, so:
+     \hskip-\linewidth \hskip-\@totalleftmargin \hskip\columnwidth}%
+ \MakeFramed {\advance\hsize-\width
+   \@totalleftmargin\z@ \linewidth\hsize
+   \@setminipage}}%
+ {\par\unskip\endMakeFramed%
+ \at@end@of@kframe}
+\makeatother
+
+\definecolor{shadecolor}{rgb}{.97, .97, .97}
+\definecolor{messagecolor}{rgb}{0, 0, 0}
+\definecolor{warningcolor}{rgb}{1, 0, 1}
+\definecolor{errorcolor}{rgb}{1, 0, 0}
+\newenvironment{knitrout}{}{} % an empty environment to be redefined in TeX
+
+\usepackage{alltt}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{fullpage}
+\usepackage{amsmath}
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\begin{document}
+
+\begin{center}
+\bf
+\LARGE
+STATS 406 Fall 2016: Lab 06
+\end{center}
+
+\section{R}
+\subsection{Vectors}
+A vector contains elements of the same type, such as integer, numeric, character, and others. There are various ways to get a subset of a vector. And there are many operations that can be carried out on a vector. Many methods on vectors are the basis for more complicated data structures.
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{v} \hlkwb{=} \hlkwd{c}\hlstd{(}\hlnum{3}\hlstd{,}\hlnum{1}\hlstd{,}\hlnum{5}\hlstd{,}\hlnum{9}\hlstd{,}\hlnum{7}\hlstd{)}
+\hlkwd{print}\hlstd{(v)}
+\end{alltt}
+\begin{verbatim}
+## [1] 3 1 5 9 7
+\end{verbatim}
+\begin{alltt}
+\hlkwd{length}\hlstd{(v)}
+\end{alltt}
+\begin{verbatim}
+## [1] 5
+\end{verbatim}
+\begin{alltt}
+\hlcom{# access elements by []}
+\hlstd{v[}\hlnum{1}\hlstd{]}
+\end{alltt}
+\begin{verbatim}
+## [1] 3
+\end{verbatim}
+\begin{alltt}
+\hlstd{v[}\hlnum{1}\hlopt{:}\hlnum{3}\hlstd{]}
+\end{alltt}
+\begin{verbatim}
+## [1] 3 1 5
+\end{verbatim}
+\begin{alltt}
+\hlstd{v[}\hlopt{-}\hlnum{1}\hlstd{]}
+\end{alltt}
+\begin{verbatim}
+## [1] 1 5 9 7
+\end{verbatim}
+\begin{alltt}
+\hlcom{# use logic values to select subset}
+\hlstd{v[v}\hlopt{>}\hlnum{4}\hlstd{]}
+\end{alltt}
+\begin{verbatim}
+## [1] 5 9 7
+\end{verbatim}
+\begin{alltt}
+\hlcom{# get the index satisfying certain conditions}
+\hlkwd{which}\hlstd{(v}\hlopt{>}\hlnum{4}\hlstd{)}
+\end{alltt}
+\begin{verbatim}
+## [1] 3 4 5
+\end{verbatim}
+\begin{alltt}
+\hlcom{# maximum of a vector}
+\hlkwd{max}\hlstd{(v)}
+\end{alltt}
+\begin{verbatim}
+## [1] 9
+\end{verbatim}
+\begin{alltt}
+\hlcom{# index that maximizes the vector}
+\hlkwd{which.max}\hlstd{(v)}
+\end{alltt}
+\begin{verbatim}
+## [1] 4
+\end{verbatim}
+\begin{alltt}
+\hlcom{# average of a vector}
+\hlkwd{mean}\hlstd{(v)}
+\end{alltt}
+\begin{verbatim}
+## [1] 5
+\end{verbatim}
+\begin{alltt}
+\hlcom{# calculation on logical vectors}
+\hlkwd{sum}\hlstd{(v}\hlopt{>}\hlnum{4}\hlstd{)}
+\end{alltt}
+\begin{verbatim}
+## [1] 3
+\end{verbatim}
+\begin{alltt}
+\hlcom{# sort increasingly}
+\hlkwd{sort}\hlstd{(v)}
+\end{alltt}
+\begin{verbatim}
+## [1] 1 3 5 7 9
+\end{verbatim}
+\begin{alltt}
+\hlcom{# sort decreasingly}
+\hlkwd{sort}\hlstd{(v,} \hlkwc{decreasing} \hlstd{= T)}
+\end{alltt}
+\begin{verbatim}
+## [1] 9 7 5 3 1
+\end{verbatim}
+\begin{alltt}
+\hlcom{# order of elements increasingly}
+\hlkwd{order}\hlstd{(v)}
+\end{alltt}
+\begin{verbatim}
+## [1] 2 1 3 5 4
+\end{verbatim}
+\begin{alltt}
+\hlcom{# order of elements decreasingly}
+\hlkwd{order}\hlstd{(v,}\hlkwc{decreasing} \hlstd{= T)}
+\end{alltt}
+\begin{verbatim}
+## [1] 4 5 3 1 2
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+  
+\subsection{Lists}
+A list can store elements that are not necessarily of the same type. Subsetting lists is different from subsetting a vector.
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{list1} \hlkwb{=} \hlkwd{list}\hlstd{(}\hlkwd{c}\hlstd{(}\hlnum{2}\hlstd{,}\hlnum{5}\hlstd{,}\hlnum{3}\hlstd{),}\hlnum{21.3}\hlstd{,}\hlstr{"hello"}\hlstd{)}
+\hlkwd{print}\hlstd{(list1)}
+\end{alltt}
+\begin{verbatim}
+## [[1]]
+## [1] 2 5 3
+## 
+## [[2]]
+## [1] 21.3
+## 
+## [[3]]
+## [1] "hello"
+\end{verbatim}
+\begin{alltt}
+\hlcom{# use [[]] to subset lists}
+\hlstd{list1[[}\hlnum{1}\hlstd{]]}
+\end{alltt}
+\begin{verbatim}
+## [1] 2 5 3
+\end{verbatim}
+\begin{alltt}
+\hlstd{list2} \hlkwb{=} \hlkwd{list}\hlstd{(}\hlkwd{c}\hlstd{(}\hlnum{1}\hlstd{,}\hlnum{2}\hlstd{,}\hlnum{3}\hlstd{,}\hlnum{4}\hlstd{),}\hlkwd{c}\hlstd{(}\hlnum{5}\hlstd{,}\hlnum{6}\hlstd{,}\hlnum{7}\hlstd{),}\hlkwd{c}\hlstd{(}\hlnum{8}\hlstd{,}\hlnum{9}\hlstd{))}
+\hlkwd{print}\hlstd{(list2)}
+\end{alltt}
+\begin{verbatim}
+## [[1]]
+## [1] 1 2 3 4
+## 
+## [[2]]
+## [1] 5 6 7
+## 
+## [[3]]
+## [1] 8 9
+\end{verbatim}
+\begin{alltt}
+\hlcom{# use lapply and sapply to run a function on every element of the list}
+\hlkwd{lapply}\hlstd{(list2,sum)}
+\end{alltt}
+\begin{verbatim}
+## [[1]]
+## [1] 10
+## 
+## [[2]]
+## [1] 18
+## 
+## [[3]]
+## [1] 17
+\end{verbatim}
+\begin{alltt}
+\hlkwd{sapply}\hlstd{(list2,sum)}
+\end{alltt}
+\begin{verbatim}
+## [1] 10 18 17
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+\subsection{Matrices}
+A matrix is two-dimensional and stores elements of the same type. There are various ways to subset a matrix and many operations for matrices.
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{A} \hlkwb{=} \hlkwd{matrix}\hlstd{(}\hlnum{1}\hlopt{:}\hlnum{6}\hlstd{,}\hlkwc{nrow}\hlstd{=}\hlnum{3}\hlstd{,}\hlkwc{ncol}\hlstd{=}\hlnum{2}\hlstd{)}
+\hlcom{# In R, the default is by column}
+\hlkwd{print}\hlstd{(A)}
+\end{alltt}
+\begin{verbatim}
+##      [,1] [,2]
+## [1,]    1    4
+## [2,]    2    5
+## [3,]    3    6
+\end{verbatim}
+\begin{alltt}
+\hlstd{B} \hlkwb{=} \hlkwd{matrix}\hlstd{(}\hlnum{1}\hlopt{:}\hlnum{6}\hlstd{,}\hlkwc{nrow}\hlstd{=}\hlnum{3}\hlstd{,}\hlkwc{ncol}\hlstd{=}\hlnum{2}\hlstd{,}\hlkwc{byrow}\hlstd{=T)}
+\hlkwd{print}\hlstd{(B)}
+\end{alltt}
+\begin{verbatim}
+##      [,1] [,2]
+## [1,]    1    2
+## [2,]    3    4
+## [3,]    5    6
+\end{verbatim}
+\begin{alltt}
+\hlcom{# subset of a matrix}
+\hlstd{A[}\hlnum{1}\hlstd{,}\hlnum{2}\hlstd{]}
+\end{alltt}
+\begin{verbatim}
+## [1] 4
+\end{verbatim}
+\begin{alltt}
+\hlstd{A[}\hlnum{2}\hlstd{,]}
+\end{alltt}
+\begin{verbatim}
+## [1] 2 5
+\end{verbatim}
+\begin{alltt}
+\hlstd{A[,}\hlnum{1}\hlstd{]}
+\end{alltt}
+\begin{verbatim}
+## [1] 1 2 3
+\end{verbatim}
+\begin{alltt}
+\hlcom{# elementwise operations}
+\hlstd{A}\hlopt{+}\hlstd{B}
+\end{alltt}
+\begin{verbatim}
+##      [,1] [,2]
+## [1,]    2    6
+## [2,]    5    9
+## [3,]    8   12
+\end{verbatim}
+\begin{alltt}
+\hlstd{A}\hlopt{*}\hlstd{B}
+\end{alltt}
+\begin{verbatim}
+##      [,1] [,2]
+## [1,]    1    8
+## [2,]    6   20
+## [3,]   15   36
+\end{verbatim}
+\begin{alltt}
+\hlcom{# matrix multiplication}
+\hlstd{A}\hlopt{%*%}\hlkwd{t}\hlstd{(B)}
+\end{alltt}
+\begin{verbatim}
+##      [,1] [,2] [,3]
+## [1,]    9   19   29
+## [2,]   12   26   40
+## [3,]   15   33   51
+\end{verbatim}
+\begin{alltt}
+\hlcom{# apply a function to every row/column}
+\hlkwd{apply}\hlstd{(A,}\hlnum{1}\hlstd{,max)}
+\end{alltt}
+\begin{verbatim}
+## [1] 4 5 6
+\end{verbatim}
+\begin{alltt}
+\hlkwd{apply}\hlstd{(A,}\hlnum{2}\hlstd{,max)}
+\end{alltt}
+\begin{verbatim}
+## [1] 3 6
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+\subsection{Dataframes}
+Dataframes are two-dimensional and they allow columns to be of different types. There are some similarities dealing with dataframes comparing to matrices. The following data file ``student-mat.csv'' is from Lab 2.
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{student} \hlkwb{=} \hlkwd{read.table}\hlstd{(}\hlstr{"student-mat.csv"}\hlstd{,}\hlkwc{header}\hlstd{=T,}\hlkwc{sep}\hlstd{=}\hlstr{";"}\hlstd{)}
+\hlcom{# subset of a dataframe}
+\hlstd{student[}\hlnum{1}\hlstd{,}\hlnum{3}\hlstd{]}
+\hlstd{student}\hlopt{$}\hlstd{age[}\hlnum{1}\hlstd{]}
+\hlstd{student[}\hlnum{1}\hlstd{,]}
+\hlcom{# select subset satisfying certain conditions}
+\hlstd{tmp} \hlkwb{=} \hlstd{student[student}\hlopt{$}\hlstd{age}\hlopt{==}\hlnum{18}\hlstd{,]}
+\hlcom{# operations}
+\hlkwd{sum}\hlstd{(student}\hlopt{$}\hlstd{age}\hlopt{==}\hlnum{18}\hlstd{)}
+\hlkwd{which}\hlstd{(student}\hlopt{$}\hlstd{age}\hlopt{>}\hlnum{18}\hlstd{)}
+\hlcom{# average of three grades G1, G2, G3}
+\hlstd{avg_G} \hlkwb{=} \hlkwd{apply}\hlstd{(student[,}\hlkwd{c}\hlstd{(}\hlstr{"G1"}\hlstd{,}\hlstr{"G2"}\hlstd{,}\hlstr{"G3"}\hlstd{)],}\hlnum{1}\hlstd{,mean)}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+\subsection{For loops}
+For loops can be used to carry out a sequence of operations sharing some common patterns. Sometimes (not always) we can express a for loop in more efficient ways without the loop.
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{s} \hlkwb{=} \hlnum{0}
+\hlkwa{for}\hlstd{(i} \hlkwa{in} \hlnum{1}\hlopt{:}\hlnum{100}\hlstd{)\{}
+  \hlstd{s} \hlkwb{=} \hlstd{s} \hlopt{+} \hlstd{i}
+\hlstd{\}}
+\hlkwd{print}\hlstd{(s)}
+\end{alltt}
+\begin{verbatim}
+## [1] 5050
+\end{verbatim}
+\begin{alltt}
+\hlcom{# another way without using for loop}
+\hlkwd{sum}\hlstd{(}\hlnum{1}\hlopt{:}\hlnum{100}\hlstd{)}
+\end{alltt}
+\begin{verbatim}
+## [1] 5050
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+\subsection{While loops}
+When the number of iterations is not known, we can use while loops to do a sequence of operations. The code below calculates the largest $K$ such that $\sum_{i=1}^{K}i\leq 200$.
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{s} \hlkwb{=} \hlnum{0}
+\hlstd{i} \hlkwb{=} \hlnum{0}
+\hlkwa{while}\hlstd{(s}\hlopt{<=}\hlnum{200}\hlstd{)\{}
+  \hlstd{i} \hlkwb{=} \hlstd{i} \hlopt{+} \hlnum{1}
+  \hlstd{s} \hlkwb{=} \hlstd{s} \hlopt{+} \hlstd{i}
+\hlstd{\}}
+\hlstd{K} \hlkwb{=} \hlstd{i} \hlopt{-} \hlnum{1}
+\hlkwd{print}\hlstd{(K)}
+\end{alltt}
+\begin{verbatim}
+## [1] 19
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+\subsection{Functions}
+We can call and use existing functions in R. Also we can define functions by ourselves. 
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{f} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{n}\hlstd{)\{}
+  \hlkwd{return}\hlstd{(}\hlkwd{sum}\hlstd{(}\hlnum{1}\hlopt{:}\hlstd{n))}
+\hlstd{\}}
+\hlkwd{f}\hlstd{(}\hlnum{100}\hlstd{)}
+\end{alltt}
+\begin{verbatim}
+## [1] 5050
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+\section{SQL}
+We can use the language SQL to work with relational databases.
+
+The basic form of ``SELECT'' in SQL is:
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{sqltext1}\hlkwb{=}\hlstr{"
+SELECT ColumnNames
+FROM TableName
+WHERE Conditions
+GROUP BY VariableNames HAVING Conditions
+ORDER BY VariableNames;"}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+We can also join two tables to get data, with the following basic form:
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{sqltext2}\hlkwb{=}\hlstr{"
+SELECT T1.ColumnNames, T2.ColumnNames
+FROM T1 INNER JOIN T2 ON JoiningConditions;"}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+An example from Lab 4: Using ``baseball.db'', join table \emph{Schools} with table \emph{SchoolsPlayers}. Generate a table showing the number of players from each school in Michigan. Sort by the number of players in descending order.
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{library}\hlstd{(}\hlstr{"RSQLite"}\hlstd{)}
+\hlstd{driver} \hlkwb{=} \hlkwd{dbDriver}\hlstd{(}\hlstr{"SQLite"}\hlstd{)}
+\hlstd{conn} \hlkwb{=} \hlkwd{dbConnect}\hlstd{(driver,} \hlstr{"baseball.db"}\hlstd{)}
+\hlstd{sqltext}\hlkwb{=}\hlstr{"SELECT Schools.schoolID, schoolName, COUNT(playerID) AS NumOfPlayers 
+                FROM Schools INNER JOIN SchoolsPlayers 
+                ON Schools.schoolID = SchoolsPlayers.schoolID 
+                WHERE schoolState = 'MI' 
+                GROUP BY Schools.schoolID 
+                ORDER BY NumOfPlayers DESC;"}
+
+\hlstd{dt} \hlkwb{=} \hlkwd{dbGetQuery}\hlstd{(conn,sqltext)}
+\hlkwd{head}\hlstd{(dt)}
+\end{alltt}
+\begin{verbatim}
+##     schoolID                  schoolName NumOfPlayers
+## 1   michigan      University of Michigan           72
+## 2 michiganst   Michigan State University           37
+## 3  wmichigan Western Michigan University           31
+## 4  emichigan Eastern Michigan University           14
+## 5  cmichigan Central Michigan University           13
+## 6    detroit University of Detroit Mercy            8
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+\section{XML}
+XML can be used to write documents that store both the data and data descriptions. It has a tree-like format. Note that XML is case-sensitive. An example from Lab 5:
+\begin{verbatim}
+<?xml version="1.0" encoding="UTF-8"?>
+<students>
+  <person SocialID="123" SchoolID="92031482">
+    <name>Jim Brown</name>
+    <gender>Male</gender>
+    <major>Mathematics</major>
+    <minor> Statistics </minor>
+  </person>
+  <person SocialID="234" SchoolID="91405720">
+    <name>Susan Leicester</name>
+    <gender>Female</gender>
+    <major>Chemistry</major>
+  </person>
+</students>
+\end{verbatim}
+Here ``students'' is the \textbf{root}, which is the first \textbf{node}. Its first child \textbf{node} has \textbf{name} ``person''. This node has two \textbf{attributes} ``SocialID'' and ``SchoolID''.
+\end{document}

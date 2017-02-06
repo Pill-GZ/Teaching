@@ -1,0 +1,265 @@
+%\documentclass[letter,10.5pt]{article}
+\documentclass[12pt]{article}
+\usepackage{graphicx}
+\usepackage{pdfpages}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{amsfonts,amssymb,amsmath,amsthm}
+\usepackage{boxedminipage}
+\usepackage{bm}
+\usepackage{color}
+\usepackage{url}
+\usepackage{enumerate}
+
+\newcommand{\rmnum}[1]{\romannumeral #1}
+\newcommand{\Rmnum}[1]{\MakeUppercase{\romannumeral #1}}
+\newcommand{\prob}{\mathbb{P}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Normal}{\mathsf{N}}
+\newcommand{\iid}{\stackrel{\text{iid}}{\sim}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\varx}{\mathbf{x}}
+% grouping operators
+\newcommand{\brac}[1]{\left[#1\right]}
+\newcommand{\set}[1]{\left\{#1\right\}}
+\newcommand{\abs}[1]{\left\lvert #1 \right\rvert}
+\newcommand{\paren}[1]{\left(#1\right)}
+\newcommand{\norm}[1]{\left\|#1\right\|}
+
+\numberwithin{equation}{subsection}
+
+\setlength{\textwidth}{150mm}
+\setlength{\textheight}{230mm}
+\setlength{\headheight}{-1.5cm}
+\setlength{\topmargin}{-0.1cm}
+\setlength{\oddsidemargin}{0cm}
+\setlength{\evensidemargin}{0cm}
+\setlength{\parskip}{1mm}
+\setlength{\unitlength}{1mm}
+\setlength{\parindent}{2.06em}
+\pagestyle{plain}
+
+\title{\textbf{STAT 406 Lab 7 Handout}}
+\author{Jun Guo}
+\date{\today}
+\begin{document}
+\begin{center}
+\large
+\textbf{STAT 406 Lab 7, 10/29/2015}
+\end{center}\vspace*{5mm}
+
+\section{Importance Sampling: more intuiation and some comparison}
+
+\textbf{Recall}: Last lab, we reviewed \textit{basic Monte Carlo integration}, introduced two versions of importance sampling, the first one only works for fully specified target density $\pi(x)$; Another, called ``\textit{weighted average Importance sampling}'' works even when $\pi(x)$ is only specified up to an multiplicative constant.  \newline
+
+Today, we are interestd in the following question of \textit{evaluating an expectation} with Importance Sampling:\newline
+
+\noindent
+\textcolor{blue}{Question}: Let $h : \R^{d} \to \R$ be a function, and $\pi(x)$ be a density on $\R^{d}$. We want to evaluate the mean $\textcolor{blue}{\mu} = \E\paren{h(X)} = \int h(x)\pi(x) dx$. \newline
+
+\noindent
+\textcolor{blue}{Importance Sampling Algorithm}:
+\begin{enumerate}[(1)]
+\item Draw $\mathbf{x_1}, \mathbf{x_2}, \dots, \mathbf{x_n}$ from an appropriate trial distribution $g(\cdot)$;
+\item Calculate the \textit{importance weight} $$w_j = \frac{\pi(\mathbf{x_j})}{g(\mathbf{x_j})},~\text{ for } j = 1, 2, \dots, n$$
+\item Approximate $\textcolor{blue}{\mu}$ by \textbf{``weighted average''}
+\begin{equation}\label{eq:eqv1}
+\hat{\mu} = \frac{w_1h(\mathbf{x_1}) + \cdots + w_nh(\mathbf{x_n})}{w_1 + \cdots + w_n}
+\end{equation}
+or by \textbf{``average of weighted sum''}
+\begin{equation}\label{eq:eqv2}
+\tilde{\mu} = \frac{1}{n}\set{w_1h(\mathbf{x_1}) + \cdots + w_nh(\mathbf{x_n})}
+\end{equation}
+\end{enumerate}
+
+\noindent
+\textcolor{blue}{Remarks}:
+
+In the above importance sampling algorithm, a major advantage of using \eqref{eq:eqv1} instead of using the unbiased \eqref{eq:eqv2} is that in using the former, one needs \textit{only} to know the ratio $\pi(\mathbf{x})/g(\mathbf{x})$ up to a multiplicative constant, versus in \eqref{eq:eqv2} the ratio needs to be known exactly.
+
+Also, in order to make the estimation error small, one wants to choose $g(\mathbf{x})$ as close in shape to $h(x)\pi(x)$ as possible. \newline
+
+Let us work on an example to have a hands on experience of the above.\newline
+
+\noindent
+\textcolor{blue}{Example 1: Choice of trial distribution $g(x)$}:
+
+Suppose $\varx$ follows an \textit{exponential distribution} with rate $\lambda = 1$. Compute the expectation $\E\brac{\varx^2(cos(\varx/3))^2}$.
+
+\underline{Solution:}
+
+firstly, for exponential distribution with rate 1, $\pi(\varx) = e^{-\varx}$. We evaluate $\mu = \E(\varx^2(cos(\varx/3))^2) = \int_0^{\infty}x^2(cos(x/3))^2e^{-x}dx$ by importance sampling.\newline
+
+How to choose the trial distribution $g(x)$? We will try the following two choices and compare them:\newline
+
+\textbf{a)}. choose $g(x)  = \lambda e^{-\lambda x}$, we will try $\lambda = 0.5 \text{ and } 1$. Notice that when $\lambda = 1,~g(x) = \pi(x)$ and the importance weights are all $1$, which is just basic Monte Carlo.
+
+\underline{Algorithm:}
+\begin{enumerate}[(1)]
+\item Draw $\mathbf{x_1}, \mathbf{x_2}, \dots, \mathbf{x_n}$ by $\set{-\log(\mathbf{u}_j)/\lambda},~\mathbf{u}_j \text{ is uniform(0,1) variable },~j=1, \dots, n$;
+\item Calculate the \textit{importance weight} $$w_j = \frac{\pi(\mathbf{x_j})}{g(\mathbf{x_j})} \propto e^{-(1-\lambda)\varx_j},~\text{ for } j = 1, 2, \dots, n$$
+\item Approximate $\mu$ by 
+$$\hat{\mu} = \frac{w_1h(\mathbf{x_1}) + \cdots + w_nh(\mathbf{x_n})}{w_1 + \cdots + w_n} $$
+\end{enumerate}
+
+\underline{Implement}: 
+\newline
+\vspace{2.5cm}
+
+\textbf{b)}. choose $g(x)$ to be a $Gamma(\alpha = 3, \beta = 1)$ distribution density $g(x) = \frac{1}{\Gamma(3)}x^2e^{-x}$, where $\Gamma(3) = 2$. In R, this Gamma random variables can be generated by $rgamma(n, shape=3, rate=1)$ or by the sum of exponential(1) random variables as introduced in Lab3.
+
+\underline{Algorithm:}
+\begin{enumerate}[(1)]
+\item Draw $\mathbf{x_1}, \mathbf{x_2}, \dots, \mathbf{x_n}$ by $rgamma(n, shape=3, rate=1)$;
+\item Calculate the \textit{importance weight} $$w_j = \frac{\pi(\mathbf{x_j})}{g(\mathbf{x_j})} \propto \varx_j^{-2},~\text{ for } j = 1, 2, \dots, n$$
+\item Approximate $\mu$ by 
+$$\hat{\mu} = \frac{w_1h(\mathbf{x_1}) + \cdots + w_nh(\mathbf{x_n})}{w_1 + \cdots + w_n} $$
+\end{enumerate}
+
+\underline{Implement}: 
+\newline
+\vspace{2.5cm}
+
+\textbf{Comparison of a) and b):}\newline
+
+We will \textbf{compare the choices of $g(x)$ in a) and b)} according to suggestions specified in lecture notes of Professor Atchade:
+\begin{itemize}
+\item Coverage/Support matching: all of our trial densities $g(x)$ have the same coverage $(0, \infty)$ as $\pi(x)$, we are good;
+\item Resemblance: choose $g(x)$ such that it's close in shape to $|h(x)|\pi(x)$;\newline
+The following plots compares the shapes of $|h(x)|\pi(x)$ versus various $g(x)$ we have used:
+\begin{center}
+\includegraphics[scale=0.65]{compare_02.pdf}
+\end{center}
+%\pagebreak
+\item Stability: the importance function $w(x) = \pi(x) / g(x) < M$, for some finite $M$ constant. We are good here but will not go to details in this lab. If you are interested, a hint: we chose $\lambda = 0.5, 1 \le1$ in exponential trial and the rate parameter $\beta = 1 \le 1$ in Gamma trial to make sure we are good here! 
+\end{itemize}
+
+And the consequence of using these different $g(x)$ for the estimation?
+
+For one run, when sample size $n = 1000$, I get the following estimate, error and $95\%$ confidence intervals:
+\begin{center}
+    \begin{tabular}{ | l | l | l | p{3.5cm} |}
+    \hline
+    Trial density & Estimate & Estimation error & confidence interval \\ \hline
+    $g(x) = e^{-x}$ & 1.052 & 0.094 & [0.868, 1.234] \\ \hline
+    $g(x) = 0.5e^{-0.5x}$ & 0.903 & 0.021 & [0.862, 0.943] \\ \hline
+    $g(x) = 0.5x^2e^{-x}$ & 0.896 & 0.020 & [0.857, 0.935] \\
+    \hline
+    \end{tabular}
+\end{center}
+And the true value $\mu \approx 0.89$, for which the Gamma trial is most accurate and precise in this run. A better comparison is to estimate $\mu$ along a sample path of increasing sample sizes, but it's safe to draw a conclusion here that $g(x) = \pi(x)$, i.e. basic Monte Carlo is not  the best choice, and the closer $g(x)$ mimicks $\abs{h(x)}\pi(x)$ the smaller the estimation error will be.
+\vspace{1cm}
+
+
+\noindent
+\textcolor{blue}{Example 2: IS with unknown constant $C$ in target density $\pi(x)$:}
+
+Compute the first moment (mean) of the distribution with density $\pi(x) \propto \tilde{\pi}(x) = \frac{e^{-x}}{1+ x}$ for $x >0$. Use exponential density for different choices of rate parameter $\lambda$ as your trial density. Find the one which minimizes the CV (rule of thumb).
+
+\underline{Solution}: we want to compute 
+\begin{equation}\label{eq:eq1}
+\int_0^{\infty} x\pi(x)dx
+\end{equation}, but we only know the density $\pi(x)$ up to a normalizing constant since $\pi(x) \propto \tilde{\pi}(x) = \frac{e^{-x}}{1+ x}$, put in math words: $\pi(x) = \tilde{\pi}(x)/C$ where the constant $C$ is unknow. 
+
+Here, only ``weighted average'' \eqref{eq:eqv1} of the two versions of importance sampling can be applied, since $w(x) = \pi(x)/g(x) = \tilde{\pi}(x)/Cg(x)$ can only be known as $w(x) \propto \tilde{\pi}(x)/g(x)$. Choosing $g(x) = \lambda e^{-\lambda x}$, we esimate \eqref{eq:eq1} by the Importance Sampling algorithm: \newline
+
+\underline{Algorithm:}
+\begin{enumerate}[(1)]
+\item Draw $\mathbf{x_1}, \mathbf{x_2}, \dots, \mathbf{x_n}$ by $rexp(n, rate=\lambda)$;
+\item Calculate the \textit{importance weight} $$w_j = \frac{\pi(\mathbf{x_j})}{g(\mathbf{x_j})} \propto \frac{e^{-(1-\lambda)\varx_j}}{1+\varx_j},~\text{ for } j = 1, 2, \dots, n$$
+\item Approximate $\mu$ by 
+$$\hat{\mu} = \frac{w_1h(\mathbf{x_1}) + \cdots + w_nh(\mathbf{x_n})}{w_1 + \cdots + w_n} $$
+\end{enumerate}
+\hfill \break
+
+\noindent
+\underline{Implementation:} notice to check this implementation with respect to the above algorithm and make sure you understand how do they match and how does it work for weighted average importance sampling method.
+
+\begin{verbatim}
+IS = function(input){
+
+	lambda = input[1]
+	n = input[2]
+	
+	# Target density with unknow constant C
+	f = function(t) (exp(-t) / (t+1))
+	
+	# trial density, g
+	g = function(t) dexp(t, lambda)
+	
+	# importance function
+	w = function(t) f(t) / g(t)
+	
+	# draw sample from g
+	X = rexp(n, lambda)
+	
+	# calculate the list of importance values
+	W = w(X)
+	
+	# importance sampling estimate
+	I = sum( X * W ) / sum(W)
+	
+	# calculate sample coefficient of variation CV
+	CV = sqrt( var( W / mean(W) ) )
+	
+	# calculate importance sampling error
+	sig.sq = var( X * W / mean(W) )
+	se = sqrt( sig.sq / n )
+	
+	output = c(I, se, CV)
+	return(output)
+
+}
+
+## calculate CV for a grid of values of lambda
+lambda.val <- seq(.02, 3, length=100)
+n.val <- rep(1000, 100)
+# inpt.mat is a 100 times 2 matrix containing all the inputs, each row 
+
+of inpt.mat is an input
+inpt.mat <- matrix(c(lambda.val, n.val), nrow = 100, ncol = 2)
+
+## estimate mu for each input row in inpt.mat
+A <- apply(inpt.mat,1, IS) 
+# each output of IS() function as c(I, se, CV) is contained a column of A
+A <- t(A)
+
+## see where CV is low enough
+plot(lambda.val, A[,3], ylab="CV", xlab="Lambda", main="CV vs. lambda", col=2, 
+type="l")
+abline(h=5) # only those with a CV value below 5 are considered stable
+
+
+##  standard errors of IS estimates
+plot(lambda.val, A[,2], xlab="Lambda", ylab="standard error vs. Lambda", col=4, 
+type="l")
+
+
+indx = which.min(A[,3])
+fin.ans <- c(lambda.val[indx], A[indx,])
+# > fin.ans
+# [1] 1.49494949 0.67352477 0.02648119 0.08984800
+# CV-optimal lambda by minimize CV : 1.49494949 (>1)
+# estimate of mu under CV-optimal lambda : 0.67352477 
+# standard error: 0.02648119 
+# minimum CV value : 0.08984800
+
+## if we try to minimize the estimation standard error
+indx_se <- which.min(A[,2])
+ans.mse <- c(lambda.val[indx_se], A[indx_se,])
+# > ans.mse
+# [1] 0.712323232 0.650455484 0.007672835 0.612279636
+# SE-optimal lambda by minimize standard error : 0.712323232 (<1)
+# estimate of mu under SE-optimal lambda : 0.650455484
+# standard error: 0.007672835
+# corresponding CV value : 0.612279636
+\end{verbatim}
+\begin{center}
+\includegraphics[scale=0.4]{lowCV.pdf}
+\end{center}
+\begin{center}
+\includegraphics[scale=0.4]{lowSE.pdf}
+\end{center}
+Which criterion do you think one should use ? minimize CV ? minimize SE ?
+
+\end{document}

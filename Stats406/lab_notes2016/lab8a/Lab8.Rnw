@@ -1,0 +1,122 @@
+%In R, use require("knitr") and knit("this Rnw file") to generate the tex file
+
+\documentclass[12pt]{article}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{fullpage}
+\usepackage{amsmath}
+
+\begin{document}
+
+\begin{center}
+\bf
+\LARGE
+STATS 406 Fall 2016: Lab 08
+\end{center}
+
+\section{Law of Large Numbers}
+Write a function which calculates the empirical distribution function of $X_1,\cdots,X_m\stackrel{\text{iid}}{\sim}N(0,1)$. The empirical distribution function is defined as
+\begin{equation*}
+\Phi_m(x) = \frac{1}{m}\sum_{i=1}^mI(X_i\leq x)
+\end{equation*}
+where $I(X\leq x)$ is an indicator function, taking value 1 if $X\leq x$ and 0 otherwise. Plot this function for $x\in[-4,4]$. Let $m=5,50,500$ respectively and plot everything on the same figure, with the true standard Normal cdf superimposed for comparison.
+
+<<eval=T>>=
+Phi.m = function(m,xseq){
+	# xseq can be either a scalar or a vector
+	X = rnorm(m)
+	Phi.m.x = sapply(xseq,function(x){mean(X<x)})
+	return(Phi.m.x)
+}
+
+m = c(5,50,500)
+xseq = seq(-4,4,by=0.01)
+plot(0,xlim=c(-4,4),ylim=c(0,1),xlab="x",ylab="Phi.m(x)",
+     main="Empirical CDF", type='n')
+for (i in 1:length(m)){
+	par(new=T)
+	plot(xseq,Phi.m(m[i],xseq),col=i,axes=F,type="l",xlim=c(-4,4),
+	ylim=c(0,1),xlab="",ylab="")
+}
+lines(xseq,pnorm(xseq,mean=0,sd=1),col="blue",lty=3,lwd=2)
+legend("topleft",legend=c(paste(m,'points'),'Normal cdf'),
+col=c(1:length(m),'blue'),lty=c(1,1,1,3))
+@
+
+Remark: here for almost all $x$, the value $\Phi_m(x)$ is approaching the Normal cdf. Why does this happen? We can use Law of Large Numbers to see that for any fixed $x$, $\Phi_m(x)$ is the mean of $m$ independent identically distributed random variables $I(X_i\leq x)$, thus will converge to the expectation $E(I(X_1\leq x))=P(X_{1}\leq x)$, which is the standard Normal cdf.
+
+\section{Generating random variables with inversion method and more}
+We learned from lecture that random variables from a particular distribution can be generated from uniform random variables by inverting their cumulative distribution function (cdf). That is, if you create samples $U_1, \cdots , U_n$ from $Uniform(0, 1)$ distribution and compute $F^{-1}(U_1), \cdots , F^{-1}(U_n)$, then what you get is samples from a distribution with cdf $F$ . Using this property, we'll generate exponential random variables and gamma random variables.
+
+\noindent \textbf{(a)} The Exponential$(\lambda)$ distribution has cdf:
+\begin{equation*}
+F(x) = 1 - e^{-\lambda x}, \lambda > 0
+\end{equation*}
+Using $runif$ function, generate 100 samples from $Exponential(3)$ distribution using the inversion method. Graph the density histogram for the sample with the true density superimposed for comparison.
+
+<<eval=T>>=
+n = 100
+lambda = 3
+x = -(1/lambda)*log(runif(n))
+hist(x, prob = TRUE)
+y = seq(0,10,length = 1000)
+lines(y,dexp(y,3))
+@
+
+\noindent
+\textbf{(b)} $Gamma(k, \theta)~,~k>0,~\theta>0$ distribution has density:
+$$f(x) = \frac{\theta^k}{(k-1)!}x^{k-1}e^{-\theta x}$$
+where $k~and~\theta$ are shape and rate parameters. What are $k~and~\theta$ for $Exponential(\lambda)$ distribution in terms of Gamma distribution?
+
+Gamma distribution also has the property that if $X \sim Gamma(a, \theta)$ and $Y \sim Gamma(b, \theta)$, and $X$ and $Y$ are independent, then
+$$X+Y \sim Gamma(a+b,\theta).$$ Using this property and the way to generate exponential distributions, create 10 samples from Gamma(5, 3) distribution.
+
+<<eval=T>>=
+n = 10
+k = 5
+lambda = 3
+x = matrix(-(1/lambda)*log(runif(n*k)), ncol=k)
+g = apply(x, 1, sum)
+@
+
+Remark: the density of exponential distribution is $\lambda e^{-\lambda x}$, which you can get by taking the derivative with respect to its cdf. Then comparing with Gamma distribution density, we can see here $\theta=\lambda$ and $k=1$. Then we can generate the Gamma(5,3) as the sum of 5 independent exponential variables of $\lambda=3$.
+
+\section{Inversion method for discrete random variables}
+Write a function to generate $n$ random numbers from binomial distribution with $m$ trials and $p$ using inversion sampling. The mass function of binomial distribution is
+$$P(X=k)= {m \choose k} p^k (1-p)^{m-k}$$
+where $k = 0,1,\ldots,m$. We set $n = 1000$, $p = 0.4$. Plot the histogram with $m = 10$.
+
+<<eval=T>>=
+## Function to implement the inversion sampling
+## for binomial distribution
+binomial <- function(n, num_trials, prop)
+{
+  ## Generate n uninform numbers
+  z <- runif(n)
+  ## Obtain P(X=0), P(X=1), ..., P(X=num_trails)
+  tmp = seq(0, num_trials)
+  p <- choose(num_trials, tmp)* prop^tmp * (1-prop)^(num_trials-tmp)
+  ## Intialize the binomial numbers
+  x <- rep(0, n)
+  for (i in seq(1, n))
+  {
+    s <- 0  ## Initialize the sum
+    k <- -1  ## Initialize
+    ## While loop
+    ## Finding the smallest k such that p[1]+...p[k] > z[i]
+    while (s < z[i])
+    {
+      k <- k + 1
+      s <- s + p[k+1]
+    }
+    x[i] <- k
+  }
+  
+  return(x)
+}
+
+## Call binomial generator
+x <- binomial(n=1000, num_trials=10, prop=0.4)
+hist(x)
+@
+\end{document}

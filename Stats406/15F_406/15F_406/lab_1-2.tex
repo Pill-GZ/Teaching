@@ -1,0 +1,459 @@
+\documentclass[10pt]{article}
+\setlength{\oddsidemargin}{0.0in} \setlength{\evensidemargin}{0.0in}
+\setlength{\textwidth}{6.5in} \setlength{\topmargin}{-0.25in}
+\setlength{\textheight}{8.75in}
+\usepackage{amsmath, amssymb, amsfonts, amscd, xspace, pifont, natbib, fullpage}
+\usepackage{epsfig, amsfonts, verbatim, multirow}
+\usepackage{epstopdf}
+\usepackage{listings}
+\lstset{
+  basicstyle=\ttfamily,
+  mathescape
+}
+%\usepackage{setspace}
+\newcommand{\mycite}[1]{{\citeNP{#1}}}
+
+\parindent=0pt
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Different font in captions
+\newcommand{\captionfonts}{\small}
+\makeatletter  % Allow the use of @ in command names
+\long\def\@makecaption#1#2{%
+  \vskip\abovecaptionskip
+  \sbox\@tempboxa{{\captionfonts #1: #2}}%
+  \ifdim \wd\@tempboxa >\hsize
+    {\captionfonts #1: #2\par}
+  \else
+    \hbox to\hsize{\hfil\box\@tempboxa\hfil}%
+  \fi
+  \vskip\belowcaptionskip}
+\makeatother   % Cancel the effect of \makeatletter
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Matrix, Vector
+\newcommand{\V}[1]{\ensuremath{\boldsymbol{#1}}\xspace}
+\newcommand{\M}[1]{\ensuremath{\boldsymbol{#1}}\xspace}
+%% Math Functions
+\newcommand{\F}[1]{\ensuremath{\mathrm{#1}}\xspace}
+\newcommand{\sgn}{\F{sgn}}
+\newcommand{\tr}{\F{trace}}
+\newcommand{\diag}{\F{diag}}
+\newcommand{\dett}{\F{det}}
+%% Transpose
+\newcommand{\T}[1]{\ensuremath{{#1}^{\mbox{\sf\tiny T}}}}
+
+%%
+\def  \R  {\boldsymbol R}
+\def\bX{\boldsymbol X}
+\def\bY{\boldsymbol Y}
+\def\bbeta{\boldsymbol \beta}
+\def\blambda{\boldsymbol \lambda}
+\def\bepsilon{\boldsymbol \epsilon}
+\def\bone{\boldsymbol{1}}
+\def\bzero{\boldsymbol 0}
+\def\E{\mbox{E}}
+\def\var{\mbox{var}}
+\def\gauss{\mbox{N}}
+\def\lap{\mbox{L}}
+\def\G{\mbox{G}}
+\def\go{  $\R$  ightarrow}
+\def\invG{\mbox{G}^{-1}}
+\def\argmin{\arg\min}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}{Proposition}
+\newtheorem{lemma}{Lemma}
+\newtheorem{corollary}{Corollary}
+\newtheorem{algorithm}{Algorithm}
+\newtheorem{definition}{Definition}
+\newtheorem{remark}{Remark}
+
+\usepackage{color}
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+\lstdefinestyle{displaycode}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+%    columns=flexible,
+    numbers=none,
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=true,
+    showtabs=false,                  
+    tabsize=2%,
+    %xleftmargin=2em,
+    %xrightmargin=2em,
+} 
+
+\lstset{style=displaycode}
+%\newcommand{\displaycodefile}[1]{\lstinputlisting[language=R]{./codeblocks/#1.txt}}
+
+\begin{document}
+
+\title{\Large \bf STATS 406 F15: Lab 01}
+\date{}
+
+\maketitle
+%\setcounter{equation}{0}
+\section{Section inforamtion}
+\begin{itemize}
+	
+	\item Lab section: Thursday, 8:30-10:00 am  (Yuan Zhang)
+	\item Office hours: (Science Learning Center, Chemistry building, attend any)
+	\begin{itemize}
+	\item Tuesday: 10:00a.m. -- 11:30a.m. (Yuan Zhang)
+	\item Tuesday: 1:00p.m. -- 2:30p.m. (Dao Nguyen)
+	\item Tuesday: 3:00p.m. -- 4:30p.m.  (Jun Guo)
+	\end{itemize}
+ \end{itemize}
+\section{Start coding in Rstudio}
+\begin{itemize}
+	\item New code:
+	\begin{itemize}
+		\item By shortcut: (Ctrl + Shift + N).
+		\item By menu: File $\to$ New File $\to$ R Script.
+	\end{itemize}
+	\item Save the code:
+	\begin{itemize}
+		\item By shortcut: (Ctrl + S).
+		\item By menu: File $\to$ Save.
+	\end{itemize}
+	\item Execute the code:
+	\begin{itemize}
+		\item Line-by-line:
+		\begin{enumerate}
+			\item Move the cursor to the line.
+			\item Press (Ctrl + R) for Windows or (Command + Enter) for Mac.
+		\end{enumerate}
+		\item Run script file(Recommended):
+		\begin{enumerate}
+			\item Set proper working directory.
+\begin{lstlisting}[style=displaycode, language=R]
+	# Only for illustration, will not run
+	## Check the working directory
+	> getwd();
+	[1] "C:/Users/yzhanghf/Documents"
+	## Set proper working directory
+	> setwd('C:/Users/yzhanghf/Desktop');
+\end{lstlisting}
+			\item Source the file.
+%			\displaycodefile{1_02}
+\begin{lstlisting}[style=displaycode, language=R]
+	> source('Lab_1.r');
+\end{lstlisting}
+		\end{enumerate}
+	\end{itemize}
+\end{itemize}
+
+\section{Variables and Functions}
+\subsection{Variables}
+Two ways to assign a value to a variable
+\begin{itemize}
+	\item (variable) \texttt{=} (value)
+	\item (variable) \texttt{<-} (value)
+\end{itemize}
+
+\begin{lstlisting}[style=displaycode, language=R]
+	> x = 6;
+	> y = x;
+	> print(y);
+	[1] 6
+	
+	> x <- 8;
+	> y <- x^2 - 2*x + 1;
+	> print(y);
+	[1] 49
+\end{lstlisting}
+
+Do not use reserved keywords of R as variable names. Examples:
+\begin{itemize}
+	\item c, function, print, return, $\ldots$
+	\item sin, cos, sqrt, abs, $\ldots$
+	\item plot, maplot, levelplot, hist, $\ldots$
+\end{itemize}
+
+{\bf Quiz: guess the output before running the script:}
+\begin{lstlisting}[style=displaycode, language=R]
+	# What happens if you run this?
+	> c = 3;
+	> aa = c(1, 2, c);
+	> print(aa);
+\end{lstlisting}
+Run:
+\begin{lstlisting}[style=displaycode, language=R]
+	> rm(c);
+\end{lstlisting}
+afterwards to remove the user-specified definition for ``c''.
+
+\subsection{Define a user-specified function}
+\underline{Format:} (function name) = function(argument list)\{function content; return(variable);\}
+\begin{itemize}
+	\item Simple functions can be defined in the in the main code file, while complicated functions are advised to be defined in separate files for clarity.
+\end{itemize}
+\underline{Example}: create a file ``plusthree.r'' under working directory with the following content:
+\begin{lstlisting}[style=displaycode, language=R]
+	# Content of file: plusthree.r
+	plusthree = function(x, y=3){
+		z = x + y;
+		return(z);
+	}
+\end{lstlisting}
+Then in the console:
+\begin{lstlisting}[style=displaycode, language=R]
+	> source('plusthree.r');
+	> plusthree(3);
+	[1] 6
+	> plusthree(3, 6);
+	[1] 9
+\end{lstlisting}
+Remarks:
+\begin{enumerate}
+	\item You can also run the content of plusthree.r instead of sourcing it in the console.
+	\item Assign \emph{default values} to variables while defining the argument list.
+	\item In STATS 406, R does not pass variables by reference, so always have {\bf return} by the end.
+\end{enumerate}
+
+\section{Vectors and Matrices}
+\subsection{Create a vector}
+Basic ways to create vectors:
+\begin{itemize}
+	\item {\bf c()}, example {\bf a=c(1, 2)}.
+	\item {\bf rep()}, example {\bf a=rep(1, 3)}, creates an all-one vector of length $3$.
+	\item {\bf seq()}, example {\bf a=seq(from=0, to=2, by=0.1)} or {\bf a=seq(0, 2, 0.1)}(not recommended).
+	The reason that we advise writting ``from'', ``to'' and especially ``by'' in {\bf seq} is \underline{\bf clarity}.
+	{\bf Quiz: what does this give you, ``0,3,6'' or ``0,2,4,6''?}
+	\begin{lstlisting}[style=displaycode, language=R]
+	# Not recommended way of writing
+	> print(seq(0, 6, 3));
+	\end{lstlisting}
+	An alternative to ``by'' is ``length.out''.
+	\begin{lstlisting}[style=displaycode, language=R]
+	> print(seq(from=0, to=6, length.out=7));
+	[1] 0 1 2 3 4 5 6
+	\end{lstlisting}
+	\item Integer sequences, example {\bf a=1:4;} equivalent to {\bf a=c(1, 2, 3, 4);} This method is originally designed to facilitate {\bf for} loops, but is now more widely applied.
+	\item By random number generators. Examples: {\bf a=rnorm(1000)}, {\bf a=runif(100, -0.5, 0.5)} and so on. A few important notes:
+	\begin{itemize}
+		\item {\bf Always save random seed if any part of your code involves random number generation to allow others repeat your experiment and verify your results!}
+\begin{lstlisting}[style=displaycode, language=R]
+	> set.seed(2015); # Use your lucky number in exams, if you have one.
+\end{lstlisting}
+		\item {\bf runif(100)} and {\bf rnorm(100)} are OK. {\bf runif(100, -1, 1)} is OK. But {\bf rnorm(100, 1, 3)} should be replaced by {\bf rnorm(100, mean=1, sd=3)}, especially ``sd='' should never be omitted in general cases.
+		\begin{itemize}
+			\item For all other distributions, explicitly write all parameter names.
+		\end{itemize}
+	\end{itemize}
+\end{itemize}
+
+
+%\begin{center}
+%\framebox[0.75\textwidth][c]{Correctness and clarity are top priorities. Everything else is secondary.}
+%\end{center}
+
+
+
+\subsection{Vector operations and manupulations}
+In R, ordinary operations on vectors are \underline{\bf element-wise}.
+\begin{lstlisting}[style=displaycode, language=R]
+	> a1 = c(1, 2, 3); a2 = c(1, 0, -1);
+	> print(a1*a2);
+	[1] 1 0 -3
+\end{lstlisting}
+Operations between vectors of different lengths is $\ldots$
+\begin{enumerate}
+	\item allowed, if one's length is multiple to the other's
+	\begin{lstlisting}[style=displaycode, language=R]
+		> a1 = c(1, 2, 3); a2 = c(1, 0, -1);
+		> a3 = c(-1, 0, 1, a2);
+		# Element-wise product of vectors with different lengths
+		> print(a1*a3);
+		[1] -1  0  3  1  0 -3
+	\end{lstlisting}
+	\item but should be avoided, to reduce bugs that do not trigger error messages.
+	\item The only exception is an operation between a vector and a scalar.
+	\begin{lstlisting}[style=displaycode, language=R]
+		> a1 = c(1, 2, 3);
+		> print(a1+3);
+		[1] 4 5 6
+	\end{lstlisting}
+	Such operations are fully acceptable and widely-used. In R, scalars are treated as length-one vectors:
+\begin{lstlisting}[style=displaycode, language=R]
+	> a=1;
+	> is.vector(a);
+	[1] TRUE
+	> length(a);
+	[1] 1
+\end{lstlisting}
+\end{enumerate}
+
+Notice: an operation alone does not change the vector itself.
+\begin{lstlisting}[style=displaycode, language=R]
+	> a1 = c(1, 2, 3);
+	> append(a1, 3);
+	[1] 1 2 3 3
+	> print(a1);
+	[1] 1 2 3
+	
+	# If you want to permanently append 3 to a1, then use ``=''.
+	> a1 = append(a1, 3);
+	> print(a1);
+	[1] 1 2 3 3
+\end{lstlisting}
+
+Two basic ways to extract subvectors:
+\begin{enumerate}
+	\item By integer indexing: {\bf a1[2:3]}, {\bf a1[c(1, 3)]} and so on.
+	\item By logical indexing: {\bf a1[c(TRUE, FALSE, FALSE)]}. Accessing by logical expressions are essentially the same.
+\begin{lstlisting}[style=displaycode, language=R]
+	> a1 = c(1, 2, 3); a2 = c(1, 0, -1);
+	> print( a1[a2<0.5] );
+	[1] 2 3
+	
+	> indexvector = a2>0.5;
+	> print(indexvector);
+	[1] TRUE FALSE FALSE
+	> print( a1[indexvector] );
+	[1] 1
+\end{lstlisting}
+
+{\bf Quiz(seen in lecture): what will be the output?}
+\begin{lstlisting}[style=displaycode, language=R]
+	> a1=c(1, 2, 3);
+	> indexvector=c(TRUE, FALSE); # Incorrectly short in length.
+	# Only for illustration, avoid in practical programming
+	> print( a1[indexvector] );
+\end{lstlisting}
+This is an example of a potential mistake that does not trigger error message.
+
+\end{enumerate}
+
+Many functions defined for scalars accept vectors as input:
+\begin{lstlisting}[style=displaycode, language=R]
+	> a=seq(from=0, to=pi, by=0.25*pi);
+	> print(round(sin(a), 3));
+	[1] 0.000 0.707 1.000 0.707 0.000
+\end{lstlisting}
+The function {\bf sin} was applied element-wise.
+
+Many other useful operations, including {\bf sort()}, {\bf order()}, {\bf min()}, {\bf median()} and so on. Learn their usage from their manuals.
+\begin{lstlisting}[style=displaycode, language=R]
+	# Toggle documentation, press ``q'' to quit when finished.
+	> ?sort
+\end{lstlisting}
+
+\subsection{Create a matrix}
+
+Useful commands:
+\begin{itemize}
+	\item {\bf matrix()}, first specify \#rows, then \#columns. Example:
+\begin{lstlisting}[style=displaycode, language=R]
+	> a = matrix(1:6, c(2, 3));
+	> print(a);
+	           [,1] [,2] [,3]
+	     [1,]    1    3    5
+	     [2,]    2    4    6
+\end{lstlisting}
+	\item {\bf array()}, similar to {\bf matrix}, but can easily generate matrices of identical elements:
+\begin{lstlisting}[style=displaycode, language=R]
+> a = array(0, c(2,2));
+> print(a);
+           [,1] [,2]
+     [1,]    0    0
+     [2,]    0    0
+\end{lstlisting}
+	{\bf Quiz: how to generate an all-one matrix of $6\times 6$ dimensions with ``matrix()''?}
+	\item {\bf cbind()} and {\bf rbind()}, combine vectors and/or matrices of proper dimensions. Example:
+\begin{lstlisting}[style=displaycode, language=R]
+	> a1 = 1:3; a2 = 2:4;
+	> a12 = cbind(a1, a2);
+	> print(a12);
+	          a1 a2
+	     [1,]  1  2
+	     [2,]  2  3
+	     [3,]  3  4
+	> print(cbind(a12, a1));
+	          a1 a2 a1
+	     [1,]  1  2  1
+	     [2,]  2  3  2
+	     [3,]  3  4  3
+\end{lstlisting}
+\end{itemize}
+
+\subsection{Matrix operations and manipulations}
+Like vectors, operations between scalars applied to matrices become element-wise.
+
+The symbol for matrix product is {\bf \%*\%}, example: {\bf A\%*\%B}.
+
+Two important remarks:
+\begin{enumerate}
+	\item Non-degenerate submatrix views produce matrix objects, but degenerate submatrix views produce vectors. To prevent this, use {\bf drop=FALSE}.
+\begin{lstlisting}[style=displaycode, language=R]
+	> A = array(1:9, c(3,3));
+	> is.matrix(A[1:2, 1:2]);
+	[1] TRUE
+	> is.matrix(A[, 1]);
+	[1] FALSE
+	> is.matrix(A[, 1, drop=FALSE]);
+	[1] TRUE
+\end{lstlisting}
+	\item R treat all vectors as column vectors, but it does not differentiate between row- and column- vectors.
+\begin{lstlisting}[style=displaycode, language=R]
+	# Example 1
+	> a1 = 1:3;
+	> a2 = t(a1); # transpose
+	> print(a2);
+	          [,1] [,2] [,3]
+	     [1,]    1    2    3
+	> is.vector(a2); # After transpose, a2 becomes a matrix.
+	[1] FALSE
+	
+	# Example 2
+	> A = diag(1:3);
+	> print( a1 %*% A %*% a1 );
+	          [,1]
+	     [1,]   36
+\end{lstlisting}
+	No need to transpose the first ``a1'' in the sandwich product.
+\end{enumerate}
+
+\subsection{Data frames}
+Data frame is an extension to matrices, allowing columns to take different types.
+
+\begin{lstlisting}[style=displaycode, language=R]
+	> A1 = (1:5)/10; A2 = letters[1:5]; A3 = round(sin(1:5), 3);
+	# Numerical objects are converted to characters when concatenating A1 to A3.
+	> A = cbind(A1, A2, A3);
+	> print(A);
+	          A1    A2  A3      
+	     [1,] "0.1" "a" "0.841" 
+	     [2,] "0.2" "b" "0.909" 
+	     [3,] "0.3" "c" "0.141" 
+	     [4,] "0.4" "d" "-0.757"
+	     [5,] "0.5" "e" "-0.959"
+	# Data frames keep numerical variables numerical, and convert characters to factors.
+	> Adataframe = data.frame(A1, A2, A3);
+	> print(Adataframe);
+	      A1 A2     A3
+	   1 0.1  a  0.841
+	   2 0.2  b  0.909
+	   3 0.3  c  0.141
+	   4 0.4  d -0.757
+	   5 0.5  e -0.959
+\end{lstlisting}
+
+Variables in a data frame can be conveniently referred by their names, like {\bf A\$A2}.
+
+Setting input type to data.frame is a requirement in many packages for regression and other purposes.
+
+\end{document}

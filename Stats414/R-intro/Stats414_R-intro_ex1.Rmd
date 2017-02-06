@@ -1,0 +1,24 @@
+---
+title: 'Data wrangling: Exercise 1'
+output:
+  html_notebook: default
+  html_document: default
+---
+
+There is a built-in dataset in R called `cars`. 
+
+You can read the description of the dataset by running 
+
+```{r}
+?cars
+```
+
+Explore the dataset. Answer the following questions:
+
+a. What does the dataset describe?
+
+b. How many observations are there?
+
+c. How many variables/columns are there?
+
+d. What relationship do you observe between the two variables?

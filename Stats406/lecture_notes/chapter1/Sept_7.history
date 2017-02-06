@@ -1,0 +1,3 @@
+##Solution Actvity
+X = rnorm(n=1000,mean=0,sd = 1);
+hist(X,freq=F,breaks = 30,col='blue')
