@@ -1,0 +1,203 @@
+---
+title: "Deriving principal components"
+author: "GAO Zheng"
+date: "February 8, 2017"
+output: 
+  html_document:
+    number_sections: true
+    css: "~/Teaching/width.css"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Population principal components
+
+For completeness we present here the problem and solution formally.
+
+We can write the principal component problem as a constrained optimization problem:
+
+$a_1$ is the solution to
+
+$$
+\begin{equation*}
+\begin{aligned}
+& \underset{a}{\text{max}}
+& & \mathrm{Var}(a'X) \\
+& \text{subject to}
+& & a'a = 1
+\end{aligned}
+\end{equation*}
+$$
+
+$a_2$ is the solution to
+
+$$
+\begin{equation*}
+\begin{aligned}
+& \underset{a}{\text{max}}
+& & \mathrm{Var}(a'X) \\
+& \text{subject to}
+& & a'a_1 = 0\\
+& & & a'a = 1
+\end{aligned}
+\end{equation*}
+$$
+
+In general the $j^{th}$ principal component is the solution to 
+
+$$
+\begin{equation*}
+\begin{aligned}
+& \underset{a}{\text{max}}
+& & \mathrm{Var}(a'X) \\
+& \text{subject to}
+& & a'a_i = 0 & \mathrm{for} \; i = 1,\dots,j-1\\
+& & & a'a = 1
+\end{aligned}
+\end{equation*}
+$$
+
+It is exercise to show that the problem is equivalent to 
+
+$$
+\begin{equation*}
+\begin{aligned}
+& \underset{a}{\text{max}}
+& & \frac{\mathrm{Var}(a'X)}{a'a} \\
+& \text{subject to}
+& & a'a_i = 0 & \mathrm{for} \; i = 1,\dots,j-1
+\end{aligned}
+\end{equation*}
+$$
+
+Looks daunting, but luckily we can derive the solutions to the problem with some simple linear algebra.
+
+$$
+\mathrm{Var}(a'X) = a'\mathrm{Var}(X)a = a'\Sigma_X a
+$$
+
+where $\Sigma_X$ is the covariance matrix of $X$. Because $\Sigma_X$ is a [positive definite matrix](https://en.wikipedia.org/wiki/Positive-definite_matrix), it admits a [spectral decomposition](https://en.wikipedia.org/wiki/Eigendecomposition_of_a_matrix). we can write 
+
+$$\Sigma_X = P\Lambda P'$$
+where $P = [v_1, \dots,v_p]$ is an [orthogonal matrix](https://en.wikipedia.org/wiki/Orthogonal_matrix), and $\Lambda$ a diagonal matrix with eigenvalues of $\Sigma_X$, $\lambda_1,\dots,\lambda_p$, in descending order as its diagonal entries. 
+
+If we write $b = P'a$, then
+
+$$
+\begin{equation*}
+\begin{aligned}
+\frac{a'\Sigma_X a}{a'a} & = \frac{a' P\Lambda P'a}{a'PP'a} = \frac{b'\Lambda b}{b'b}
+= \frac{\sum_{i=1}^{p}\lambda_i b_i^2}{\sum_{i=1}^{p} b_i^2}\\
+& \le \lambda_1 \frac{\sum_{i=1}^{p} b_i^2}{\sum_{i=1}^{p} b_i^2}\\
+& = \lambda_1
+\end{aligned}
+\end{equation*}
+$$
+
+where equality can be attained when $a$ is a constant multiple of $v_1$. Say $a = v_1$ so $b = P'a = (1,0,\dots,0)'$ since by orthogonality of $P$,
+
+$$
+b = P'a = \begin{bmatrix}v_1'\\v_2'\\\vdots\\v_p'\end{bmatrix} v_1 = \begin{bmatrix}1\\0\\\vdots\\0\end{bmatrix} 
+$$
+
+We have solved the optimization problem for the first principal component.
+
+Similar arguments work for the rest of the problems.
+
+For the $j^{th}$ problem we require that $a\perp a_i \; \mathrm{for}\; i = {1,\dots,j-1}$, so the optimizing $a$ must be in the span of $v_j,\dots,v_p$, i.e., $a = b_j v_j + \dots + b_p v_p$, for some $b_j,\dots,b_p$.
+
+(Note that we have not abused notations here since $b_k = (P'a)_k = (P')_{k*}a = (P)_{*k}'a = v_k'a = v_k'(b_j v_j + \dots + b_p v_p) = b_k$.)
+
+The objective function simplifies to 
+
+$$
+\begin{equation*}
+\begin{aligned}
+\frac{a'\Sigma_X a}{a'a} & = \frac{a' P\Lambda P'a}{a'PP'a} = \frac{b'\Lambda b}{b'b}
+= \frac{\sum_{i=j}^{p}\lambda_i b_i^2}{\sum_{i=j}^{p} b_i^2}\\
+& \le \lambda_j \frac{\sum_{i=j}^{p} b_i^2}{\sum_{i=j}^{p} b_i^2}\\
+& = \lambda_j
+\end{aligned}
+\end{equation*}
+$$
+
+Setting $a = v_j$ and $b = P'a = \underbrace{(0,\dots,0,1,0,\dots,0)}_{j^{th} \text{ unit vector}}$ attains the maximum.
+
+To summarize, the the principal components are exactly the eigenvectors of the covariance matrix of $X$, corresponding to the eigenvalues in decreasing order. 
+
+An interesting consequence of the decomposition is that the sum of variances are preserved.
+
+$$
+\begin{aligned}
+\sum_{i=1}^{p}\mathrm{Var}(Y_i) 
+& = \sum_{i=1}^{p} \lambda_i = \mathrm{tr}(\Lambda) = \mathrm{tr}(P'P\Lambda)\\ & = \mathrm{tr}(P\Lambda P')\\
+& = \mathrm{\Sigma_X} = \sum_{i=1}^{p}\mathrm{Var}(X_i)
+\end{aligned}
+$$
+
+where the second line uses the fact that trace is [cyclic invariant](https://en.wikipedia.org/wiki/Trace_(linear_algebra)#Trace_of_a_product).
+
+This allows us to quantify in a sense how how variability in the data is captured by each of the transformed variables.
+
+$$
+\begin{bmatrix}
+\text{proportion of variation}\\
+\text{ captured by the}\\
+i^{th}\text{ principal component}
+\end{bmatrix} = \frac{\lambda_i}{\lambda_1 + \dots + \lambda_p}
+$$
+
+Sometimes a [scree plot](http://support.minitab.com/en-us/minitab/17/topic-library/modeling-statistics/multivariate/principal-components-and-factor-analysis/what-is-a-scree-plot/) is helpful as a visual representation. We will see an example later.
+
+The transformed variables $Y_i$'s are sometimes called PC-scores, denoted as $\text{PC}_1,\dots,\text{PC}_p$.
+
+Since A is an orthogonal matrix, $A' = A^{-1}$, we can recover the original variables by 
+
+$$
+X = A'Y
+$$
+
+When variances of the later coordinates of $Y$ are small, reconstruction can be done approximately using only the first few PC-scores with large variances. More on this in the exmaple.
+
+You may have noticed that we have not used any normality assumptions on the random vector $X$. The above derivation is distribution-free.
+
+# Estimation of principal components
+
+Now we have a sample of random vectors $x_1, \dots, x_n$, each from the p-dimensional distribution with mean $\mu$ and covariance matrix $\Sigma$.
+
+When the two population parameters are unknown, We can form the sample estimates by
+
+$$
+\hat\mu = \bar{x}\in {\rm I\!R}^p\\
+$$
+and
+$$
+\hat\Sigma 
+= S 
+= \frac{1}{n-1}\sum_{i=1}^{n}(x_i-\bar{x})(x_i-\bar{x})' \in {\rm I\!R}^{p\times p}
+$$
+
+Estimation of the principal components follow that of the derivation in the population version. This is a `plug-in' version of the derivation eariler.
+
+$$
+\hat{v_i} = i^{th}\text{ eigenvector of sample covariance matrix}
+$$
+
+Sample variances are estimated as corresponding eigenvalues of sample covariance matrix, $\hat\lambda_i$'s.
+
+## Large sample properties of $\hat\lambda_i$ and $\hat{v}_i$
+
+We only briefly mention here asymptotic results under i.i.d. normality assumptions, ^[Anderson, T. W. Asymptotic Theory for Principal Component Analysis. Ann. Math. Statist. 34 (1963), no. 1, 122--148. doi:10.1214/aoms/1177704248. http://projecteuclid.org/euclid.aoms/1177704248.]
+
+1. $\sqrt{n}(\hat\lambda-\lambda)$ is distributed approximately $N_p(0,2\Lambda^2)$.
+
+2. $\sqrt{n}(\hat v_i-v_i)$ is distributed approximately $N_p(0,E_i)$. where
+$$
+E_i = \lambda\sum_{k\ne i}\frac{\lambda_k}{(\lambda_k-\lambda_i)^2}v_kv_k'
+$$
+
+Approximate confidence intervals may be formed using these results.
+
+Note that we always assume $n>p$ and the sample covariance matrix is positive definite. The `mordern' case where $n<p$ is more complicated to analyze analytically.

@@ -1,11 +1,20 @@
 ---
 title: "A Tutorial on Pincipal Component Analysis"
+author: 'GAO Zheng' 
+date: "Feb 2, 2017" 
 output:
-  html_document: default
+  html_document: 
+    number_sections: true
+    css: "~/Teaching/width.css"
   html_notebook: default
 ---
 
-This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+This is a tutorial on applied principal component analysis. Minimal background on linear algebra is assumed.
+Notations roughly follow that of *Applied Multivariate Statistical Analysis* by R.A. Johndon and D.W.Wichern.
+Interactive display plotted with [Plotly](https://plot.ly).
+
+For derivations of the principal components, refer to [this page](./PCA_derivations.html)
+
 
 ```{r, include = F}
 if (!require("rgl")){
@@ -29,10 +38,10 @@ if (!require("printr")){
   library(printr)
 }
 
+
 ```
 
-
-## A motivating example for data reduction
+# A motivating example for data reduction
 
 `mtcars` is a data frame with 32 observations on 11 variables. The data was extracted from the 1974 Motor Trend US magazine, and comprises fuel consumption and 10 aspects of automobile design and performance for 32 automobiles (1973–74 models). ^[Henderson and Velleman (1981), Building multiple regression models interactively. *Biometrics*, **37**, 391–411.]
 
@@ -50,22 +59,22 @@ Its columns are
 - `gear`:	 Number of forward gears
 - `carb`:	 Number of carburetors
 
+
 We will be working with only three of the columns: cylinder displacement, gross horsepower, and vihecle weight.
+
 
 ```{r}
 mtcars3col <- mtcars[,c("disp","hp","wt")]
-library(printr)
-```
-
-```{r}
 summary(mtcars3col)
 ```
 
+We color the plot by transmission type. The plot is interactive, try give it a spin to see the data is 3D. (This may not work on your mobile phone.)
 
 ```{r}
 mtcars$am[which(mtcars$am == 0)] <- 'Automatic'
 mtcars$am[which(mtcars$am == 1)] <- 'Manual'
 mtcars$am <- as.factor(mtcars$am)
+
 
 p <- plot_ly(mtcars, x = ~hp, y = ~wt, z = ~disp, color = ~am, colors = c('#BF382A', '#0C4B8E')) %>%
   add_markers() %>%
@@ -82,12 +91,14 @@ It is natural to ask:
 
 1. Is there a way to represent the dataset is a way that is consistent with this observation? i.e., most of the variation happens in one (or a few) of the variables.
 
-2. Is there a way, using linear combinations of the variables to represent the data without losing much information, so that we can work with only a fewer variables?
+2. Is there a way, using linear combinations of the variables to represent the data without losing much information, so that we can work with fewer variables?
 
 
-## Population principal components
+# PCA as a data reduction tool
 
-We have to be precise about what we mean by "not losing much information". 
+We next introduce principal component analysis as a tool for data reduction, and describe the idea heuristically.
+
+We have make precise what we mean by "summarize data in a few variables" and "not losing much information". 
 
 Suppose we have a p-dimensional random vector $\mathbf{X}' = (X_1, X_2, \dots , X_p)$, we represent each data point as a collection o flinear combinations $Y$'s of its original data $X$'s.
 
@@ -104,7 +115,7 @@ $$
 Y = AX
 $$
 
-where $A$ is a $p$ by $p$ matrix.
+where $A$ is a $p$ by $p$ matrix; $i^{th}$ row of A is $a_i'$.
 
 We want most of the variation in the data $X$ to be summarized into as few components of $Y$'s as possible. Intuitively, we want variance of $Y_1$ to be as large as possible, and the variances of the rest of the $Y$'s in decreasing order.
 
@@ -112,15 +123,16 @@ A moments thought reveals that this cannont be done without contraints on $A$:
 
 1. Scaling $a_1$ by a constant factor increase the variance of $Y_1$, leading to indeterminancy. We require that $a_i'a_i = 1$, i.e., $a_i$'s are unit vectors.
 
-2. We also require that whatever has been explained in earlier $Y$'s does not re-enter later $Y$'s. We require $a_i'a_j = 0$, i.e., $a_i$ is orthogonal to $a_j$ whenever $i\ne j$. (It is infac equivalent to require that the components $Y$'s are independent; left as an exercise).
+2. We also require that whatever has been explained in earlier $Y$'s does not re-enter later $Y$'s. We require $a_i'a_j = 0$, i.e., $a_i$ is orthogonal to $a_j$ whenever $i\ne j$. (It is in fact equivalent to require that the components of $Y$ are independent; left as an exercise).
 
-The coefficients of the linear combinations therefore has the interpretation of a `direction'; each is direction orthogonal to the rest.
+The coefficients of the linear combinations therefore has the interpretation of a 'direction'; each is direction orthogonal to the rest.
 
 In two dimensions this is illustrated with the folloing plot. The two directions of linear combinations should be perpendicular to each other, with the first maximizing the variance of data along its direction.
 
 ```{r, echo=FALSE, message=FALSE}
 Sigma <- 0.5*matrix(c(2,1,1,1),2,2)
 V <- -eigen(Sigma)$vectors
+
 
 library(MASS)
 X <- mvrnorm(300, c(0,0), Sigma)
@@ -150,129 +162,118 @@ X %>%
   )
 ```
 
-Formally, we can write the problem as a constrained optimization problem:
+In the context of the example above, we try to find 'directions' along which variability in the data is maximized. The data can be summarized as a 'score', which is calculated as a linear combination of the original variables in that direction.
 
-$a_1$ is the solution to
+Mathematically, this 'direction' can be estimated by the eigenvector corresponding to the largest eigenvalue of the sample covariance matrix of your data.
 
-$$
-\begin{equation*}
-\begin{aligned}
-& \underset{a}{\text{max}}
-& & \mathrm{Var}(a'X) \\
-& \text{subject to}
-& & a'a = 1
-\end{aligned}
-\end{equation*}
-$$
+# Back to the example
 
-$a_2$ is the solution to
-
-$$
-\begin{equation*}
-\begin{aligned}
-& \underset{a}{\text{max}}
-& & \mathrm{Var}(a'X) \\
-& \text{subject to}
-& & a'a_1 = 0\\
-& & & a'a = 1
-\end{aligned}
-\end{equation*}
-$$
-
-In general the $j^{th}$ principal component is the solution to 
-
-$$
-\begin{equation*}
-\begin{aligned}
-& \underset{a}{\text{max}}
-& & \mathrm{Var}(a'X) \\
-& \text{subject to}
-& & a'a_i = 0 & \mathrm{for} \; i = 1,\dots,j-1\\
-& & & a'a = 1
-\end{aligned}
-\end{equation*}
-$$
-
-It is exercise to show that the problem is equivalent to 
-
-$$
-\begin{equation*}
-\begin{aligned}
-& \underset{a}{\text{max}}
-& & \frac{\mathrm{Var}(a'X)}{a'a} \\
-& \text{subject to}
-& & a'a_i = 0 & \mathrm{for} \; i = 1,\dots,j-1
-\end{aligned}
-\end{equation*}
-$$
-
-Looks daunting, but luckily we can derive the solutions to the problem with some simple linear algebra.
-
-$$
-\mathrm{Var}(a'X) = a'\mathrm{Var}(X)a = a'\Sigma_X a
-$$
-
-where $\Sigma_X$ is the covariance matrix of $X$. Because $\Sigma_X$ is a [positive definite matrix](https://en.wikipedia.org/wiki/Positive-definite_matrix), it admits a [spectral decomposition](https://en.wikipedia.org/wiki/Eigendecomposition_of_a_matrix). we can write 
-
-$$\Sigma_X = P\Lambda P'$$
-where $P = [v_1, \dots,v_p]$ is an [orthogonal matrix](https://en.wikipedia.org/wiki/Orthogonal_matrix), and $\Lambda$ a diagonal matrix with eigenvalues of $\Sigma_X$, $\lambda_1,\dots,\lambda_p$, in descending order as its diagonal entries. 
-
-If we write $b = P'a$, then
-
-$$
-\begin{equation*}
-\begin{aligned}
-\frac{a'\Sigma_X a}{a'a} & = \frac{a' P\Lambda P'a}{a'PP'a} = \frac{b'\Lambda b}{b'b}
-= \frac{\sum_{i=1}^{p}\lambda_i b_i^2}{\sum_{i=1}^{p} b_i^2}\\
-& \le \lambda_1 \frac{\sum_{i=1}^{p} b_i^2}{\sum_{i=1}^{p} b_i^2}\\
-& = \lambda_1
-\end{aligned}
-\end{equation*}
-$$
-
-
-where equality can be attained when $a$ is a constant multiple of $v_1$. Say $a = v_1$ so $b = P'a = (1,0,\dots,0)'$ since by orthogonality of $P$,
-
-$$
-b = P'a = \begin{bmatrix}v_1'\\v_2'\\\vdots\\v_p'\end{bmatrix} v_1 = \begin{bmatrix}1\\0\\\vdots\\0\end{bmatrix} 
-$$
-
-We have solved the optimization problem for the first principal component.
-
-Similar arguments work for the rest of the problems.
-
-For the $j^{th}$ problem we require that $a\perp a_i \; \mathrm{for}\; i = {1,\dots,j-1}$, so the optimizing $a$ must be in the span of $v_j,\dots,v_p$, i.e., $a = b_j v_j + \dots + b_p v_p$, for some $b_j,\dots,b_p$.
-
-(Note that we have not abused notations here since $b_k = (P'a)_k = (P')_{k*}a = (P)_{*k}'a = v_k'a = v_k'(b_j v_j + \dots + b_p v_p) = b_k$.)
-
-The objective function simplifies to 
-
-$$
-\begin{equation*}
-\begin{aligned}
-\frac{a'\Sigma_X a}{a'a} & = \frac{a' P\Lambda P'a}{a'PP'a} = \frac{b'\Lambda b}{b'b}
-= \frac{\sum_{i=j}^{p}\lambda_i b_i^2}{\sum_{i=j}^{p} b_i^2}\\
-& \le \lambda_j \frac{\sum_{i=j}^{p} b_i^2}{\sum_{i=j}^{p} b_i^2}\\
-& = \lambda_j
-\end{aligned}
-\end{equation*}
-$$
-
-Setting $a = v_j$ and $b = P'a = \underbrace{(0,\dots,0,1,0,\dots,0)}_{\mathrm{j^{th} unit vector}}$ attains the maximum.
-
-An interesting consequence of the decomposition is that the sum of variances are preserved (exercise).
-
-$$
-\sum_{i=1}^{p}\mathrm{Var}(Y_i) = \sum_{i=1}^{p}\mathrm{Var}(X_i)
-$$
-
-## Estimation of principal components
-
-
-
-## Application: quality montoring using PCA
+Lets estimate principal components of the car data that we introduced earlier.
 
 ```{r}
-
+centered <- scale(mtcars3col, center = T, scale = F)
+S <- t(centered) %*% centered / (nrow(centered) - 1)
+eigen(S)
 ```
+
+R has a built-in function `prcomp` in `stats` package that does this automatically. 
+
+```{r}
+(mtcarsPCA <- prcomp(mtcars3col))
+```
+
+The promised scree plot:
+
+```{r fig.width=6,fig.height=4}
+par(mar = c(2,4,1,1))
+plot(mtcarsPCA$sdev^2, type = 'b')
+```
+
+first component explained `r mtcarsPCA$sdev[1]^2/sum(mtcarsPCA$sdev^2)` of the variations in the data, consistent with our initial observarion that variations in a single direction is dominating.
+
+## PC as projections to lower-dim spaces
+
+The implication of the above finding is that one can represent the data using fewer dimensions without losing much of the information.
+
+In the `mtcars` example one could potentially use a single number that is the linear combination of cylinder displacement, gross horsepower, and vihecle weight for each data point, and achieve a 67% saving in terms of storage (store 1 variable instead of 3). 
+
+The 1st PC-score for the $i^{th}$ obsercation is
+
+$$
+\begin{aligned}
+\text{PC}_{i,1} & = v_1' (x_1 - \bar{x}) \\
+& = 0.900 * (\text{disp}-\bar{\text{disp}}) + 0.435 * (\text{hp} - \bar{\text{hp}}) + 0.006 * (\text{wt} - \bar{\text{wt}})
+\end{aligned}
+$$
+
+To recover the original variables approximately using only the first PC-score, 
+
+$$
+\begin{bmatrix}\text{disp}\\\text{hp}\\\text{wt}\end{bmatrix}_i 
+\approx \text{PC}_{i,1}\hat v_1 + 
+  \begin{bmatrix}\bar{\text{disp}}\\\bar{\text{hp}}\\\bar{\text{wt}}\end{bmatrix}
+= \text{PC}_{i,1} \begin{bmatrix}0.900\\0.435\\0.006\end{bmatrix}  + 
+  \begin{bmatrix}\bar{\text{disp}}\\\bar{\text{hp}}\\\bar{\text{wt}}\end{bmatrix}
+$$
+
+
+## PCA on standardized data
+
+The PC loading of the first component on the third variable in this example is extremely small compared to the other two coordinates. This is an artifact of the difference in unit of measurement in the three variables, and the lack of standardization before we performed the procedure. 
+
+The measurements in the variables are by nature orders of magnitudes apart. If we choose to preserve the overall distance structure of the dataset, the measurements that are smaller are naturally disadvantaged. In recovery the relative errors are larger on variables originally on smaller scales.
+
+To correct for this artificial preference, we can perform PCA on the standardized dataset.
+
+```{r}
+(mtcarsPCAstd <- prcomp(mtcars3col, scale. = T))
+```
+
+Now the first component explained `r mtcarsPCAstd$sdev[1]^2/sum(mtcarsPCAstd$sdev^2)` of the variations in the data, but the loadings are much more comparable.
+
+In practice, standarzation is always a good idea, unless units/special meanings are to be preserved.
+
+One may want to think about if it even makes sense to PCA on variables with different units for interpretation. (What does it mean when we add, say distance^2 to seconds^2?)
+
+
+## Number of principal components
+
+Number of principal component to use can be decided by looking at the scree plot. We look for an 'elbow' in the plot, where much of the variation in the data are contained in the PC's that come before the 'elbow'.
+
+In the example above the kink seems to be at 2; second and third PC are responsible for little vairability in the data.
+
+If we perform the same analysis on the first 7 columns of `mtcars`
+
+```{r}
+mtcars7PCA <- prcomp(mtcars[,1:7], scale. = T)
+plot(mtcars7PCA$sdev^2, type = 'b', ylab = "Sigma^2 of PC on 7 columns")
+```
+
+You may decide that the elbow is at 3, and chooses the first 2 PC's to summarize the data.
+
+Using more PC's can more faithfully represent and recover the data, but at the same time defeats the purpose of data reduction. One should choose this number to his/her satisfaction; the heuristic of identifying a kink in the elbow plot is a viable solution.
+
+## Interpretation
+
+As we have seen earlier, principal components are nothing but weighted averages of the original variables.
+
+In the 2D synthetic data example above, the first PC indicates a positive correlation between the two variables, with most variations taking place along its directions. Scales of the standard deviations gives us a sense of how much the variation is accounted for.
+
+In the 3D real data example (for the standardized version), the first PC $(0.605, 0.549, 0.576)$ also points to a positive quadrant in the direction of the largest variation, indicating for cars higher horse powers are assciated with heavier weight and larger engine displacement. This PC score may be interpreted as a measure of overall power of the particular model.
+
+Second PC indicates a negative relationship between horsepower and the other two variables, after accounting for the co-movement described in the first PC. This PC is a little harder to interpret.
+
+## Practical issues and questions
+
+What to do when there is categorical / ordinal variable in the data?
+
+If your goal is data reduction, PCA may not be the best tool.
+
+If you insist on doing PCA, there is nothing wrong with preceeding as usual. However, the categorical / ordinal variables will most likely be lost in the recovery. Interpretation isn't clear either. 
+
+One get-around may to partition data by the levels of the categorical / ordinal variables, and perform PCA on each partition. But you would have more PC directions (for each partition) to keep track of; not a pretty solution.
+
+
+# Q&A
+
 
