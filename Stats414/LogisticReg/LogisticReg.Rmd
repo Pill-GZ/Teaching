@@ -1,0 +1,82 @@
+---
+title: "Logistic Regression, Trees, Boosting, and CV"
+author: "GAO Zheng"
+date: "March 25, 2017"
+output:
+  html_document: 
+    number_sections: true
+    css: "~/Teaching/markdown7.css"
+  html_notebook: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Classification problems
+
+In this project we are trying to predict if a loan will be in good standing or go bad, given information about the loan and the borrower. The problem is a classical classification problem; we are trying to make a binary decision, based on existing records. 
+
+Such binary predictions can have one of four outcomes:
+
+<style type="text/css">
+.table {
+    width: 40%;
+}
+</style>
+
+
+
+```{r}
+training <- read.csv("../data/LoanStatsTraining.csv", header = T)
+names(training)
+lapply(training, class)
+model <- glm(formula = isBadLoan ~ sub_grade+ loan_amnt + home_ownership + dti + term + purpose, family = "binomial", data = training)
+predicted <- predict(model, newdata = training,type="response")
+```
+
+```{r}
+if (!require(ROCR)) {
+  install.packages("ROCR")
+  library(ROCR)
+}
+pred <- prediction(predicted, training$isBadLoan)
+perf <- performance(pred,measure = "tpr", x.measure = "fpr")
+plot(perf, colorize=T, print.cutoffs.at=seq(0,1,by=0.1))
+
+acc.perf = performance(pred, measure = "acc")
+plot(acc.perf)
+```
+
+0/1 loss weighs misclassification in two classes equally, and leads to degenerate models, or models that favor the majority group overwhelmingly. Vanilla versions of logistic regression, classification trees, etc all do with equal weights, and suffer from the same problem.
+I could barely improve upon the naive prediction (all approvals) in terms 0/1 loss on this dataset.
+
+A misclassified bad loan is much more costly than a misclassified good loan in practice; hence underwriter "conservativeness". Without access to a good cost/loss function, picking a cut-off is difficult. 
+AUC, on the other hand, at least picks out classifiers that dominate others, regardless of type I/II error costs.
+
+I think it is 
+
+## Logistic Regression
+
+```{r}
+?lm
+```
+
+## Classification Trees
+
+```{r}
+
+```
+
+## Boosted Trees
+
+```{r}
+
+```
+
+## Over/under-fitting and Cross Validation
+
+```{r}
+
+```
+
