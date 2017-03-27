@@ -4,7 +4,7 @@ author: "GAO Zheng"
 date: "March 25, 2017"
 output:
   html_document: 
-    number_sections: true
+    number_sections: false
     css: "~/Teaching/markdown7.css"
   html_notebook: default
 ---
@@ -19,19 +19,57 @@ In this project we are trying to predict if a loan will be in good standing or g
 
 Such binary predictions can have one of four outcomes:
 
-<style type="text/css">
-.table {
-    width: 40%;
-}
-</style>
 
+Classification \\ Ground Truth | Positive Sample | Negative Sample
+--------------------|-----------------|-----------------
+**Classified Positive** | True Positive (TP)   | False Positive (FP)
+**Classified Negative** | False Negative (FN)  | True Negative (TN)
+
+We would like to make as few mistakes as possible, i.e., make FP (type I error) and FN (type II error) small.
+
+Different types errors carry different costs in applications. In the loan default prediction context, a bad loan misclassified as a good one may be more costly than a good loan classified as a bad one: the credit intermediary may lose all the money that it lends out in the first case, but may only suffer from a small loss of profit that they could have earned in the latter case (and possibly a small loss of goodwill).
+
+Classification \\ Ground Truth | Bad Borrower | Good Borrower
+--------------------|-----------------|-----------------
+**Classified as Bad** | TP, correctly labeled   | FP, less costly mistake
+**Classified as Good** | FN, more costly mistake | TN, correctly labeled
+
+
+In this dataset around 86% of all records are loans in good standing. This is known as an **unbalanced** dataset, where samples of one class constitute the majority. Given this history, a naive solution to the classification problem may be to classify all incoming loan applications as good loans, and stamp approvals on all of them. This may not seem like a bad idea, after all you will get roughly 86% correct on all applications.
+
+However this may be suboptimal: extending credit to untrust-worthy borrowers is far more risky than accidentally rejecting a good borrower. We want to be more conservative. As we move from very aggressive underwriter to an extremely conservative one, FP decreases, and FN increases. Fewer bad loans are approved, but more good loans are rejected too; costs associated with type II error decrease, costs associated with type I increase.
+
+The best underwirter should fall somewhere in the middle: a goldilock's point where the overall cost is minimized.
+
+In this project we assume that each approved good loan makes \$1,000 for the company, and each bad loan eventually costs the company \$5,000. Therefore the cost associate with type I and type II errors are \$1,000 and \$5,000 respectively.
+
+### Some other measures of classification accuracy
+
+Some most commonly used measures of accuracy are Sensitivity (also known as recall), specificity, and precision.
+
+- **sensitivity** = TP / (TP + FN), aka true positive rate (TPR), measures how well a positive sample can be identified
+- **false negative rate** (FNR) = FN / (TP + FN) = 1 - TPR, measures the proportion of true positives classified as negative.
+- **specificity** = TN / (TN + FP), measures how well a negative sample can be identified
+- **precision** = TP / (TP + FP), measures the proportion of true positives among all samples classified as positive
+
+## Logistic Regression
+
+We are going to study some tools that allow us to learn the rules to classify new observations. 
+
+
+### Over/under-fitting and Cross Validation
+
+```{r}
+
+```
 
 
 ```{r}
 training <- read.csv("../data/LoanStatsTraining.csv", header = T)
 names(training)
-lapply(training, class)
-model <- glm(formula = isBadLoan ~ sub_grade+ loan_amnt + home_ownership + dti + term + purpose, family = "binomial", data = training)
+# lapply(training, class) # chack all data types
+model <- glm(formula = isBadLoan ~ sub_grade + loan_amnt + home_ownership + dti + term + purpose, family = "binomial", data = training)
+model <- glm(formula = isBadLoan ~ sub_grade + dti + loan_amnt , family = "binomial", data = training)
 predicted <- predict(model, newdata = training,type="response")
 ```
 
@@ -41,25 +79,45 @@ if (!require(ROCR)) {
   library(ROCR)
 }
 pred <- prediction(predicted, training$isBadLoan)
-perf <- performance(pred,measure = "tpr", x.measure = "fpr")
+perf <- performance(pred, measure = "tpr", x.measure = "fpr")
 plot(perf, colorize=T, print.cutoffs.at=seq(0,1,by=0.1))
+```
 
+
+If we were to weigh false positives and false negative equally and only look at the overall classification accuracy, then all incoming applications should be approved.
+
+```{r}
 acc.perf = performance(pred, measure = "acc")
 plot(acc.perf)
 ```
 
 0/1 loss weighs misclassification in two classes equally, and leads to degenerate models, or models that favor the majority group overwhelmingly. Vanilla versions of logistic regression, classification trees, etc all do with equal weights, and suffer from the same problem.
-I could barely improve upon the naive prediction (all approvals) in terms 0/1 loss on this dataset.
 
-A misclassified bad loan is much more costly than a misclassified good loan in practice; hence underwriter "conservativeness". Without access to a good cost/loss function, picking a cut-off is difficult. 
-AUC, on the other hand, at least picks out classifiers that dominate others, regardless of type I/II error costs.
+A misclassified bad loan is much more costly than a misclassified good loan in practice; underwriter should be more conservative.
 
-I think it is 
-
-## Logistic Regression
+Let's take into account the costs and find optimal threshold that minimizes the total cost.
 
 ```{r}
-?lm
+tpr <- slot(perf, "y.values")[[1]]
+fnr <- 1 - tpr
+fpr <- slot(perf, "x.values")[[1]]
+cut.offs <- slot(perf, "alpha.values")[[1]]
+
+number.positive <- sum(training$isBadLoan)
+number.negative <- length(training$isBadLoan) - number.positive
+
+type.I.error.cost <- 1
+type.II.error.cost <- 5
+
+total.cost <- type.I.error.cost * number.negative * fpr + type.II.error.cost * number.positive * fnr
+opt.cut.off <- cut.offs[which.min(total.cost)]
+
+plot(cut.offs, total.cost, type = 'l',
+     xlab = "Cutoff", ylab = "Total cost")
+points(opt.cut.off, min(total.cost), pch = 5, lwd = 2, col = 4)
+text(opt.cut.off, min(total.cost),
+     labels = paste("optimal cut-off: ", round(opt.cut.off, digits = 3)),
+     pos = 4)
 ```
 
 ## Classification Trees
@@ -74,9 +132,5 @@ I think it is
 
 ```
 
-## Over/under-fitting and Cross Validation
 
-```{r}
-
-```
 
