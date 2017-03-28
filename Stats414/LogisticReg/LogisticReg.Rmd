@@ -55,14 +55,116 @@ Some most commonly used measures of accuracy are Sensitivity (also known as reca
 ## Logistic Regression
 
 We are going to study some tools that allow us to learn the rules to classify new observations. 
+First tool we are going to look at is logistic regression.
 
+### Motivation: A generative model
 
-### Over/under-fitting and Cross Validation
+Suppose we have two batches of milk from Washtenaw Dairy, each of 50 bottles. The first batch has fat content normally distributed with mean 3.25\% and s.d. 0.5\%, the second batch has fat content 2\% and s.d. 0.5% (ignornig the negative part of the distribution). The two batches are unfortunately mixed up and we have no label on the bottles to tell them apart.
 
 ```{r}
-
+par(mar = c(4,4,1,1))
+fat.content <- seq(0, 6, 0.01)
+batch1 <- dnorm(fat.content, 3.25, 0.5)
+batch2 <- dnorm(fat.content, 2, 0.5)
+plot(fat.content, batch1 + batch2, type = 'l', lty = 2, lwd = 2,
+     xlab = "fat content (percentage points)", ylab = "density",
+     ylim = c(0,0.9), yaxt='n')
+polygon(c(fat.content,rev(fat.content)),
+        c(batch1 + batch2,rep(0, length(fat.content))),
+        col = rgb(0, 0, 1, 0.2), border = F)
+polygon(c(fat.content,rev(fat.content)),
+        c(batch1,rep(0, length(fat.content))),
+        col = rgb(1, 0, 0, 0.5))
+polygon(c(fat.content,rev(fat.content)),
+        c(batch2,rep(0, length(fat.content))),
+        col = rgb(0, 1, 0, 0.5))
+text(x = 4, y = 0.7, "Batch 1", pos = 1)
+text(x = 1.2, y = 0.7, "Batch 2", pos = 1)
+text(x = 2.6, y = 0.95, "Mixture density", pos = 1)
 ```
 
+Suppose we want to tell which btach a bottle is from, only by testing the fat content in the milk. We do won't have a hard time if the milk tested has fat content below 2\% or above 3.25\%; we know that the chances of us making mistakes is quite low, given the distributions. But how should we classify the milk if fat content falls somewhere in between?
+
+Can we work out the probability of the milk being from the first batch, given its fat content?
+
+That is,
+
+$$
+\mathrm{P}\{\text{milk from batch 1 | fat content = }x\}
+$$
+
+We can work out the ratio of density to the sum of the densities
+
+$$
+\begin{aligned}
+\mathrm{P}\{\text{milk from batch 1 | fat content = }x\} &= \frac{\text{density of fat content from batch 1}}{\text{sum of densities from batch 1 and 2}} \\
+ &= \frac{1/(\sqrt{2\pi}\sigma)\exp{\{-(x-\mu_1)^2/(2\sigma^2)}\}} {1/(\sqrt{2\pi}\sigma)[\exp{\{-(x-\mu_1)^2/(2\sigma^2)}\} + \exp{\{-(x-\mu_2)^2/(2\sigma^2)}\}]} \\
+ &= \Big(1 + \exp{\{-\frac{2(\mu_1-\mu_2)}{2\sigma^2}x + \frac{\mu_1^2-\mu_2^2}{2\sigma^2}}\}\Big)^{-1} \\
+ &= \frac{e^{ax-b}}{e^{ax-b}+1}
+\end{aligned}
+$$
+
+where $a = \frac{(\mu_1-\mu_2)}{\sigma^2}$, and $b = \frac{\mu_1^2-\mu_2^2}{2\sigma^2}$.
+
+We can massage the algebraic relationship to get from 
+
+$$
+p = \frac{e^{ax-b}}{e^{ax-b}+1}
+$$
+
+to
+
+$$
+\log(\frac{p}{1-p}) = ax-b
+$$
+
+The function $\text{logit}(p) = \log(\frac{p}{1-p})$ is called a logit function.
+
+We can then choose a threshold to classify objects, if a binary decision is to be made. Say we pick the cutoff at $p^*=0.5$, i.e., $\text{logit}(p^*) = 1$. Solve for $\text{logit}(p^*) = ax-b = 1$, we have $x=2.625$. So if the fat content is over than 2.625\%, we classify the bottle of milk as from batch 1.
+
+```{r}
+a <- (3.25 - 2) / 0.5^2
+b <- (3.25^2 - 2^2) / (2*0.5^2)
+logistic <- exp(a*fat.content - b) / (exp(a*fat.content - b) + 1)
+plot(fat.content, batch1 + batch2, type = 'l', lty = 2, lwd = 2,
+     xlab = "fat content (percentage points)", ylab = "probability",
+     ylim = c(0,1))
+lines(fat.content, logistic, col = "blue", lwd = 2)
+polygon(c(fat.content,rev(fat.content)),
+        c(logistic,rep(0, length(fat.content))),
+        col = rgb(1, 0, 0, 0.2), border = F)
+polygon(c(fat.content,rev(fat.content)),
+        c(rep(1, length(fat.content)),rev(logistic)),
+        col = rgb(0, 1, 0, 0.2), border = F)
+arrows(x0 = 0, y0 = 0.5, x1 = 2.625, y1 = 0.5)
+abline(v = 2.625, lwd = 2, col = 6)
+text(x = 3.6, y = 0.2, "Classified as batch 1", pos = 1, col = "red")
+text(x = 1.6, y = 0.2, "Classified as batch 2", pos = 1, col = "darkgreen")
+text(x = 4.5, y = 1, "P(batch 1| fat content)", pos = 1, col = "blue")
+text(x = 1, y = 0.75, "Mixture density", pos = 1)
+text(x = 0.5, y = 0.5, "p* = 0.5", pos = 1)
+text(x = 1.7, y = 1, "Decision boundary", pos = 1, col = 6)
+```
+
+### Discriminative model
+
+In practice we do not work from two known distributions to derive the conditional probabilities and classification rules. Rather we build upon the assumption that the logit function is a linear response of the covariates.
+
+$$
+\text{logit}(p) = \log(\frac{p(x)}{1-p(x)}) = a' x + b
+$$
+
+where $a$ is a vector of parameters, $b$ a scalar parameter, and $x$ the covariates.
+
+It is important to notice that the level curves of probability are linear in the covariates.
+
+Typically parameters are estimated by maximizing the (log-)likelihood of our observations. Unlike linear regressions, closed form solutions do not exist for logistic regression, estimation is done via numerical optimization.
+
+Let's look at how this works in `R`.
+
+
+
+### Over/under-fitting, model selection, and Cross Validation
 
 ```{r}
 training <- read.csv("../data/LoanStatsTraining.csv", header = T)
