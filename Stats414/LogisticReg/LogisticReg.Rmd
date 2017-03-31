@@ -1,5 +1,5 @@
 ---
-title: "Logistic Regression, Trees, Boosting, and CV"
+title: "Logistic Regression, Model Selection, and Cross Validation"
 author: "GAO Zheng"
 date: "March 25, 2017"
 output:
@@ -13,7 +13,7 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Classification problems
+# Classification problems
 
 In this project we are trying to predict if a loan will be in good standing or go bad, given information about the loan and the borrower. The problem is a classical classification problem; we are trying to make a binary decision, based on existing records. 
 
@@ -43,7 +43,7 @@ The best underwirter should fall somewhere in the middle: a goldilock's point wh
 
 In this project we assume that each approved good loan makes \$1,000 for the company, and each bad loan eventually costs the company \$5,000. Therefore the cost associate with type I and type II errors are \$1,000 and \$5,000 respectively.
 
-### Some other measures of classification accuracy
+## Some other measures of classification accuracy
 
 Some most commonly used measures of accuracy are Sensitivity (also known as recall), specificity, and precision.
 
@@ -52,12 +52,12 @@ Some most commonly used measures of accuracy are Sensitivity (also known as reca
 - **specificity** = TN / (TN + FP), measures how well a negative sample can be identified
 - **precision** = TP / (TP + FP), measures the proportion of true positives among all samples classified as positive
 
-## Logistic Regression
+# Logistic Regression
 
 We are going to study some tools that allow us to learn the rules to classify new observations. 
 First tool we are going to look at is logistic regression.
 
-### Motivation: A generative model
+## Motivation: A generative model
 
 Suppose we have two batches of milk from Washtenaw Dairy, each of 50 bottles. The first batch has fat content normally distributed with mean 3.25\% and s.d. 0.5\%, the second batch has fat content 2\% and s.d. 0.5% (ignornig the negative part of the distribution). The two batches are unfortunately mixed up and we have no label on the bottles to tell them apart.
 
@@ -100,22 +100,22 @@ $$
 \mathrm{P}\{\text{milk from batch 1 | fat content = }x\} &= \frac{\text{density of fat content from batch 1}}{\text{sum of densities from batch 1 and 2}} \\
  &= \frac{1/(\sqrt{2\pi}\sigma)\exp{\{-(x-\mu_1)^2/(2\sigma^2)}\}} {1/(\sqrt{2\pi}\sigma)[\exp{\{-(x-\mu_1)^2/(2\sigma^2)}\} + \exp{\{-(x-\mu_2)^2/(2\sigma^2)}\}]} \\
  &= \Big(1 + \exp{\{-\frac{2(\mu_1-\mu_2)}{2\sigma^2}x + \frac{\mu_1^2-\mu_2^2}{2\sigma^2}}\}\Big)^{-1} \\
- &= \frac{e^{ax-b}}{e^{ax-b}+1}
+ &= \frac{e^{ax+b}}{e^{ax+b}+1}
 \end{aligned}
 $$
 
-where $a = \frac{(\mu_1-\mu_2)}{\sigma^2}$, and $b = \frac{\mu_1^2-\mu_2^2}{2\sigma^2}$.
+where $a = \frac{(\mu_1-\mu_2)}{\sigma^2}$, and $b = -\frac{\mu_1^2-\mu_2^2}{2\sigma^2}$.
 
 We can massage the algebraic relationship to get from 
 
 $$
-p = \frac{e^{ax-b}}{e^{ax-b}+1}
+p = \frac{e^{ax+b}}{e^{ax+b}+1}
 $$
 
 to
 
 $$
-\log(\frac{p}{1-p}) = ax-b
+\log(\frac{p}{1-p}) = ax+b
 $$
 
 The function $\text{logit}(p) = \log(\frac{p}{1-p})$ is called a logit function.
@@ -124,8 +124,8 @@ We can then choose a threshold to classify objects, if a binary decision is to b
 
 ```{r}
 a <- (3.25 - 2) / 0.5^2
-b <- (3.25^2 - 2^2) / (2*0.5^2)
-logistic <- exp(a*fat.content - b) / (exp(a*fat.content - b) + 1)
+b <- - (3.25^2 - 2^2) / (2*0.5^2)
+logistic <- exp(a*fat.content + b) / (exp(a*fat.content + b) + 1)
 plot(fat.content, batch1 + batch2, type = 'l', lty = 2, lwd = 2,
      xlab = "fat content (percentage points)", ylab = "probability",
      ylim = c(0,1))
@@ -146,9 +146,12 @@ text(x = 0.5, y = 0.5, "p* = 0.5", pos = 1)
 text(x = 1.7, y = 1, "Decision boundary", pos = 1, col = 6)
 ```
 
-### Discriminative model
+## Discriminative models
+
+We usually have at hand samples with known labels, and we wish to learn the rules to make classification from the labeled samples. Think of the situation where we have previous batches of milk samples with labels of either batch 1 or 2, but we do not know the batch from which a new bottle of milk comes. Can we somehow still classify the new sample with a test of its fat content?
 
 In practice we do not work from two known distributions to derive the conditional probabilities and classification rules. Rather we build upon the assumption that the logit function is a linear response of the covariates.
+
 
 $$
 \text{logit}(p) = \log(\frac{p(x)}{1-p(x)}) = a' x + b
@@ -158,24 +161,124 @@ where $a$ is a vector of parameters, $b$ a scalar parameter, and $x$ the covaria
 
 It is important to notice that the level curves of probability are linear in the covariates.
 
-Typically parameters are estimated by maximizing the (log-)likelihood of our observations. Unlike linear regressions, closed form solutions do not exist for logistic regression, estimation is done via numerical optimization.
+(Typically parameters are estimated by maximizing the (log-)likelihood of our observations. Unlike linear regressions, closed form solutions do not exist for logistic regression, estimation is done via numerical optimization.)
 
 Let's look at how this works in `R`.
 
-
-
-### Over/under-fitting, model selection, and Cross Validation
+We first simulate the two batches of milk, with 50 bottles each
 
 ```{r}
-training <- read.csv("../data/LoanStatsTraining.csv", header = T)
-names(training)
-# lapply(training, class) # chack all data types
-model <- glm(formula = isBadLoan ~ sub_grade + loan_amnt + home_ownership + dti + term + purpose, family = "binomial", data = training)
-model <- glm(formula = isBadLoan ~ sub_grade + dti + loan_amnt , family = "binomial", data = training)
-predicted <- predict(model, newdata = training,type="response")
+batch1.samples <- rnorm(100, 3.25, 0.5)
+batch2.samples <- rnorm(100, 2, 0.5)
+```
+
+Create a dataframe with labels
+
+```{r}
+milk.samples <- data.frame(fat.content = c(batch1.samples, batch2.samples), label = rep(c(1,0), each = 100))
+```
+
+Then fit a logistic regression using `glm`
+
+```{r}
+(logistic.reg.fit <- glm(label ~ fat.content, family = "binomial", data = milk.samples))
 ```
 
 ```{r}
+par(mar = c(4,4,1,4))
+with(data = milk.samples, 
+     expr = plot(fat.content, jitter(label), 
+                 yaxt = 'n', ylab = "Prob(from batch 1)", xlab = "fat content (percentage points)",
+                 pch = 8, col = rep(2:3, each = 100)))
+axis(side = 4, at = 0:1, labels = c("batch 2", "batch 1"), las = 1)
+b.fitted <- logistic.reg.fit$coefficients["(Intercept)"]
+a.fitted <- logistic.reg.fit$coefficients["fat.content"]
+logistic <- exp(a.fitted*fat.content + b.fitted) / (exp(a.fitted*fat.content + b.fitted) + 1)
+lines(fat.content, logistic, col = "blue", lwd = 2)
+text(x = 3.5, y = 0.8, "P(batch 1| fat content)", pos = 1, col = "blue")
+axis(side = 2, at = seq(0, 1, 0.1), las = 1)
+
+```
+
+For new samples without labels, we can make a probablistic statement, given their fat content (say we have 2 new samples with fat content at 1.5\% and 3\%)
+
+```{r}
+(new.sample.prediction <- predict(logistic.reg.fit,
+                                  newdata = data.frame(fat.content = c(1.5, 3)),
+                                  type="response"))
+```
+
+i.e., the first bottle is very likely from batch 2, and the second one with high probability from batch 1.
+
+If a binary decision were to be made, we can hard threshold the predictive probabilities to 0 an 1's
+
+```{r}
+as.numeric(new.sample.prediction > 0.5)
+```
+
+
+# Over/under-fitting, model selection, and Cross Validation
+
+When we have multiple co-variates, we have the freedom of building a model that includes some or all of them.
+It is natural to ask how the best model should be selected.
+
+One may try fitting the largest model possible, but that may quickly leads to over-fitting. The some covariates that may have nothing to do with what you want to predict, but happens to correlate with your response, enter your equation. No ominous signs show up when you fit the model: the more covariates you through in, the lower the error rates on your data. Testing your model on the same set of data that you trained it on is not a good idea. When a new prediction needs to be made, a overfit model may give us way inferior results than a correctly specified one.
+
+One way to prevent overfitting is to perform cross validation.
+
+The idea is to 
+
+1. partition your data into training data and testing data (sometimes called validation data); treat testing data as unobserved, and
+2. fit your model using only the training data.
+3. Evaluate your model on the testing data that you held out earlier, compare with the actual results, and obtain a testing error.
+
+Repeat the process K times then take average of the testing errors as a final performance measure.
+
+![k = 4 fold cross validation](CV.jpg)
+
+If a model is over-crowded, then the performance will suffer in cross validation. The testing data, independent of the training data, serves as a judge for the true performance of the model.
+
+We will demonstrate how this is done with the dataset for your project
+
+## Illustrating cross validation with Lending Club dataset 
+
+Suppose we want to compare prediction accuracy in terms of total cost incurred: each misclassified good loan incurs a cost of \$1,000, each misclassified bad loan incurs \$5,000, reflecting the fact that bad loan is more costly.
+
+We first split the data into K-folds
+
+```{r}
+LCdata <- read.csv("../data/LoanStatsTraining.csv", header = T)
+# scramble the indeces
+LCdata <- LCdata[sample(nrow(LCdata)),]
+# K = 5 fold CV
+K <- 5
+
+# demonstrate using the first split
+k <- 1
+fold.size <- nrow(LCdata) / K
+testing.index <- (k-1)*fold.size + 1:fold.size
+
+training <- LCdata[-testing.index,]
+testing <- LCdata[testing.index,]
+names(training)
+# lapply(training, class) # chack all data types
+```
+
+We want to evaluate the following model
+
+```{r}
+model <- glm(formula = isBadLoan ~ sub_grade + dti + loan_amnt,
+             family = "binomial", data = training)
+```
+
+Next we try to find a threshold for the binary decision
+
+```{r}
+predicted <- predict(model, newdata = training,type="response")
+```
+
+
+```{r message = FALSE}
 if (!require(ROCR)) {
   install.packages("ROCR")
   library(ROCR)
@@ -185,6 +288,7 @@ perf <- performance(pred, measure = "tpr", x.measure = "fpr")
 plot(perf, colorize=T, print.cutoffs.at=seq(0,1,by=0.1))
 ```
 
+We can see the trade off between type I and type II errors here: as we make out cutoff closer to 0, we reject more good loans, but also make fewer mistakes on bad loans, hence higher sensitivity, but higher false positive rate as well.
 
 If we were to weigh false positives and false negative equally and only look at the overall classification accuracy, then all incoming applications should be approved.
 
@@ -208,31 +312,113 @@ cut.offs <- slot(perf, "alpha.values")[[1]]
 number.positive <- sum(training$isBadLoan)
 number.negative <- length(training$isBadLoan) - number.positive
 
-type.I.error.cost <- 1
-type.II.error.cost <- 5
+type.I.error.cost <- 1000
+type.II.error.cost <- 5000
 
-total.cost <- type.I.error.cost * number.negative * fpr + type.II.error.cost * number.positive * fnr
-opt.cut.off <- cut.offs[which.min(total.cost)]
+total.cost <- type.I.error.cost * number.negative * fpr +
+                    type.II.error.cost * number.positive * fnr
+average.cost <- total.cost / nrow(training)
+opt.cut.off <- cut.offs[which.min(average.cost)]
 
-plot(cut.offs, total.cost, type = 'l',
-     xlab = "Cutoff", ylab = "Total cost")
-points(opt.cut.off, min(total.cost), pch = 5, lwd = 2, col = 4)
-text(opt.cut.off, min(total.cost),
-     labels = paste("optimal cut-off: ", round(opt.cut.off, digits = 3)),
+plot(cut.offs, average.cost, type = 'l',
+     xlab = "Cutoff", ylab = "Average cost")
+points(opt.cut.off, min(average.cost), pch = 5, lwd = 2, col = 4)
+text(opt.cut.off, min(average.cost),
+     labels = paste0("optimal cut-off: ", round(opt.cut.off, digits = 3),
+                    ", with cost: $", round(min(average.cost), digits = 2),
+                    " on training"),
      pos = 4)
 ```
 
-## Classification Trees
+Now we can test our model using the testing data
 
 ```{r}
+predicted.testing <- predict(model, newdata = testing, type="response") > opt.cut.off
+predicted.testing <- as.numeric(predicted.testing)
+type.I.error <- sum(!(testing$isBadLoan) & predicted.testing)
+type.II.error <- sum((testing$isBadLoan) & !predicted.testing)
 
+total.cost <- type.I.error.cost * type.I.error +
+                    type.II.error.cost * type.II.error
+(average.cost <- total.cost / nrow(testing))
 ```
 
-## Boosted Trees
+
+## Putting everything together
+
+We have done model fitting and evaluation on one split of the data. Now we can repeat the procedure for the rest of the 5 folds.
 
 ```{r}
+CV <- function(k, K, model.formula) {
+  fold.size <- nrow(LCdata) / K
+  testing.index <- (k-1)*fold.size + 1:fold.size
+  
+  training <- LCdata[-testing.index,]
+  testing <- LCdata[testing.index,]
+  
+  model <- glm(formula = model.formula,
+               family = "binomial", data = training)
+  predicted <- predict(model, newdata = training,type="response")
+  pred <- prediction(predicted, training$isBadLoan)
+  perf <- performance(pred, measure = "tpr", x.measure = "fpr")
+  
+  tpr <- slot(perf, "y.values")[[1]]
+  fnr <- 1 - tpr
+  fpr <- slot(perf, "x.values")[[1]]
+  cut.offs <- slot(perf, "alpha.values")[[1]]
+  
+  number.positive <- sum(training$isBadLoan)
+  number.negative <- length(training$isBadLoan) - number.positive
+  
+  type.I.error.cost <- 1000
+  type.II.error.cost <- 5000
+  
+  total.cost <- type.I.error.cost * number.negative * fpr +
+                      type.II.error.cost * number.positive * fnr
+  average.cost <- total.cost / nrow(training)
+  opt.cut.off <- cut.offs[which.min(average.cost)]
+  
+  predicted.testing <- predict(model, newdata = testing, type="response") > opt.cut.off
+  predicted.testing <- as.numeric(predicted.testing)
+  type.I.error <- sum(!(testing$isBadLoan) & predicted.testing)
+  type.II.error <- sum((testing$isBadLoan) & !predicted.testing)
 
+  total.cost <- type.I.error.cost * type.I.error +
+                      type.II.error.cost * type.II.error
+  return(average.cost <- total.cost / nrow(testing))
+}
 ```
 
+Record performance on testing dataset
 
+```{r}
+# performance storage
+average.cost.testing <- numeric(K)
+for (k in 1:K) {
+  average.cost.testing[k] <- CV(k = k, K = K, 
+                                model.formula = isBadLoan ~ sub_grade + dti + loan_amnt)
+}
+average.cost.testing
+# final performance
+mean(average.cost.testing)
+```
 
+Let us compare this with a larger model, with `home_ownership` included
+
+```{r}
+# performance storage
+average.cost.testing <- numeric(K)
+for (k in 1:K) {
+  average.cost.testing[k] <- CV(k = k, K = K,
+                                model.formula = isBadLoan ~ sub_grade + dti + loan_amnt + home_ownership)
+}
+average.cost.testing
+# final performance
+mean(average.cost.testing)
+```
+
+The performance seems comparable. Adding new variables to the logistic regression, does not always decrease your CV cost/error, as we previously explained.
+
+There may also be better ways to model the relationship, consider taking transformations of the vairables (log, squared, etc.).
+
+.
