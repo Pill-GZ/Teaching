@@ -1,0 +1,55 @@
+---
+title: "Homework 0 template"
+author: "GAO Zheng"
+date: "September 1, 2017"
+output: 
+  pdf_document:
+    number_sections: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Coinflip Trivia
+
+Write formula as you would in LaTeX
+
+$$
+\mathbb P(HT|T) = p.
+$$
+
+# Exchangeability
+
+## Use subsections for sub-questions
+
+## Match the sub-question labels
+
+This question has 2 sub-questions
+
+# Gamma-Poisson
+
+We strongly recommend following style guide for code chuncks. See, for example, [Advanced R](http://adv-r.had.co.nz/Style.html) [http://adv-r.had.co.nz/Style.html], or [Google's R stype guide](https://google.github.io/styleguide/Rguide.xml) [https://google.github.io/styleguide/Rguide.xml].
+
+Always set seed in your simulation
+
+```{r}
+set.seed(123)
+(N <- rpois(n = 1, lambda = 5))
+```
+
+# Gaussian Example
+
+Always label axes in your plots
+
+```{r fig.height = 4}
+par(mar = c(4,4,1,1), las = 1)
+x <- seq(-10, 10, length = 1000)
+plot(x, sin(x), xlab = "x-values", ylab = "f(x)", 
+     type = "l" , cex = 0.5, ylim = c(-1.2, 1.5))
+lines(x, cos(x), lty = 4, lwd = 2)
+abline(h = 0)
+legend("topright", legend = c("y = sin(x)", "y = cos(x)"),
+       lty = c(1, 4), bty = "n")
+```
+

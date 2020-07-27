@@ -1,0 +1,102 @@
+---
+title: "HW1"
+author: "Anwesha Bhattacharyya"
+date: "September 18, 2017"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+This homework is based on the "Banknote Authentication" dataset obtained in UCI laboratory. The owner of the dataset is Volker Lohweg (University of Applied Sciences, Ostwestfalen-Lippe) and the donor of the dataset is  Helene Darksen (University of Applied Sciences, Ostwestfalen-Lippe). Data were extracted from images that were taken from genuine and forged banknote-like specimens. For digitization, an industrial camera usually used for print inspection was used. The final images have 400x 400 pixels. Due to the object lens and distance to the investigated object gray-scale pictures with a resolution of about 660 dpi were gained. Wavelet Transform tool were used to extract features from images. There are five variables in the dataset. The objective is classification of the images as coming from a genuine banknote or a forged banknote like specimen. The first attribute is variance of the wavelet transformed image. The second is the skewness of the wavelet transformed image and the third is the kurtosis of the wavelet transformed image. The fourth variable dentes the entropy of images. All of the four attributes are continuous observations. The fifth variable is the classification variable which indicates whether its a genuine note or a forged specimen. \
+
+## Data Summary
+
+```{r}
+data = read.table("C:/Users/Anwesha/Desktop/700/banknote.txt", sep = ",")
+n = dim.data.frame(data)[1]
+class = data$V5
+table(class)
+```
+There is a total 1372 number of observations with no missing values and we want to build a supervised classifier. There are \textbf{610} genuine banknotes and \textbf{762} false ones. Following is the histogram of the four described attributes. \
+
+
+```{r}
+variance = data[,1]; skewness = data[,2]; kurtosis = data[,3]; entropy = data[,4]
+par(mfrow = c(2,2))
+hist(variance);hist(skewness);hist(kurtosis); hist(entropy)
+```
+The noticeable characteristics are the high variance of the "skewness" distribution, the positive skewness and variance of the "kurtosis" distribution, and the negative skewness of the "entropy" distribution. None of the distributions resemble a Gaussian or bell shaped distribution. however the flatness of the "variance" distribution indicates that it might be modelled as a mixture of two gaussian distribution.  \newline
+
+A summary of the variables is presented below. One can quickly observe from the table and the histogram that the distribution of the variance and the skewness appears to be symmetric around 0 . 
+```{r}
+summary(cbind(variance,skewness,kurtosis,entropy,class))
+```
+
+## Correlation plots
+Next we study the association between the four attributes through a correlation plot. There is a high negative correlation between "skewness" and "kurtosis" of the images. The other associations are comparitively much less significant. 
+```{r}
+library(corrplot)
+corrplot(corr = cor(cbind(variance,skewness,kurtosis,entropy)))
+```
+
+## Classification plots for each attribute. 
+```{r}
+par(mfrow = c(2,2))
+plot(data[,1],data[,1],col = c("darkblue","cyan")[data[,5]+1], xlab = "variance", ylab  = "variance")
+plot(data[,1],data[,2],col = c("darkblue","cyan")[data[,5]+1], xlab = "variance", ylab = "skewness")
+plot(data[,1],data[,3],col = c("darkblue","cyan")[data[,5]+1], xlab = "variance", ylab = "kurtosis")
+plot(data[,1],data[,4],col = c("darkblue","cyan")[data[,5]+1], xlab = "variance", ylab = "entropy")
+```
+The variance attribute as well as the variance and skewness attribute jointly seems to be well seperated in the two classes. hence these two variates would be good classifiers. On the other hand kurtosis and entropy seems to introduce some overlap in the classes which indicates they are not the ideal candidates as classifiers as compared to variance and skewness. 
+
+```{r}
+par(mfrow = c(1,3))
+plot(data[,2],data[,2],col = c("darkblue","cyan")[data[,5]+1], xlab = "skewness", ylab = "skewness")
+plot(data[,2],data[,3],col = c("darkblue","cyan")[data[,5]+1], xlab = "skewness", ylab = "kurtosis")
+plot(data[,2],data[,4],col = c("darkblue","cyan")[data[,5]+1], xlab = "skewness", ylab = "entropy")
+```
+The skewness attribute seems to be a less efficient classifier than the variance attribute in the marginal sense. The plots clearly show the negative relation between skewness and kurtosis while they also indicate two different quadratic relationship between skewness and entropy for each of the two classes respectively. 
+
+```{r}
+par(mfrow = c(1,2))
+plot(data[,3],data[,3],col = c("darkblue","cyan")[data[,5]+1], xlab = "kurtosis", ylab = "kurtosis")
+plot(data[,3],data[,4],col = c("darkblue","cyan")[data[,5]+1], xlab = "kurtosis", ylab = "entropy")
+```
+
+```{r}
+
+plot(data[,4],data[,4],col = c("darkblue","cyan")[data[,5]+1], xlab = "entropy", ylab = "entropy")
+```
+
+The last set of three plots validates the initial idea that kurtosis and entropy should be poor classifiers as compared o variance and kurtosis of the images. 
+
+## General linear model
+We first fit a logistic regression model using general linear model with binomial family. We first fit a model without intercepts. 
+
+```{r}
+gl = glm(class ~ variance +skewness + kurtosis + entropy - 1,  family = "binomial")
+summary(gl);
+pred = gl$fitted.values; pred = round(pred)
+errsq = sum((pred - class)^2)/n; errsq
+table(class,pred)
+```
+This shows all of the attributes to be significant. The prediction error sum of squares is \textbf{0.04}. There is a total number of 57 misclassification of genuine notes being classified as non-genuine. 
+
+We do the same fiiting next with an intercept. 
+
+```{r}
+gl = glm(class ~ variance +skewness + kurtosis + entropy ,  family = "binomial")
+summary(gl);
+pred = gl$fitted.values; pred = round(pred)
+errsq = sum((pred - class)^2)/n; errsq
+table(class,pred)
+```
+Two important change is that while the intercept becomes significant the attribute looses its significance at 5 /% level of significance. Also the predicion error square goes down to \textbf{.008}. The number of mis-classifications is greatly reduced to 11, with 6 images of genuine notes being mis-classified as non-genuine and 5 images being mis-classified the other way round. 
+
+## Conclusion
+The plot analysis indicate that the variance and skewness attributes themselves are sufficient as classifiers but the logistic regression analysis suggests that kurtosis is also a significant predictor. However as shown by the correlation plot analysis shows kurtosis and skewness are highly correlated which may lead to the significance of kurtosis as a predictor in logistic regresion. \newline
+This dataset has been widely used for studying vaious classification techniques and hence comparing the methods against those papers would give us a better analysis of the efficiency of the Bayesian methods. I would probably use this dataset for the rest of the homework problems. However I would like to work on a more challenging and interesting dataset for the project. 

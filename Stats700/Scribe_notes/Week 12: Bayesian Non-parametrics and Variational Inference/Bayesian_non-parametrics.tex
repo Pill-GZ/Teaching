@@ -1,0 +1,206 @@
+%
+% This is the LaTeX template file for lecture notes for STATS700,
+% Bayesian Inference and Computations.  When preparing 
+% LaTeX notes for this class, please use this template.
+%
+% To familiarize yourself with this template, the body contains
+% some examples of its use.  Look them over.  Then you can
+% run LaTeX on this file.  After you have LaTeXed this file then
+% you can look over the result either by printing it out with
+% dvips or using xdvi.
+%
+% This template is based on the template for Prof. Sinclair's CS 270.
+
+\documentclass[twoside]{article}
+\usepackage{graphics}
+\setlength{\oddsidemargin}{0.25 in}
+\setlength{\evensidemargin}{-0.25 in}
+\setlength{\topmargin}{-0.6 in}
+\setlength{\textwidth}{6.5 in}
+\setlength{\textheight}{8.5 in}
+\setlength{\headsep}{0.75 in}
+\setlength{\parindent}{0 in}
+\setlength{\parskip}{0.1 in}
+
+\usepackage{amssymb}
+
+%
+% The following commands set up the lecnum (lecture number)
+% counter and make various numbering schemes work relative
+% to the lecture number.
+%
+\newcounter{lecnum}
+\renewcommand{\thepage}{\thelecnum-\arabic{page}}
+\renewcommand{\thesection}{\thelecnum.\arabic{section}}
+\renewcommand{\theequation}{\thelecnum.\arabic{equation}}
+\renewcommand{\thefigure}{\thelecnum.\arabic{figure}}
+\renewcommand{\thetable}{\thelecnum.\arabic{table}}
+
+%
+% The following macro is used to generate the header.
+%
+\newcommand{\lecture}[4]{
+   \pagestyle{myheadings}
+   \thispagestyle{plain}
+   \newpage
+   \setcounter{lecnum}{#1}
+   \setcounter{page}{1}
+   \noindent
+   \begin{center}
+   \framebox{
+      \vbox{\vspace{2mm}
+    \hbox to 6.28in { {\bf STATS 700 Bayesian Inference and Computation \hfill Fall 2017} }
+       \vspace{4mm}
+       \hbox to 6.28in { {\Large \hfill Lecture #1: #2  \hfill} }
+       \vspace{2mm}
+       \hbox to 6.28in { {\it Lecturer: #3 \hfill Scribe: #4} }
+      \vspace{2mm}}
+   }
+   \end{center}
+   \markboth{Lecture #1: #2}{Lecture #1: #2}
+   {\bf Disclaimer}: {\it These notes have not been subjected to the
+   usual scrutiny reserved for formal publications.  They may be distributed
+   outside this class only with the permission of the Instructor.}
+   \vspace*{4mm}
+}
+
+
+%Use this command for a figure; it puts a figure in wherever you want it.
+%usage: \fig{NUMBER}{SPACE-IN-INCHES}{CAPTION}
+\newcommand{\fig}[3]{
+			\vspace{#2}
+			\begin{center}
+			Figure \thelecnum.#1:~#3
+			\end{center}
+	}
+% Use these for theorems, lemmas, proofs, etc.
+\newtheorem{theorem}{Theorem}[lecnum]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{claim}[theorem]{Claim}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}[theorem]{Definition}
+\newenvironment{proof}{{\bf Proof:}}{\hfill\rule{2mm}{2mm}}
+
+% **** IF YOU WANT TO DEFINE ADDITIONAL MACROS FOR YOURSELF, PUT THEM HERE:
+
+\begin{document}
+%FILL IN THE RIGHT INFO.
+%\lecture{**LECTURE-NUMBER**}{**DATE**}{**LECTURER**}{**SCRIBE**}
+\lecture{20}{Nov 29, Dec 4}{CHEN Yang}{Greg Hunt}
+%\footnotetext{These notes are partially based on those of Nigel Mansell.}
+
+% **** YOUR NOTES GO HERE:
+
+% Some general latex examples and examples making use of the
+% macros follow.  
+%**** IN GENERAL, BE BRIEF. LONG SCRIBE NOTES, NO MATTER HOW WELL WRITTEN,
+%**** ARE NEVER READ BY ANYBODY.
+
+\section{Bayesian Non-parametrics}
+
+We say that a method is {\bf parametric} if the number of parameters is the same for each different sample size. On the other hand we say a method is {\bf non-parametric} if the number of parameters grows with the sample size. For example, We have a couple of parameters for each sample point. Alternatively, non-parametric models have an infinite dimensional parameter space.
+
+Bayesian non-parametric models have been posited to solve lots of different problems. For example, a gaussian process for regression, chinese restaurant process for clustering, or a hierarchical dirichlet process for topic modeling.
+
+\subsection{Dirichlet Process}
+
+A dirichlet process is a bayesian non-parametric method that can be used as an alternative to parametric methods. Basically we have a prior of a set of distributions rather than constraining our data to be in a certain family.
+
+We can simulate a Dirichlet process by picking a base distribution $H$, scaling parameter $\alpha$, drawing $X_1$ from $H$ and then with probability $\alpha/(\alpha+n-1)$ drawing $X_n$ from $H$ and with probability $n_x/\alpha+n-1$ setting $X_n=x$ where $n_x$ is the number of previous observations where $j<n$ and $X_j=x$.
+
+The Dirichlet process mixture is specified with some $G\mid \alpha,G_0 \sim D(\alpha,G_0)$ and then
+\[
+X_i \stackrel{i.i.d.}{\sim} \sum_{j}p_jf(x\mid \phi_j).
+\]
+
+We can sample MCMC from a DP mixture with the following steps:
+
+\begin{enumerate}
+  \item $u_i \stackrel{ind.}{\sim} Unif(0, p_{r_i})$
+  \item sample $V_{1:q}$ for which $p_q > u_i$
+\[V_h \sim B(1 + m_h, \alpha+\sum_{k>h}m_k), m_h = \#\{i : r_i = h\}.\]
+\item $p(\phi_h) \propto \prod_{r_i=h} f(x_i|\phi_h)G_0(d\phi_h)$.
+    \item $P(r_i = h) \propto f(x_i\mid h)$ for h such that $p_h > u_i$
+\end{enumerate}
+
+\subsubsection{Extensions}
+
+There are extensions to the DP like the Hierarchical Dirichlet Process where we have a collection of data sets $D_1,\ldots,D_m$ each of which is a mixture model but share a common density $f$ and have measures $G_1,\ldots,G_m$. The proposed model is
+\[
+G_1,..., G_m \sim D(\alpha, G_0)
+\]
+and $G_0|\gamma,H0 \sim D(\gamma,H_0)$.
+
+\subsection{Gaussian Process}
+
+The basic idea is to extend the gaussian distribution to infinite dimensions. It's possible to show that the GP is entirely determined by its mean and covariance function. There are many choices for these functions.
+
+GPs have lots of applications, including GP regression, integration, optimization, unsupervized learning and much much more. We can use GPs for classifction.
+
+Classification can either be broken down into
+\begin{enumerate}
+\item Generative approaches
+\item Descriptive approaches
+\end{enumerate}
+
+GP classifcation really falls under the second of these two. The main idea of a GP classifier is to have
+\begin{enumerate}
+\item A latent function $f$ that tells us about how the classes are different
+  \item a map $\phi$ of $f$ to the probability of the class
+\end{enumerate}
+
+The solution is then basically follows as (1) assume a GP proior for f,  compute $p(f\mid X,y)$, (2) compute this again for the test data $p(f*\mid X*,f,X)$ (3) compute the probability for the test data $\pi*$
+
+\section{Variational Inference \& Approximate Bayesian Computation}
+
+VI is another way of calculating the posterior for interesting models when we can't do it easily. For example, a bayesian mixture of Gaussians since they are comuputationally intractable.
+
+VI is an idea from CS that takes advantage of optimization and is much faster than MCMC. The main idea is to use the KL divergence to find densities closest to a target family.
+
+This has lots of appliations in areas like comp. biology, computer vision, robotics, neuro. or NLP. The main idea is
+\begin{enumerate}
+\item Pick a family of dists over the latent variables $q$, parameterized by some variational parameter $\nu$
+\item find the $\nu$ so that $q$ is closest to the true posterior using KL div
+\item use that $q$ as an approx for the posterior
+\end{enumerate}
+
+There are different ways of doing this, for example Mean fidle Variational Inference:
+\begin{enumerate}
+\item group hidden variables in a nice way so that the family factorizes
+\item then cycle through a coordinate ascent to find the max (e.g. ELBO)
+\end{enumerate}
+
+Some concerns that might come up here are (1) numerical stability (2) convergence possibilties (3) initalization. 
+
+\section*{References}
+
+\begin{thebibliography}{}
+
+\bibitem{teh}
+\newblock {Teh, Yee Whye. ”Dirichlet process.” Encyclopedia of machine
+  learning. Springer US, 2011. 280-287.}
+\bibitem{columbia}
+\newblock{ http://stat.columbia.edu/~porbanz/npb-tutorial.html}
+\bibitem{gp}
+  \newblock{http://www.gaussianprocess.org/gpml/chapters}
+
+\bibitem{c}\newblock{Csillry, Katalin, et al. ”Approximate Bayesian computation (ABC) in
+practice.” Trends in ecology \& evolution 25.7 (2010): 410-418.}
+\bibitem{m}\newblock{Marin, Jean-Michel, et al. ”Approximate Bayesian computational
+methods.” Statistics and Computing (2012): 1-14.}
+\bibitem{t}\newblock{Toni, Tina, et al. ”Approximate Bayesian computation scheme for
+parameter inference and model selection in dynamical systems.”}
+\bibitem{jrssb}\newblock{Journal of the Royal Society Interface 6.31 (2009): 187-202.
+Del Moral, Pierre, Arnaud Doucet, and Ajay Jasra. ”An adaptive
+sequential Monte Carlo method for approximate Bayesian
+computation.” Statistics and Computing 22.5 (2012): 1009-1020.}
+\end{thebibliography}
+
+
+\end{document}
+
+
+
+
+

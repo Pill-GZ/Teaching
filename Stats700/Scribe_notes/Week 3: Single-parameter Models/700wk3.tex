@@ -1,0 +1,301 @@
+%
+% This is the LaTeX template file for lecture notes for STATS700,
+% Bayesian Inference and Computations.  When preparing 
+% LaTeX notes for this class, please use this template.
+%
+% To familiarize yourself with this template, the body contains
+% some examples of its use.  Look them over.  Then you can
+% run LaTeX on this file.  After you have LaTeXed this file then
+% you can look over the result either by printing it out with
+% dvips or using xdvi.
+%
+% This template is based on the template for Prof. Sinclair's CS 270.
+
+\documentclass[twoside]{article}
+\usepackage{graphics}
+\setlength{\oddsidemargin}{0.25 in}
+\setlength{\evensidemargin}{-0.25 in}
+\setlength{\topmargin}{-0.6 in}
+\setlength{\textwidth}{6.5 in}
+\setlength{\textheight}{8.5 in}
+\setlength{\headsep}{0.75 in}
+\setlength{\parindent}{0 in}
+\setlength{\parskip}{0.1 in}
+\usepackage{amsmath}
+\usepackage{cases}
+\usepackage{subeqnarray}
+\usepackage{diagbox}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{bm}
+\usepackage{listings}
+
+%
+% The following commands set up the lecnum (lecture number)
+% counter and make various numbering schemes work relative
+% to the lecture number.
+%
+\newcounter{lecnum}
+\renewcommand{\thepage}{\thelecnum-\arabic{page}}
+\renewcommand{\thesection}{\thelecnum.\arabic{section}}
+\renewcommand{\theequation}{\thelecnum.\arabic{equation}}
+\renewcommand{\thefigure}{\thelecnum.\arabic{figure}}
+\renewcommand{\thetable}{\thelecnum.\arabic{table}}
+
+%
+% The following macro is used to generate the header.
+%
+\newcommand{\lecture}[4]{
+   \pagestyle{myheadings}
+   \thispagestyle{plain}
+   \newpage
+   \setcounter{lecnum}{#1}
+   \setcounter{page}{1}
+   \noindent
+   \begin{center}
+   \framebox{
+      \vbox{\vspace{2mm}
+    \hbox to 6.28in { {\bf STATS 700 Bayesian Inference and Computation \hfill Fall 2017} }
+       \vspace{4mm}
+       \hbox to 6.28in { {\Large \hfill Lecture #1: #2  \hfill} }
+       \vspace{2mm}
+       \hbox to 6.28in { {\it Lecturer: #3 \hfill Scribe: #4} }
+      \vspace{2mm}}
+   }
+   \end{center}
+   \markboth{Lecture #1: #2}{Lecture #1: #2}
+   {\bf Disclaimer}: {\it These notes have not been subjected to the
+   usual scrutiny reserved for formal publications.  They may be distributed
+   outside this class only with the permission of the Instructor.}
+   \vspace*{4mm}
+}
+
+
+%Use this command for a figure; it puts a figure in wherever you want it.
+%usage: \fig{NUMBER}{SPACE-IN-INCHES}{CAPTION}
+\newcommand{\fig}[3]{
+			\vspace{#2}
+			\begin{center}
+			Figure \thelecnum.#1:~#3
+			\end{center}
+	}
+% Use these for theorems, lemmas, proofs, etc.
+\newtheorem{theorem}{Theorem}[lecnum]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{claim}[theorem]{Claim}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}[theorem]{Definition}
+\newenvironment{proof}{{\bf Proof:}}{\hfill\rule{2mm}{2mm}}
+
+% **** IF YOU WANT TO DEFINE ADDITIONAL MACROS FOR YOURSELF, PUT THEM HERE:
+
+\begin{document}
+%FILL IN THE RIGHT INFO.
+%\lecture{**LECTURE-NUMBER**}{**DATE**}{**LECTURER**}{**SCRIBE**}
+\lecture{3}{Sept 18, 20 Single-parameter model}{CHEN Yang}{Yuequan Guo, Yuanzhi Li, Zoey Li}
+%\footnotetext{These notes are partially based on those of Nigel Mansell.}
+
+% **** YOUR NOTES GO HERE:
+
+% Some general latex examples and examples making use of the
+% macros follow.  
+%**** IN GENERAL, BE BRIEF. LONG SCRIBE NOTES, NO MATTER HOW WELL WRITTEN,
+%**** ARE NEVER READ BY ANYBODY.
+
+\section{Comparison between MLE and Bayesian inference}
+
+\begin{itemize}
+    \item Frequentist and Bayesian inferences might converge as sample sizes
+        increase. 
+    \item The choice of prior in Bayesian inference has significant implication for the inference especially for a small sample size
+\end{itemize}
+
+\section{Binomial model}
+
+\textit{data}: Bernoulli/ Binomial \\ 
+\textit{prior}: Beta / Uniform \\
+\textit{posterior}: (Unnormalized ) Beta  
+
+Binomial model: $X_1,X_2,\ldots,X_n \mid p \sim B(n,p)$. We assume the prior for $p$ follows Beta$(\alpha,\beta)$.
+\begin{align*}
+\text{Likelihood}:\quad &\mathrm{P}(X_1,\ldots,X_n\mid p) \propto p^{\sum_{i=1}^n X_i}(1-p)^{n-\sum_{i=1}^n X_i},\\
+\text{Prior}:\quad &\text{P}(p) \propto p^{\alpha-1}(1-p)^{\beta-1}.
+\end{align*}
+
+Since the parameters $(\alpha,\beta)$ in the prior is considered fixed, we can omit the normalizing constant in the prior. The posterior is the product of the likelihood and the prior.
+\begin{align*}
+\text{Posterior}:\quad &\text{P}(p\mid X_1,\ldots,X_n) = \text{P}(p)\cdot \text{P}(X_1,\ldots,X_n\mid p) \\ 
+&\propto p^{\alpha - 1 +\sum_{i=1}^nX_i} (1-p)^{\beta-1+n-\sum_{i=1}^n X_i}
+\end{align*}
+Hence, the posterior would be Beta$(\alpha + \sum_{i=1}^n X_i, \;\beta + n -{\sum_{i=1}^n X_i})$. Note that if $\alpha = \beta = 1$, the prior is simply uniform distribution on $(0,1)$, while the posterios will be Beta$({\sum_{i=1}^n X_i} + 1,\; n - {\sum_{i=1}^n X_i} + 1)$.
+
+\section{Gaussian model}
+
+\subsection{Gaussian with unknown mean but known variance}
+
+\textit{data}: normal \\ 
+\textit{prior}: normal  \\
+\textit{posterior}: normal  
+
+Gaussian model with unknown mean and known variance: $X_1,X_2,\ldots,X_n \mid
+\theta \sim \mathcal{N}(\theta,\sigma_0^2)$. We assume the prior for the mean $\theta$ also follow a Gaussian distribution $\mathcal{N}(\mu_0,\tau_0^2)$.
+\begin{align*}
+\text{Likelihood}:\quad &\mathrm{P}(X_1,\ldots,X_n\mid \theta) \propto \exp{\left\{\frac{1}{2\sigma_0^2}\sum_{i=1}^n (X_i-\theta)^2\right\}}\\
+\text{Prior}:\quad &\text{P}(\theta) \propto \exp{\left\{\frac{1}{2\tau_0^2}(\theta-\mu_0)^2\right\}}\\
+\text{Posterior}:\quad &\text{P}(\theta\mid X_1,\ldots,X_n) \propto \exp{\left\{\left(\frac{n}{2\sigma_0^2}+\frac{1}{2\tau_0^2}\right)\theta^2 - \left(\frac{n\overline{X}}{\sigma_0^2}+\frac{1}{\tau_0^2}\right)\theta + C\right\}}, \text{ for some constant C.}
+\end{align*}
+Hence, the posterior for $\theta$ is a Gaussian distribution $\mathcal{N}(\mu,\sigma^2)$ with:
+\[
+\sigma^2 = \frac{1}{n/\sigma_0^2+1/\tau_0^2},\quad \mu = \frac{\frac{n\overline{X}}{\sigma_0^2}+\frac{\mu_0}{\tau_0^2}}{n/\sigma_0^2+1/\tau_0^2}.
+\]
+We can see that the variance for the posterior satisfy:
+\begin{equation}
+\label{eq:fisher}
+\frac{1}{\sigma^2} = \frac{n}{\sigma_0^2}+\frac{1}{\tau_0^2}.
+\end{equation}
+Note that for any normal distribution $\mathcal{N}(\mu,\sigma^2)$, the Fisher information for the mean $\mu$ is $\mathcal{I}(\mu) = 1/\sigma^2$. Equation (\ref{eq:fisher}) indicates that the posterior fisher information is the sum of the information from prior and the information from the likelihood. Also, the posterior mean is a weighted average of the mean from prior and likelihood, and the weights are proportional to Fisher information. 
+
+\begin{itemize}
+    \item The inverse of the variance is the precision (i.e. the information).
+    \item The posterior info is the addition of the info of the prior and the
+        data.
+    \item The posterior mean is weighted average of the prior and the data and
+        the weights are proportional to information.
+\end{itemize}
+
+\textit{shrinkage estimators}
+The posterior is shrinking towards the prior and the data depending on the relative information
+
+\textit{posterior predictive distribution} 
+
+With the posterior, assume we want to predict the distribution for some new data $\tilde{y}$. From
+\[
+\text{P}(\tilde{y}\mid y) = \int p(\tilde{y}\mid \theta) p(\theta\mid y)\mathrm{d}\theta,
+\]
+we can see that the predictive posterior for $\tilde{y}$ is also normal. Below we calculate the mean and variance for this predictive posterior.
+
+Recall: $\mathrm{E}(\tilde{y}\mid \theta) = \theta$, $\mathrm{Var}(\tilde{y}\mid \theta) = \sigma^2$. Then we have:
+\begin{gather*}
+\mathrm{E}(\tilde{y}\mid y) = \mathrm{E}\left[\mathrm{E}(\tilde{y}\mid \theta,y)\mid y\right] = \mu,\\
+\mathrm{Var}(\tilde{y}\mid y) = \mathrm{E}[\mathrm{Var}(\tilde{y}\mid \theta,y)\mid y] + \mathrm{Var}[\mathrm{E}(\tilde{y}\mid \theta,y)\mid y] = \mathrm{E}(\sigma_0^2 \mid y) + \mathrm{Var}(\theta\mid y ) = \sigma_0^2 + \sigma^2.
+\end{gather*}
+
+\subsection{Gaussian with known mean but unknown variance}
+
+\textit{data}: Normal \\ 
+$$
+p(y_i:1\leq i\leq n|\sigma^{2})\propto (\sigma^{2})^{-\frac{n}{2}}\exp{(-\frac{1}{2\sigma^{2}}\sum_{i=1}^{n}(y_i-\theta)^{2})}=(\sigma^{2})^{-\frac{n}{2}}\exp{(-\frac{nv}{2\sigma^{2}})}
+$$ 
+where $v=\frac{1}{n}\sum_{i=1}^{n}(y_i-\theta)^{2}$.
+
+\textit{prior}: Inverse Gamma  
+$$
+p(\sigma^{2})\propto (\sigma^2)^{-(\alpha+1)}\exp{(-\frac{\beta}{\sigma^2})}
+$$
+where $(\alpha,\beta)$ are hyperparameters of the inverse-gamma distribution.
+
+\textit{posterior}: Inverse Gamma  
+$$
+p(\sigma^{2}|y_i:1\leq i\leq n)\propto (\sigma^2)^{-(\alpha+\frac{n}{2}+1)}\exp{(-\frac{1}{\sigma^2}(\beta+\frac{nv}{2}))}
+$$
+which is also an Inverse-Gamma distribution with parameters $(\alpha+\frac{n}{2},\beta+\frac{nv}{2})$.
+\section{Poisson model}
+
+\textit{data}: Poisson (number of counts)\\ 
+$$
+p(y_i:1\leq i\leq n|\theta)\propto \theta^{\sum_{i=1}^{n}y_i}e^{-n\theta}
+$$
+ 
+\textit{prior}: Gamma  \\
+$$
+p(\theta)\propto e^{-\beta\theta}\theta^{\alpha-1}
+$$
+where $(\alpha,\beta)$ are hyperparameters of the prior Gamma distribution.
+
+\textit{posterior}: Gamma \\ 
+$$
+p(\theta|y_i:1\leq i\leq n)\propto e^{-(\beta+n)\theta}\theta^{(\sum_{i=1}^{n}y_i+\alpha-1)}
+$$
+which is also a Gamma distribution with parameters $(\sum_{i=1}^{n}y_i+\alpha,\beta+n)$.
+
+\textit{prior predictive distribution}: Negative Binomial  \\
+The prior predictive distribution of a single observation from the Poisson model is
+$$
+p(y)=\frac{p(y|\theta)p(\theta)}{p(\theta|y)}=\frac{\Gamma(\alpha+y)\beta^{\alpha}}{\Gamma(\alpha)y!(1+\beta)^{\alpha+y}}=\binom{\alpha+y-1}{y}(\frac{\beta}{\beta+1})^{\alpha}(\frac{1}{\beta+1})^{y}
+$$
+which is a negative binomial distribution with parameters $(\alpha,\beta)$.
+
+\section{Exponential model}
+
+\textit{data}: Exponential (length of waiting time)\\ 
+$$
+p(y_i:1\leq i\leq n|\theta)\propto \theta^{n}\exp{(-\theta\sum_{i=1}^{n}y_i)}
+$$
+
+\textit{prior}: Gamma  \\
+$$
+p(\theta)\propto e^{-\beta\theta}\theta^{\alpha-1}
+$$
+which is also a Gamma distribution with parameters $(\sum_{i=1}^{n}y_i+\alpha,\beta+n)$.
+
+\textit{posterior}: Gamma 
+$$
+p(\theta|y_i:1\leq i\leq n)\propto e^{-(\beta+\sum_{i=1}^{n}y_i)\theta}\theta^{(n+\alpha-1)}
+$$
+
+\section{Discussion on posterior distribution}
+\begin{itemize}
+    \item The posterior distribution is centered around a point that represents
+        a compromise between the prior and the data and the compromise is controlled to a greater extent by the data as the sample size increases
+    \item The posterior variance is on average smaller than the prior variance
+    \item The posterior will become more concentrated if the prior and the data agrees
+    \item The posterior will become diffuse if they conflict. If this happens,
+        this implies inconsistency between the prior and the data.
+\end{itemize}
+
+\section{Informative prior distribution}
+\begin{itemize}
+    \item Population interpretation
+    \item State of knowledge interpretation
+    \item Cover all possible values
+\end{itemize}
+
+\section{Summary statistics of posterior distribution}
+
+\begin{itemize}
+    \item mean, median, mode, interquartile, etc.
+        \item standard deviation
+            \item $100(1 - \alpha)\%$ central posterior interval vs $100(1 -
+                \alpha)\%$ highest posterior density region. (See page 33 Figure
+                2.2 from \cite{gelman2014bayesian})
+            
+\end{itemize}
+
+
+%%%%%%%%%%%%%%%%%%% reference
+
+
+\begin{thebibliography}{}
+
+\bibitem{efron2012large}
+Bradley Efron.
+\newblock {\em Large-scale inference: empirical Bayes methods for estimation,
+  testing, and prediction}, Volume~1.
+\newblock Cambridge University Press, 2012.
+
+
+\bibitem{gelman2014bayesian}
+Andrew Gelman, John B Carlin, Hal S Stern, David B Dunson, Aki Vehtari, and Donald B Rubin.
+\newblock {\em Bayesian data analysis}, Volume~2.
+\newblock CRC press Boca Raton, FL, 2014.
+
+\end{thebibliography}
+
+
+\end{document}
+
+
+
+
+

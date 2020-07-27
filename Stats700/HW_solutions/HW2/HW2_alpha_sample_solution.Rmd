@@ -1,0 +1,130 @@
+---
+title: "Homework 2 Sample Solutions"
+author: "Courtesy of Chun-Chen Tu and Ran Bi"
+date: "Oct 16, 2017"
+output: 
+  pdf_document:
+    number_sections: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, cache=TRUE, warning=FALSE )
+library(ggplot2)
+library(GGally)
+library(dplyr)
+set.seed(1234)
+```
+
+```{r}
+# input the dataset
+df = data.frame(year=1976:1985, 
+                fatalAccidents=c(24, 25, 31, 31, 22, 21, 26, 20, 16, 22),
+                passengerDeaths=c(734, 516, 754, 877, 814, 362, 764, 809, 223, 1066),
+                deathRate=c(0.19, 0.12, 0.15, 0.16, 0.14, 0.06, 0.13, 0.13, 0.03, 0.15))
+df
+```
+# 
+I would choose a prior distribution with mean about 20. We know that Gamma distribution is the conjugate prior for Poisson distribution. Thus, I would choose Gamma($\alpha$, $\beta$) where $\alpha=40$, $\beta=2$. 
+
+Let $y_1, ..., y_N$, denote the fatal accidents from 1976 to 1985 ($N=10$) with Poisson($\theta$), the likelihood priot and the posterior distribution is:
+\begin{align}
+p(y|\theta) &\propto \prod_{n=1}^N \theta^{y_n}e^{-\theta} = \theta^{\sum_{n=1}^N y_n}e^{-n\theta} \\
+p(\theta)& \propto \theta^{\alpha-1}e^{-\beta \theta} \\
+p(\theta|y) &\propto \theta^{\alpha + \sum_{n=1}^N y_n -1} e^{-\theta(\beta+N)}
+\end{align}
+And thus the posterior distribution follows Gamma($\alpha+\sum_{n=1}^N y_n$, $\beta+N$), which is Gamma(278, 12)
+```{r}
+alpha = 40
+beta = 2
+x = seq(0, 50, length.out=1000)
+
+alpha_posterior = alpha + sum(df$fatalAccidents)
+beta_posterior = beta + nrow(df)
+
+# random sample from the posterior
+nsample = 10000
+theta = rgamma(nsample, alpha_posterior, beta_posterior)
+obs = rpois(nsample, theta)
+quantile(obs, c(0.025, 0.975))
+```
+
+The 95% predictive interval is [14, 33].
+
+Alternatively, we may use the Jeffrey's prior: $$J(\theta) \propto \sqrt{I(\theta)} = \sqrt{-E[\frac{d^2}{d\theta^2}log(\frac{e^{-\theta}\theta^y}{y!})|\theta]}=\sqrt{\theta^{-1}},$$
+which is improper.
+```{r}
+alpha = 1/2
+beta = 0
+x = seq(0, 50, length.out=1000)
+
+alpha_posterior = alpha + sum(df$fatalAccidents)
+beta_posterior = beta + nrow(df)
+
+# random sample from the posterior
+nsample = 10000
+theta = rgamma(nsample, alpha_posterior, beta_posterior)
+obs = rpois(nsample, theta)
+quantile(obs, c(0.025, 0.975))
+```
+
+The 95% predictive interval in this case is [15, 35]. Result is relatively insensitive to the choice of prior. If your result differs significantly from this numerical value, it is likely that there is something wrong with your solution.
+
+#
+First we have to calculate the numbers of passenger miles in each year:
+```{r}
+df = df %>% mutate(passengeMiles = passengerDeaths/deathRate*100*10e5)
+df
+```
+
+Let $x_n$ be the number of passenger flown in year $n$. The posterior distribution is:
+Gamma($\alpha+\sum_{n=1}^N y_n$, $\beta+\sum_{n=1}^N x_n$), which is Gamma(278, 5.7159$\times 10^{12}$)
+```{r}
+alpha = 40
+beta = 2
+alpha_posterior = alpha + sum(df$fatalAccidents)
+beta_posterior = beta + sum(df$passengeMiles)
+nsample = 10000
+theta = rgamma(nsample, alpha_posterior, beta_posterior)
+obs = rpois(nsample, theta*8e11)
+quantile(obs, c(0.025, 0.975))
+```
+The 95% predictive interval is [27, 53].
+
+
+#
+We choose the Jeffreys prior (Gamma distribution with $\alpha=1/2$, $\beta=0$)
+```{r}
+alpha = 1/2
+beta = 0
+x = seq(1, 1200, length.out=1000)
+
+alpha_posterior = alpha + sum(df$passengerDeaths)
+beta_posterior = beta + nrow(df)
+
+# random sample from the posterior
+nsample = 10000
+theta = rgamma(nsample, alpha_posterior, beta_posterior)
+obs = rpois(nsample, theta)
+quantile(obs, c(0.025, 0.975))
+```
+The 95% predictive interval is [639, 746].
+
+# 
+We choose the Jeffreys prior (Gamma distribution with $\alpha=1/2$, $\beta=0$)
+```{r}
+alpha = 1/2
+beta = 0
+alpha_posterior = alpha + sum(df$passengerDeaths)
+beta_posterior = beta + sum(df$passengeMiles)
+nsample = 10000
+theta = rgamma(nsample, alpha_posterior, beta_posterior)
+obs = rpois(nsample, theta*8e11)
+quantile(obs, c(0.025, 0.975))
+```
+The 95% predictive interval is [905, 1032].
+
+#
+The number of accidents data is more amenable to Poisson modeling, while the number of deaths is more appropriately modeled by a Compound Poisson Process. 
+
+Comparing a and b, it seems that the latter is more realistic in that the rate of accidents is proportional to passenger miles flown. Ignoring advances in safty technology over the years, it is natural to assume that the more passenger miles flown, the more accidents tend to happen.
+

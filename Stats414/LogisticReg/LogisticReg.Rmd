@@ -9,6 +9,9 @@ output:
   html_notebook: default
 ---
 
+Dataset for this tutorial can be found here:
+[LoanStatsTraining.csv](../data/LoanStatsTraining.csv)
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```

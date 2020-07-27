@@ -1,0 +1,222 @@
+%
+% This is the LaTeX template file for lecture notes for STATS700,
+% Bayesian Inference and Computations.  When preparing 
+% LaTeX notes for this class, please use this template.
+%
+% To familiarize yourself with this template, the body contains
+% some examples of its use.  Look them over.  Then you can
+% run LaTeX on this file.  After you have LaTeXed this file then
+% you can look over the result either by printing it out with
+% dvips or using xdvi.
+%
+% This template is based on the template for Prof. Sinclair's CS 270.
+
+\documentclass[twoside]{article}
+\usepackage{graphics}
+\usepackage{amsmath,mathtools,amssymb}
+\setlength{\oddsidemargin}{0.25 in}
+\setlength{\evensidemargin}{-0.25 in}
+\setlength{\topmargin}{-0.6 in}
+\setlength{\textwidth}{6.5 in}
+\setlength{\textheight}{8.5 in}
+\setlength{\headsep}{0.75 in}
+\setlength{\parindent}{0 in}
+\setlength{\parskip}{0.1 in}
+
+%
+% The following commands set up the lecnum (lecture number)
+% counter and make various numbering schemes work relative
+% to the lecture number.
+%
+\newcounter{lecnum}
+\renewcommand{\thepage}{\thelecnum-\arabic{page}}
+\renewcommand{\thesection}{\thelecnum.\arabic{section}}
+\renewcommand{\theequation}{\thelecnum.\arabic{equation}}
+\renewcommand{\thefigure}{\thelecnum.\arabic{figure}}
+\renewcommand{\thetable}{\thelecnum.\arabic{table}}
+
+%
+% The following macro is used to generate the header.
+%
+\newcommand{\lecture}[4]{
+   \pagestyle{myheadings}
+   \thispagestyle{plain}
+   \newpage
+   \setcounter{lecnum}{#1}
+   \setcounter{page}{1}
+   \noindent
+   \begin{center}
+   \framebox{
+      \vbox{\vspace{2mm}
+    \hbox to 6.28in { {\bf STATS 700 Bayesian Inference and Computation \hfill Fall 2017} }
+       \vspace{4mm}
+       \hbox to 6.28in { {\Large \hfill Lecture #1: #2  \hfill} }
+       \vspace{2mm}
+       \hbox to 6.28in { {\it Lecturer: #3 \hfill Scribes: #4} }
+      \vspace{2mm}}
+   }
+   \end{center}
+   \markboth{Lecture #1: #2}{Lecture #1: #2}
+   {\bf Disclaimer}: {\it These notes have not been subjected to the
+   usual scrutiny reserved for formal publications.  They may be distributed
+   outside this class only with the permission of the Instructor.}
+   \vspace*{4mm}
+}
+
+
+%Use this command for a figure; it puts a figure in wherever you want it.
+%usage: \fig{NUMBER}{SPACE-IN-INCHES}{CAPTION}
+\newcommand{\fig}[3]{
+			\vspace{#2}
+			\begin{center}
+			Figure \thelecnum.#1:~#3
+			\end{center}
+	}
+% Use these for theorems, lemmas, proofs, etc.
+\newtheorem{theorem}{Theorem}[lecnum]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{claim}[theorem]{Claim}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}[theorem]{Definition}
+\newenvironment{proof}{{\bf Proof:}}{\hfill\rule{2mm}{2mm}}
+
+% **** IF YOU WANT TO DEFINE ADDITIONAL MACROS FOR YOURSELF, PUT THEM HERE:
+
+\begin{document}
+%FILL IN THE RIGHT INFO.
+%\lecture{**LECTURE-NUMBER**}{**DATE**}{**LECTURER**}{**SCRIBE**}
+\lecture{4}{Sept 25 27}{Yang Cheng}{Anwesha Bhattacharyya, Jingqi Liu}
+%\footnotetext{These notes are partially based on those of Nigel Mansell.}
+
+% **** YOUR NOTES GO HERE:
+
+% Some general latex examples and examples making use of the
+% macros follow.  
+%**** IN GENERAL, BE BRIEF. LONG SCRIBE NOTES, NO MATTER HOW WELL WRITTEN,
+%**** ARE NEVER READ BY ANYBODY.
+
+\section{Nuisance Parameters}
+
+In a given model there might exist certain parameters that help in interpretation on computation, however these are not the parameters of interest, such parameters are called nuisance parameters.
+
+For example if the parameters in a model are $(\theta_1,\theta_2)$ where we are interested only in $p(\theta_1|y)$, then $\theta_2$ is a nuisance parameter. Here Y is the data available. 
+
+It is easy to obtain $p(\theta_1|Y)$ from $p(\theta_1,\theta_2|y)$ by integrating out $\theta_2$.
+
+The necessity of a nuisance parameter may simply arise from the fact that it is easier to sample from $p(\theta_2|y)$ and then conditionally simulate $\theta_1$ from $p(\theta_1|\theta_2,y)$. 
+
+
+\section{Non-informative priors}
+
+To quote Andrew Gelman, "Prior distributions that are uniform, or nearly so, and basically allow the information from the likelihood to be interpreted probabilistically. These are noninformative priors, or maybe, in some cases, weakly informative." 
+
+
+\subsection*{Gaussian example}
+Let $\{Y_i\}  \sim iid Gaussian(\mu,\sigma^2)$. We can place a non informative uniform prior on $(\mu,\log (\sigma))$. The reson for inducing a uniform prior on $\log(\sigma)$ is that it can take any value on the real line and is not bounded by the positivity constraint. But, more importantly it induces the conjugate prior inverse gamma or inverse chi-square on the parameter $\sigma^2$.
+
+Indeed the prior on $(\mu, \sigma)$ is given as
+\[p(\mu, \sigma^2) \propto (\sigma^2)^{-1} \]
+
+This results in the following posterior distribution. 
+\[p(\mu,\sigma^2|y) \propto \sigma^{-n-2}\exp\Bigg(\frac{-1}{2\sigma^2}\Big[(n-1)s^2 + n(\mu - \bar{y})^2\Big]\Bigg)\]
+
+As a consequence, we have the following
+\begin{itemize}
+	\item $(\mu|\sigma^2,y) \sim N(\bar{y},\sigma^2/n)$
+	\item $(\sigma^2|y) \sim Inv-\chi^2(n-1,s^2)$
+	\item $(\mu|y) \sim t_{n-1}(\bar{y}, s^2/n)$
+\end{itemize}
+It can be noted that as a result of non-informative prior the first conditional posterior of $(\mu|\sigma^2,y)$ is data driven and gives the same inference as a frequentist approach with concentrated variance $\sigma^2/n$. HOwever marginalizing out $\sigma^2$ we get the conditional posterior to be a t-distribution with heavier tails as compared to the gaussian distribution. This is essentially to account for the uncertainty of the data which is not known anymore and has been integrated out.
+
+\section{Jeffery's Prior}
+Jeffery?s Prior is proportional to the square root of the determinant of the Fisher information matrix.
+\[\mathbb P(\theta) = \sqrt{|det \mathcal I(\theta)}\]
+Jeffery?s Prior is invariant under reparameterization.
+Proof: 
+Suppose $\Theta = \Phi (\theta)$
+\[\mathcal I(\Theta) = \mathbb E(\frac{d\log{P(y|\Theta)}}{d\Theta})^2\]
+\[\mathcal I(\theta) = \mathbb E(...)|\frac{d\Theta}{d\theta}|^2\]
+\[\sqrt{\mathcal I(\theta)} = \sqrt{\mathcal I(\Theta)}|\frac{d\Theta}{d\theta}|\]
+
+\section{ Jeffery's Prior for Binomial Distribution}
+Suppose $y \sim Binomial(n,p), then its log-likelihood is \mathcal L = y\log{p} + (n-y)\log{(1-p)}$
+Then
+\[\mathbb E(-\frac{\partial L^2}{\partial p^2}) \propto p^{-\frac{1}{2}}(1-p)^{-\frac{1}{2}}\]
+So, under Jeffery?s method, the prior should look like the above.
+The posterior distribution then will be Beta Distribution
+\[\mathbb P(p|y) = p^{y - \frac{1}{2}}(1-p)^{n-y-\frac{1}{2}}\]
+
+\section{Jeffery's Prior for Gaussian Distribution}
+When both $\mu$ and $\sigma$ are known, $\mathbb P(\mu)P(\sigma^2)$ are more accepted prior compared with $P(\mu,\sigma^2)$
+Suppose $\mu \sim N(0,k_0^2) and y \sim N(\mu, \sigma^2)$
+Then the Jeffery?s Prior for $\mu$ will be $\mathbb P(\mu) \propto exp(- \frac{\mu^2}{2k_0^2})$
+\[\mathbb P(\mu,\sigma^2) \sim \mathbb P(\mu | \sigma^2)\mathbb P(\sigma^2) \times Likelihood\]
+\[\mathbb P(\mu,\sigma^2) = \sigma^2 exp(- \frac{\sum (y_i - y)^2}{2\sigma^2} - \frac{(y-\mu)^2}{2\sigma^2} - \frac{\mu^2}{2k_0^2})\]
+If we know $\sigma$ is 1 and $y \sim N(\mu, 1)$, by intuition, the Jeffery's prior of $\mu$ will be flat as the second derivative of log-likelihood is a constant and therefore, it's expectation is a constant.
+
+\section{ Why is Jeffery's Prior useful?}
+It is useful because of its invariance property. Consider for instance the binomial model with unknown
+proportion parameter $\theta$ and odds parameter $\psi = \frac{\theta}{1-\theta}$.
+The Jeffrey's posterior on $\theta$ reflects as best as possible the information about brought by the data. There is a one-to-one correspondence between $\theta$ and $\psi$. Then, transforming the Jeffrey's posterior on $\theta$ into a posterior on $\psi$ (via the usual change-of-variables formula) should yield a distribution reflecting as best as possible the information about $\psi$. Thus this distribution should be the Jeffrey's posterior about $\psi$. This is the invariance property.
+Also, an important point when drawing conclusions of a statistical analysis is scientific communication.
+Imagine you give the Jeffrey's posterior on $\theta$ to a scientific colleague. But he/she is interested in rather than $\theta$. Then this is not a problem with the invariance property: he/she just has to apply the change-of-variables formula.
+
+\section{Conjugate Priors for Gaussian Distribution}
+
+If the posterior distributions $\mathbb P(\theta |y)$ are in the same family as the prior probability distribution $\mathbb P(\theta)$, the prior is called a conjugate prior. From the example of Binomial distribution, the Jeffery's Prior of $p$ when the number of trials are fixed is beta distribution is also in exponential family. So, the Jeffery's prior for $p$ is a conjugate prior.
+
+\subsection*{prior}
+\[(\mu|\sigma^2) \sim N(\mu_0, \frac{\sigma^2}{\kappa_0})  \]
+\[(\sigma^2) \sim Inv-\chi^2(\nu_0, \sigma^2_0)\]
+
+\subsection*{Conditional and marginal posteriors}
+\[(\mu|\sigma^2,y) \sim N(\mu_n,\frac{\sigma^2}{\kappa_n})\]
+\[(\sigma^2|y) \sim Inv-\chi^2(\nu_n,\sigma_n)\]
+\[(\mu|y) \sim t_{\nu_n}(\mu_n, \sigma^2_n/\kappa_n)\]
+Here, we have 
+
+\begin{align}
+\kappa_n &= n +\kappa_0\\
+\mu_n &= \frac{\sigma^2}{\kappa_n}\Big[\frac{\kappa_0\mu_0 + n\bar{y}}{\sigma^2}\Big]\\
+\nu_n &= \nu_0 + n\\
+\sigma_n^2\nu_n &= \sigma_0^2\nu_0 + \sum_{i=1}^{n}(y_i - \bar{y})^2
+ + \frac{(\bar{y} - \mu_0)^2}{1/n + 1/\kappa_0} \end{align}
+
+  
+\subsection*{Multivariate Gaussian}
+If the variance is known we again use a conjugate Gaussian prior on the mean. If the variance is unknown then we can either use a non-informative prior as in the first case or use a conjugate Wishart distribution for the covariance. Once we get the joint posterior distribution little algebraic maneuver will yield the posterior predictive distribution. 
+
+\section{Bioassay Experiment}
+In clinical trials to determine the dosage of a drug, one needs to carry out bioassay experiments where different dosage levels are implement on different batches of animals/patients and  response is analyzed. 
+The setup here includes $(n_i,y_i,x_i)$ where $x_i$ is the dose level administered to $i_{th}$ batch. There are "k" dose levels corresponding to the "k" batches. $y_i$ is the positive response, in this case the number of alive mice out of the $n_i$ mice given the $x_i$ dose. 
+Since $y_i$ is count data with finite options it can be modelled as $Bin(n_i,\theta_i)$ where $\theta_i$ is the probability of success for dose $x_i$. Hence we can use a logit model to explain the dose response relation as
+\[logit(\theta_i) = \alpha + \beta x_i\]
+
+Using a uniform prior $p(\alpha,\beta) \propto 1$ we can carry out the posterior inference of the model and use R codes to draw the contour plots. Samling from the posterior we can get a histogram of the parameter $\frac{-\aleph}{\beta}$ which gives us an idea of dosage required for 50\% survival rate. 
+
+\begin{align*}
+& \theta_i = .5\\
+\implies& logit(\theta_i) = 0\\
+\implies & \alpha +\beta x_i = 0\\
+\implies & x_i = \frac{-\alpha}{\beta}
+\end{align*}
+
+\begin{thebibliography}{}
+
+
+
+\bibitem{gelman2014bayesian}
+Andrew Gelman, John B Carlin, Hal S Stern, David B Dunson, Aki Vehtari, and Donald B Rubin.
+\newblock {\em Bayesian data analysis}, Volume~2.
+\newblock CRC press Boca Raton, FL, 2014.
+
+\end{thebibliography}
+
+
+\end{document}
+
+
+
+
+
